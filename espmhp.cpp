@@ -9,7 +9,7 @@
  *
  * Requirements:
  * - https://github.com/geoffdavis/HeatPump#init_fix (until upstream is fixed)
- * - ESPHome 1.5.0-dev or greater
+ * - ESPHome 1.15.0-dev or greater
  */
 
 #include "espmhp.h"
