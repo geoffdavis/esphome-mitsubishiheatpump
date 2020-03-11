@@ -59,7 +59,7 @@ the `HardwareSerial` handle within the ESPHome framework.
 Create an ESPHome YAML configuration with the following sections:
  * `esphome: libraries:`
  * `climate:` - set up a custom climate, change the Serial port as needed.
- * ESP8266 only: `logger: baud\_rate: 0` - disables serial port logging on the
+ * ESP8266 only: `logger: baud_rate: 0` - disables serial port logging on the
    sole ESP8266 hardware UART
 
 ```yaml
