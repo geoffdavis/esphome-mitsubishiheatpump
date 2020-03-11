@@ -19,14 +19,14 @@ with the following MCUs:
 ## Supported Mitsubishi Climate Units
 The underlying HeatPump library works with a number of Mitsubishi HeatPump
 units. Basically, if the unit has a CN105 header on the main board, it should
-work with this library. The (HeatPump
-wiki)[https://github.com/SwiCago/HeatPump/wiki/Supported-models] has a more
+work with this library. The [HeatPump
+wiki](https://github.com/SwiCago/HeatPump/wiki/Supported-models) has a more
 exhaustive list.
 
 The whole integration with this libary and the underlying HeatPump has been
 tested by the author on the following units:
-* MSZ-GL06NA
-* MFZ-KA09NA
+* `MSZ-GL06NA`
+* `MFZ-KA09NA`
 
 ## Usage
 ### Step 1: Build a control circuit as detailed in the SwiCago/HeatPump README.
