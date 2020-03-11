@@ -51,11 +51,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
          *   poll_interval: polling interval in milliseconds
          */
         MitsubishiHeatPump(
-                HardwareSerial * hw_serial, uint32_t
-                poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
-        ) : PollingComponent(poll_interval) {
-            this->hw_serial_ = hw_serial;
-        }
+                HardwareSerial * hw_serial,
+                uint32_t poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
+        ) : PollingComponent(poll_interval);
 
         // Print a banner with library information.
         void banner() {

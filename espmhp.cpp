@@ -15,6 +15,20 @@
 
 #include "espmhp.h"
 
+/**
+ * Create a new MitsubishiHeatPump object
+ *
+ * Args:
+ *   hw_serial: pointer to an Arduino HardwareSerial instance
+ *   poll_interval: polling interval in milliseconds
+ */
+MitsubishiHeatPump(
+        HardwareSerial * hw_serial,
+        uint32_t poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
+) : PollingComponent(poll_interval) {
+    this->hw_serial_ = hw_serial;
+}
+
 void MitsubishiHeatPump::check_logger_conflict_() {
     #ifdef USE_LOGGER
         if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
