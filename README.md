@@ -1,8 +1,7 @@
 # esphome-mitsubishiheatpump
-ESPHome Climate Component for Mitsubishi Heatpumps using direct serial connection
 
-Wirelessly control your Mitsubishi Comfort HeatPump with an ESP8266 or ESP32
-using the [ESPHome](https://esphome.io) framework.
+Wirelessly control your Mitsubishi Comfort HVAC equipment with an ESP8266 or
+ESP32 using the [ESPHome](https://esphome.io) framework.
 
 ## Features
 * Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
@@ -26,7 +25,8 @@ work with this library. The [HeatPump
 wiki](https://github.com/SwiCago/HeatPump/wiki/Supported-models) has a more
 exhaustive list.
 
-The same `CN105` connector is used by the Mitsubishi Kumocloud remotes, which have a
+The same `CN105` connector is used by the Mitsubishi KumoCloud remotes, which
+have a
 [compatibility list](https://www.mitsubishicomfort.com/kumocloud/compatibility)
 available.
 
@@ -42,7 +42,7 @@ Build a control circuit with your MCU as detailed in the [SwiCago/HeatPump
  README](https://github.com/SwiCago/HeatPump/blob/master/README.md).
 You can use either an ESP8266 or an ESP32 for this.
 
-Note that several users have reported that they've been able to get away with
+Note: several users have reported that they've been able to get away with
 not using the pull-up resistors, and just [directly connecting a Wemos D1 mini
 to the control
 board](https://github.com/SwiCago/HeatPump/issues/13#issuecomment-457897457)
@@ -62,15 +62,6 @@ On Hass.IO, you'll want to do something like:
 * `git clone https://github.com/geoffdavis/esphome-mitsubishiheatpump.git`
 
 ### Step 3: Configure your ESPHome device with YAML
-
-Note: this component DOES NOT use the ESPHome `uart` component, as it requires
-direct access to a hardware UART via the Arduino `HardwareSerial` class. The
-Mitsubishi Heatpump units use an atypical serial port setting ("even parity").
-Parity bit support is not implemented in any of the existing software serial
-libraries, including the one in ESPHome.
-
-There's currently no way to guarantee access to a hardware UART nor retrieve
-the `HardwareSerial` handle within the ESPHome framework.
 
 Create an ESPHome YAML configuration with the following sections:
  * `esphome: libraries: [https://github.com/geoffdavis/HeatPump#init_fix]`
@@ -99,6 +90,14 @@ climate:
     climates:
       - name: "My Heat Pump"
 ```
+
+Note: this component DOES NOT use the ESPHome `uart` component, as it requires
+direct access to a hardware UART via the Arduino `HardwareSerial` class. The
+Mitsubishi Heatpump units use an atypical serial port setting ("even parity").
+Parity bit support is not implemented in any of the existing software serial
+libraries, including the one in ESPHome. There's currently no way to guarantee
+access to a hardware UART nor retrieve the `HardwareSerial` handle from the
+`uart` component within the ESPHome framework.
 
 # Example configuration
 
