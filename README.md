@@ -6,17 +6,22 @@ Wirelessly control your Mitsubishi Comfort HeatPump with an ESP8266 or ESP32 usi
 ## Features
 * Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
 * Direct control without the remote.
-* Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino libary to talk to the unit directly via the internal J105 header.
-* NOTE: REQUIRES SEVERAL FIXES - SEE https://github.com/SwiCago/HeatPump/pull/155
+* Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino libary to talk to the unit directly via the internal CN105 header.
+  NOTE: REQUIRES SEVERAL FIXES - SEE [PR #155](https://github.com/SwiCago/HeatPump/pull/155)
 
 ## Supported Microcontrollers
-This library should work on most ESP8266 or ESP32 platforms. It has been tested with the following:
+This library should work on most ESP8266 or ESP32 platforms. It has been tested
+with the following MCUs:
 * Generic ESP-01S board (ESP8266)
 * WeMos D1 Mini (ESP8266)
 * Generic ESP32 Dev Kit (ESP32)
 
 ## Supported Mitsubishi Climate Units
-The underlying HeatPump library works with a number of Mitsubishi HeatPump units. Basically, if the unit has a J105 header on the main board, it should work with this library.
+The underlying HeatPump library works with a number of Mitsubishi HeatPump
+units. Basically, if the unit has a CN105 header on the main board, it should
+work with this library. The (HeatPump
+wiki)[https://github.com/SwiCago/HeatPump/wiki/Supported-models] has a more
+exhaustive list.
 
 The whole integration with this libary and the underlying HeatPump has been
 tested by the author on the following units:
@@ -24,12 +29,14 @@ tested by the author on the following units:
 * MFZ-KA09NA
 
 ## Usage
-### Build a control circuit as detailed in the SwiCago/HeatPump README.
+### Step 1: Build a control circuit as detailed in the SwiCago/HeatPump README.
 You can use either an ESP8266 or an ESP32 for this.
 
-### Clone this repository into your ESPHome configuration directory
+### Step 2: Clone this repository into your ESPHome configuration directory
 
-This repository needs to live in your ESPHome configuration directory, as it doesn't work correctly when used as a Platform.IO library, and there doesn't seem to be an analog for that functionality for esphome code.
+This repository needs to live in your ESPHome configuration directory, as it
+doesn't work correctly when used as a Platform.IO library, and there doesn't
+seem to be an analog for that functionality for ESPHome code.
 
 On Hass.IO, you'll want to do something like:
 
@@ -38,12 +45,13 @@ On Hass.IO, you'll want to do something like:
 * `cd src`
 * `git clone https://github.com/geoffdavis/esphome-mitsubishiheatpump.git`
 
-### Configure your ESPHome device with YAML
+### Step 3: Configure your ESPHome device with YAML
 
 Note: this component DOES NOT use the ESPHome `uart` component, as it requires
 direct access to a hardware UART via the Arduino `HardwareSerial` class. The
-Mitsubishi Heatpump uses an untypical serial port setting, which are not
-implemented in any of the existing software serial libraries.
+Mitsubishi Heatpump units use an atypical serial port setting ("even parity").
+Parity bit support is not implemented in any of the existing software serial
+libraries, including the one in ESPHome.
 
 There's currently no way to guarantee access to a hardware UART nor retrieve
 the `HardwareSerial` handle within the ESPHome framework.
@@ -147,8 +155,8 @@ particularly robust, but the controls worked fine. Like this ESPHome
 repository, it will automatically register the device in your HomeAssistant
 instance if you have HA configured to do so.
 
-There's also the built-in to ESPHome [Mitsubishi]
-(https://github.com/esphome/esphome/blob/dev/esphome/components/mitsubishi/mitsubishi.h)
+There's also the built-in to ESPHome
+[Mitsubishi](https://github.com/esphome/esphome/blob/dev/esphome/components/mitsubishi/mitsubishi.h)
 climate component. It's only in the `dev` branch at the moment (2020-03-11).
 The big drawback with the built-in component is that it uses Infrared Remote
 commands to talk to the Heat Pump. By contrast, the approach used by this
