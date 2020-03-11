@@ -195,8 +195,8 @@ climate:
 ## Other Implementations
 The [gysmo38/mitsubishi2MQTT](https://github.com/gysmo38/mitsubishi2MQTT)
   Arduino sketch also uses the `SwiCago/HeatPump`
-library, and works with MQTT directly. I found it's WiFi stack to not be
-particularly robust, but the controls worked fine. Like this ESPHome
+library, and works with MQTT directly. The author found it's WiFi stack to not
+be particularly robust, but the controls worked fine. Like this ESPHome
 repository, it will automatically register the device in your HomeAssistant
 instance if you have HA configured to do so.
 
