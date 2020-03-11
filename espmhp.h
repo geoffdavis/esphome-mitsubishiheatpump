@@ -16,9 +16,9 @@
 //#define USE_CALLBACKS
 #pragma once
 
-#include "esphome/components/climate.h"
-#include "esphome/components/climate_traits.h"
-#include "esphome/components/climate_mode.h"
+#include "esphome/components/climate/climate.h"
+#include "esphome/components/climate/climate_traits.h"
+#include "esphome/components/climate/climate_mode.h"
 #include "esphome/core/component.h"
 
 #include "HeatPump.h"
