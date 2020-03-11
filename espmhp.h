@@ -14,18 +14,17 @@
 
 // Uncomment to use HeatPump callback functions (broken, causes boot failures)
 //#define USE_CALLBACKS
-#pragma once
 
-#include "esphome/components/climate/climate.h"
-#include "esphome/components/climate/climate_traits.h"
-#include "esphome/components/climate/climate_mode.h"
-#include "esphome/core/component.h"
-
+#include "esphome.h"
 #include "HeatPump.h"
+using namespace esphome;
 
-static const char *TAG = "MitsubishiHeatPump"; // Logging tag
+#ifndef ESPMHP_H
+#define ESPMHP_H
 
-static const char *ESPMHP_VERSION = "1.0.0-dev";
+static const char* TAG = "MitsubishiHeatPump"; // Logging tag
+
+static const char* ESPMHP_VERSION = "1.0.0-dev";
 
 /* If polling interval is greater than 9 seconds, the HeatPump
 library reconnects, but doesn't then follow up with our data request.*/
@@ -38,10 +37,10 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
 static const uint8_t ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
 
+
 class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
     public:
-
 
         /**
          * Create a new MitsubishiHeatPump object
@@ -51,14 +50,15 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
          *   poll_interval: polling interval in milliseconds
          */
         MitsubishiHeatPump(
-                HardwareSerial * hw_serial,
-                uint32_t poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
-        ) : PollingComponent(poll_interval);
+            HardwareSerial* hw_serial,
+            uint32_t poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
+        );
 
         // Print a banner with library information.
         void banner() {
             ESP_LOGI(TAG, "ESPHome MitsubishiHeatPump version %s",
                     ESPMHP_VERSION);
+        }
 
         // print the current configuration
         void dump_config() override;
@@ -102,6 +102,8 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
-        HardwareSerial *hw_serial_{nullptr};
+        HardwareSerial *hw_serial_;
 
 };
+
+#endif

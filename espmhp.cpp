@@ -12,8 +12,8 @@
  * - ESPHome 1.5.0-dev or greater
  */
 
-
 #include "espmhp.h"
+using namespace esphome;
 
 /**
  * Create a new MitsubishiHeatPump object
@@ -22,33 +22,34 @@
  *   hw_serial: pointer to an Arduino HardwareSerial instance
  *   poll_interval: polling interval in milliseconds
  */
-MitsubishiHeatPump(
-        HardwareSerial * hw_serial,
-        uint32_t poll_interval=ESPMHP_POLL_INTERVAL_DEFAULT
-) : PollingComponent(poll_interval) {
-    this->hw_serial_ = hw_serial;
-}
+MitsubishiHeatPump::MitsubishiHeatPump(
+        HardwareSerial* hw_serial,
+        uint32_t poll_interval
+) :
+    PollingComponent{poll_interval}, // member initializers list
+    hw_serial_{hw_serial}
+{ }
 
 void MitsubishiHeatPump::check_logger_conflict_() {
-    #ifdef USE_LOGGER
-        if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
-            ESP_LOGW(TAG, "  You're using the same serial port for logging"
-                    " and the MitsubishiHeatPump component. Please disable"
-                    " logging over the serial port by setting"
-                    " logger:baud_rate to 0.");
-        }
-    #endif
+#ifdef USE_LOGGER
+    if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
+        ESP_LOGW(TAG, "  You're using the same serial port for logging"
+                " and the MitsubishiHeatPump component. Please disable"
+                " logging over the serial port by setting"
+                " logger:baud_rate to 0.");
+    }
+#endif
 }
 
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     //this->dump_config();
-    hp->sync();
-    #ifndef USE_CALLBACKS
-        this->hpSettingsChanged();
-        heatpumpStatus currentStatus = hp->getStatus();
-        this->hpStatusChanged(currentStatus);
-    #endif
+    this->hp->sync();
+#ifndef USE_CALLBACKS
+    this->hpSettingsChanged();
+    heatpumpStatus currentStatus = hp->getStatus();
+    this->hpStatusChanged(currentStatus);
+#endif
 }
 
 /**
@@ -59,7 +60,7 @@ void MitsubishiHeatPump::update() {
  * ESPHome, particularly the Dry operation mode, and several of the fan modes.
  *
  * Returns:
- *   This class' supported ESPHome climate::ClimateTraits.
+ *   This class' supported climate::ClimateTraits.
  */
 climate::ClimateTraits MitsubishiHeatPump::traits() {
     auto traits = climate::ClimateTraits();
@@ -136,8 +137,10 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     }
 
     if (call.get_target_temperature().has_value()){
-        ESP_LOGV("control", "Sending target temp: %.1f",
-                *call.get_target_temperature())
+        ESP_LOGV(
+            "control", "Sending target temp: %.1f",
+            *call.get_target_temperature()
+        )
         hp->setTemperature(*call.get_target_temperature());
         updated = true;
     }
@@ -201,9 +204,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     }
     ESP_LOGD(TAG, "control - Was HeatPump updated? %s", YESNO(updated));
     hp->update();
-
-    #endif
-
 }
 
 void MitsubishiHeatPump::hpSettingsChanged() {
@@ -230,15 +230,15 @@ void MitsubishiHeatPump::hpSettingsChanged() {
      */
     if (strcmp(currentSettings.power, "ON") == 0) {
         if (strcmp(currentSettings.mode, "HEAT") == 0) {
-            this->mode = CLIMATE_MODE_HEAT;
+            this->mode = climate::CLIMATE_MODE_HEAT;
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
-            this->mode = CLIMATE_MODE_DRY;
+            this->mode = climate::CLIMATE_MODE_DRY;
         } else if (strcmp(currentSettings.mode, "COOL") == 0) {
-            this->mode = CLIMATE_MODE_COOL;
+            this->mode = climate::CLIMATE_MODE_COOL;
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
-            this->mode = CLIMATE_MODE_FAN_ONLY;
+            this->mode = climate::CLIMATE_MODE_FAN_ONLY;
         } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
-            this->mode = CLIMATE_MODE_AUTO;
+            this->mode = climate::CLIMATE_MODE_AUTO;
         } else {
             ESP_LOGW(
                     TAG,
@@ -247,7 +247,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             );
         }
     } else {
-        this->mode = CLIMATE_MODE_OFF;
+        this->mode = climate::CLIMATE_MODE_OFF;
     }
 
     ESP_LOGI(TAG, "Climate mode is: %i", this->mode);
@@ -258,17 +258,17 @@ void MitsubishiHeatPump::hpSettingsChanged() {
      * const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
      */
     if (strcmp(currentSettings.fan, "QUIET") == 0) {
-        this->fan_mode = CLIMATE_FAN_DIFFUSE;
+        this->fan_mode = climate::CLIMATE_FAN_DIFFUSE;
     } else if (strcmp(currentSettings.fan, "1") == 0) {
-            this->fan_mode = CLIMATE_FAN_LOW;
+            this->fan_mode = climate::CLIMATE_FAN_LOW;
     } else if (strcmp(currentSettings.fan, "2") == 0) {
-            this->fan_mode = CLIMATE_FAN_MEDIUM;
+            this->fan_mode = climate::CLIMATE_FAN_MEDIUM;
     } else if (strcmp(currentSettings.fan, "3") == 0) {
-            this->fan_mode = CLIMATE_FAN_MIDDLE;
+            this->fan_mode = climate::CLIMATE_FAN_MIDDLE;
     } else if (strcmp(currentSettings.fan, "4") == 0) {
-            this->fan_mode = CLIMATE_FAN_HIGH;
+            this->fan_mode = climate::CLIMATE_FAN_HIGH;
     } else { //case "AUTO" or default:
-        this->fan_mode = CLIMATE_FAN_AUTO;
+        this->fan_mode = climate::CLIMATE_FAN_AUTO;
     }
     ESP_LOGI(TAG, "Fan mode is: %i", this->fan_mode);
 
@@ -279,10 +279,10 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             (strcmp(currentSettings.vane, "AUTO") == 0)
             || (strcmp(currentSettings.vane, "SWING") == 0)
     ) {
-        this->swing_mode = CLIMATE_SWING_VERTICAL;
+        this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
     }
     else {
-        this->swing_mode = CLIMATE_SWING_OFF;
+        this->swing_mode = climate::CLIMATE_SWING_OFF;
     }
     ESP_LOGI(TAG, "Swing mode is: %i", this->swing_mode);
 
@@ -327,7 +327,7 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
 
-    #ifdef USE_CALLBACKS
+#ifdef USE_CALLBACKS
     hp->setSettingsChangedCallback(
             [this]() {
                 this->hpSettingsChanged();
@@ -339,7 +339,7 @@ void MitsubishiHeatPump::setup() {
                 this->hpStatusChanged(currentStatus);
             }
     );
-    #endif
+#endif
 
     ESP_LOGCONFIG(
             TAG,
