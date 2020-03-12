@@ -8,8 +8,11 @@ ESP32 using the [ESPHome](https://esphome.io) framework.
 * Direct control without the remote.
 * Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino
   libary to talk to the unit directly via the internal `CN105` connector.
-  NOTE: REQUIRES SEVERAL FIXES - SEE [PR
-  #155](https://github.com/SwiCago/HeatPump/pull/155)
+  NOTE: REQUIRES SEVERAL FIXES - SEE [PR #155](https://github.com/SwiCago/HeatPump/pull/155)
+
+## Requirements
+* https://github.com/geoffdavis/HeatPump#init_fix (until upstream is fixed)
+* ESPHome 1.15.0-dev or greater 
 
 ## Supported Microcontrollers
 This library should work on most ESP8266 or ESP32 platforms. It has been tested
@@ -48,7 +51,11 @@ to the control
 board](https://github.com/SwiCago/HeatPump/issues/13#issuecomment-457897457)
 via CN105.
 
-### Step 2: Clone this repository into your ESPHome configuration directory
+### Step 2: Use ESPHome 1.15.0-dev or higher
+
+The code in this repository makes use of a number of features in the as-yet unreleased 1.15.0 version of ESPHome, including various Fan modes.
+
+### Step 3: Clone this repository into your ESPHome configuration directory
 
 This repository needs to live in your ESPHome configuration directory, as it
 doesn't work correctly when used as a Platform.IO library, and there doesn't
@@ -61,7 +68,7 @@ On Hass.IO, you'll want to do something like:
 * `cd src`
 * `git clone https://github.com/geoffdavis/esphome-mitsubishiheatpump.git`
 
-### Step 3: Configure your ESPHome device with YAML
+### Step 4: Configure your ESPHome device with YAML
 
 Create an ESPHome YAML configuration with the following sections:
  * `esphome: libraries: [https://github.com/geoffdavis/HeatPump#init_fix]`
