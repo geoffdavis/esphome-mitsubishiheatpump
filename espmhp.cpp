@@ -8,7 +8,7 @@
  * License: BSD
  *
  * Requirements:
- * - https://github.com/geoffdavis/HeatPump#init_fix (until upstream is fixed)
+ * - https://github.com/SwiCago/HeatPump
  * - ESPHome 1.15.0-dev or greater
  */
 
