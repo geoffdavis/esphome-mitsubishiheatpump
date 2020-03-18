@@ -8,11 +8,10 @@ ESP32 using the [ESPHome](https://esphome.io) framework.
 * Direct control without the remote.
 * Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino
   libary to talk to the unit directly via the internal `CN105` connector.
-  NOTE: REQUIRES SEVERAL FIXES - SEE [PR #155](https://github.com/SwiCago/HeatPump/pull/155)
 
 ## Requirements
-* https://github.com/geoffdavis/HeatPump#init_fix (until upstream is fixed)
-* ESPHome 1.15.0-dev or greater 
+* https://github.com/SwiCago/HeatPump
+* ESPHome 1.15.0-dev or greater
 
 ## Supported Microcontrollers
 This library should work on most ESP8266 or ESP32 platforms. It has been tested
@@ -71,7 +70,7 @@ On Hass.IO, you'll want to do something like:
 ### Step 4: Configure your ESPHome device with YAML
 
 Create an ESPHome YAML configuration with the following sections:
- * `esphome: libraries: [https://github.com/geoffdavis/HeatPump#init_fix]`
+ * `esphome: libraries: [https://github.com/SwiCago/HeatPump]`
  * `esphome: includes: [src/esphome-mitsubishiheatpump]`
  * `climate:` - set up a custom climate entry, change the Serial port as needed.
  * ESP8266 only: `logger: baud_rate: 0` - disable serial port logging on the
@@ -121,8 +120,7 @@ esphome:
   # Boards tested: ESP-01S (ESP8266), Wemos D1 Mini (ESP8266); ESP32 Wifi-DevKit2
 
   libraries:
-    #- SwiCago/HeatPump
-    - https://github.com/geoffdavis/HeatPump#init_fix
+    - SwiCago/HeatPump
 
   includes:
     - src/esphome-mitsubishiheatpump

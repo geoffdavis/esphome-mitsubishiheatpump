@@ -8,12 +8,11 @@
  * License: BSD
  *
  * Requirements:
- * - https://github.com/geoffdavis/HeatPump#init_fix (until upstream is fixed)
+ * - https://github.com/SwiCago/HeatPump
  * - ESPHome 1.15.0-dev or greater
  */
 
-// Uncomment to use HeatPump callback functions (broken, causes boot failures)
-//#define USE_CALLBACKS
+#define USE_CALLBACKS
 
 #include "esphome.h"
 #include "HeatPump.h"
@@ -24,11 +23,11 @@ using namespace esphome;
 
 static const char* TAG = "MitsubishiHeatPump"; // Logging tag
 
-static const char* ESPMHP_VERSION = "1.0.2";
+static const char* ESPMHP_VERSION = "1.1.0";
 
 /* If polling interval is greater than 9 seconds, the HeatPump
 library reconnects, but doesn't then follow up with our data request.*/
-static const uint32_t ESPMHP_POLL_INTERVAL_DEFAULT = 2000; // in milliseconds,
+static const uint32_t ESPMHP_POLL_INTERVAL_DEFAULT = 500; // in milliseconds,
                                                            // 0 < X <= 9000
 static const uint8_t ESPMHP_MIN_TEMPERATURE = 16; // degrees C,
                                                   // defined by hardware
