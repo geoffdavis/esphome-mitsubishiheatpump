@@ -206,6 +206,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         }
     }
     ESP_LOGD(TAG, "control - Was HeatPump updated? %s", YESNO(updated));
+
     // send the update back to esphome:
     this->publish_state();
     // and the heat pump:
@@ -305,14 +306,18 @@ void MitsubishiHeatPump::hpSettingsChanged() {
      * Compute running state from mode & temperatures
      */
     this->action = climate::CLIMATE_ACTION_OFF;
-    if (this->mode == climate::CLIMATE_MODE_HEAT) {
-      if (this->current_temperature < this->target_temperature) {
-	this->action = climate::CLIMATE_ACTION_HEATING;
-      }
-    } else if(this->mode == climate::CLIMATE_MODE_COOL) {
-      if (this->current_temperature > this->target_temperature) {
-	this->action = climate::CLIMATE_ACTION_COOLING;
-      }
+    switch (this->mode) {
+      case climate::CLIMATE_MODE_HEAT:
+        if (this->current_temperature < this->target_temperature) {
+          this->action = climate::CLIMATE_ACTION_HEATING;
+        }
+        break;
+      case climate::CLIMATE_MODE_COOL:
+      case climate::CLIMATE_MODE_DRY:
+        if (this->current_temperature > this->target_temperature) {
+          this->action = climate::CLIMATE_ACTION_COOLING;
+        }
+        break;
     }
 
     /*
