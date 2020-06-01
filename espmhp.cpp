@@ -317,8 +317,8 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 this->action = climate::CLIMATE_ACTION_COOLING;
             }
             break;
-      default:
-          this->action = climate::CLIMATE_ACTION_OFF;
+        default:
+            this->action = climate::CLIMATE_ACTION_OFF;
     }
 
     /*
