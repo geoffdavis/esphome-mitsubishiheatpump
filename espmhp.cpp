@@ -4,7 +4,8 @@
  * Implementation of esphome-mitsubishiheatpump
  *
  * Author: Geoff Davis.<geoff@geoffdavis.com>
- * Date: 2020-03-11
+ * Author: Phil Genera @pgenera on Github.
+ * Last Updated: 2020-06-02
  * License: BSD
  *
  * Requirements:
@@ -102,6 +103,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
 
     bool updated = false;
     if (call.get_mode().has_value()){
+        this->mode = *call.get_mode();
         switch (*call.get_mode()) {
             case climate::CLIMATE_MODE_COOL:
                 hp->setModeSetting("COOL");
@@ -142,13 +144,14 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             *call.get_target_temperature()
         )
         hp->setTemperature(*call.get_target_temperature());
+        this->target_temperature = *call.get_target_temperature();
         updated = true;
     }
 
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (call.get_fan_mode().has_value()) {
         ESP_LOGV("control", "Requested fan mode is %s", *call.get_fan_mode());
-
+        this->fan_mode = *call.get_fan_mode();
         switch(*call.get_fan_mode()) {
             case climate::CLIMATE_FAN_OFF:
                 hp->setPowerSetting("OFF");
@@ -188,6 +191,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(TAG, "control - requested swing mode is %s",
                 *call.get_swing_mode());
 
+        this->swing_mode = *call.get_swing_mode();
         switch(*call.get_swing_mode()) {
             case climate::CLIMATE_SWING_OFF:
                 hp->setVaneSetting("AUTO");
@@ -203,6 +207,10 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         }
     }
     ESP_LOGD(TAG, "control - Was HeatPump updated? %s", YESNO(updated));
+
+    // send the update back to esphome:
+    this->publish_state();
+    // and the heat pump:
     hp->update();
 }
 
@@ -294,6 +302,32 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     this->target_temperature = currentSettings.temperature;
     ESP_LOGI(TAG, "Target temp is: %f", this->target_temperature);
 
+
+    /*
+     * Compute running state from mode & temperatures
+     */
+    switch (this->mode) {
+        case climate::CLIMATE_MODE_HEAT:
+            if (this->current_temperature < this->target_temperature) {
+                this->action = climate::CLIMATE_ACTION_HEATING;
+            }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
+            break;
+        case climate::CLIMATE_MODE_COOL:
+            if (this->current_temperature > this->target_temperature) {
+                this->action = climate::CLIMATE_ACTION_COOLING;
+            }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
+            break;
+        case climate::CLIMATE_MODE_DRY:
+            this->action = climate::CLIMATE_ACTION_DRYING;
+        default:
+            this->action = climate::CLIMATE_ACTION_OFF;
+    }
 
     /*
      * ******** Publish state back to ESPHome. ********
