@@ -4,7 +4,8 @@
  * Implementation of esphome-mitsubishiheatpump
  *
  * Author: Geoff Davis.<geoff@geoffdavis.com>
- * Date: 2020-03-11
+ * Author: Phil Genera @pgenera on Github.
+ * Last Updated: 2020-06-02
  * License: BSD
  *
  * Requirements:
