@@ -33,7 +33,7 @@ static const uint8_t ESPMHP_MIN_TEMPERATURE = 16; // degrees C,
                                                   // defined by hardware
 static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
                                                   //defined by hardware
-static const uint8_t ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
+static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
 
 
