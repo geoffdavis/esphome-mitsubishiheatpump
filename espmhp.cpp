@@ -310,13 +310,20 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             if (this->current_temperature < this->target_temperature) {
                 this->action = climate::CLIMATE_ACTION_HEATING;
             }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
             break;
         case climate::CLIMATE_MODE_COOL:
-        case climate::CLIMATE_MODE_DRY:
             if (this->current_temperature > this->target_temperature) {
                 this->action = climate::CLIMATE_ACTION_COOLING;
             }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
             break;
+        case climate::CLIMATE_MODE_DRY:
+            this->action = climate::CLIMATE_ACTION_DRYING;
         default:
             this->action = climate::CLIMATE_ACTION_OFF;
     }
