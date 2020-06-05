@@ -102,17 +102,26 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     ESP_LOGV(TAG, "Control called.");
 
     bool updated = false;
+    bool has_temp = call.get_target_temperature().has_value();
     if (call.get_mode().has_value()){
         this->mode = *call.get_mode();
         switch (*call.get_mode()) {
             case climate::CLIMATE_MODE_COOL:
                 hp->setModeSetting("COOL");
                 hp->setPowerSetting("ON");
+                if (cool_setpoint.has_value() && !has_temp) {
+                    hp->setTemperature(cool_setpoint.value());
+                    this->target_temperature = cool_setpoint.value();
+                }
                 updated = true;
                 break;
             case climate::CLIMATE_MODE_HEAT:
                 hp->setModeSetting("HEAT");
                 hp->setPowerSetting("ON");
+                if (heat_setpoint.has_value() && !has_temp) {
+                    hp->setTemperature(heat_setpoint.value());
+                    this->target_temperature = heat_setpoint.value();
+                }
                 updated = true;
                 break;
             case climate::CLIMATE_MODE_DRY:
@@ -123,6 +132,10 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             case climate::CLIMATE_MODE_AUTO:
                 hp->setModeSetting("AUTO");
                 hp->setPowerSetting("ON");
+                if (auto_setpoint.has_value() && !has_temp) {
+                    hp->setTemperature(auto_setpoint.value());
+                    this->target_temperature = auto_setpoint.value();
+                }
                 updated = true;
                 break;
             case climate::CLIMATE_MODE_FAN_ONLY:
@@ -138,11 +151,11 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         }
     }
 
-    if (call.get_target_temperature().has_value()){
+    if (has_temp){
         ESP_LOGV(
             "control", "Sending target temp: %.1f",
             *call.get_target_temperature()
-        )
+        );
         hp->setTemperature(*call.get_target_temperature());
         this->target_temperature = *call.get_target_temperature();
         updated = true;
@@ -239,14 +252,26 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     if (strcmp(currentSettings.power, "ON") == 0) {
         if (strcmp(currentSettings.mode, "HEAT") == 0) {
             this->mode = climate::CLIMATE_MODE_HEAT;
+            if (heat_setpoint != currentSettings.temperature) {
+                heat_setpoint = currentSettings.temperature;
+                save(currentSettings.temperature, heat_storage);
+            }
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
             this->mode = climate::CLIMATE_MODE_DRY;
         } else if (strcmp(currentSettings.mode, "COOL") == 0) {
             this->mode = climate::CLIMATE_MODE_COOL;
+            if (cool_setpoint != currentSettings.temperature) {
+                cool_setpoint = currentSettings.temperature;
+                save(currentSettings.temperature, cool_storage);
+            }
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
         } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
             this->mode = climate::CLIMATE_MODE_AUTO;
+            if (auto_setpoint != currentSettings.temperature) {
+                auto_setpoint = currentSettings.temperature;
+                save(currentSettings.temperature, auto_storage);
+            }
         } else {
             ESP_LOGW(
                     TAG,
@@ -397,7 +422,35 @@ void MitsubishiHeatPump::setup() {
         this->mark_failed();
     }
 
+    // create various setpoint persistence:
+    cool_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 1);
+    heat_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 2);
+    auto_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 3);
+
+    // load values from storage:
+    cool_setpoint = load(cool_storage);
+    heat_setpoint = load(heat_storage);
+    auto_setpoint = load(auto_storage);
+
     this->dump_config();
+}
+
+/**
+ * The ESP only has a few bytes of rtc storage, so instead
+ * of storing floats directly, we'll store the number of 
+ * TEMPERATURE_STEPs from MIN_TEMPERATURE.
+ **/
+void MitsubishiHeatPump::save(float value, ESPPreferenceObject& storage) {
+    uint8_t steps = (value - ESPMHP_MIN_TEMPERATURE) / ESPMHP_TEMPERATURE_STEP;
+    storage.save(&steps);
+}
+
+optional<float> MitsubishiHeatPump::load(ESPPreferenceObject& storage) {
+    uint8_t steps = 0;
+    if (!storage.load(&steps)) {
+        return {};
+    }
+    return ESPMHP_MIN_TEMPERATURE + (steps * ESPMHP_TEMPERATURE_STEP);
 }
 
 void MitsubishiHeatPump::dump_config() {
@@ -405,6 +458,9 @@ void MitsubishiHeatPump::dump_config() {
     ESP_LOGI(TAG, "  Supports HEAT: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports COOL: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports AWAY mode: %s", YESNO(false));
+    ESP_LOGI(TAG, "  Saved heat: %.1f", heat_setpoint.value_or(-1));
+    ESP_LOGI(TAG, "  Saved cool: %.1f", cool_setpoint.value_or(-1));
+    ESP_LOGI(TAG, "  Saved auto: %.1f", auto_setpoint.value_or(-1));
 }
 
 void MitsubishiHeatPump::dump_state() {

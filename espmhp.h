@@ -15,6 +15,8 @@
 #define USE_CALLBACKS
 
 #include "esphome.h"
+#include "esphome/core/preferences.h"
+
 #include "HeatPump.h"
 using namespace esphome;
 
@@ -35,7 +37,6 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
                                                   //defined by hardware
 static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
-
 
 class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
@@ -98,6 +99,19 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         //Print a warning message if we're using the sole hardware UART on an
         //ESP8266 or UART0 on ESP32
         void check_logger_conflict_();
+
+        // various prefs to save mode-specific temperatures, akin to how the IR
+        // remote works.
+        ESPPreferenceObject cool_storage;
+        ESPPreferenceObject heat_storage;
+        ESPPreferenceObject auto_storage;
+
+        optional<float> cool_setpoint;
+        optional<float> heat_setpoint;
+        optional<float> auto_setpoint;
+
+        static void save(float value, ESPPreferenceObject& storage);
+        static optional<float> load(ESPPreferenceObject& storage);
 
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
