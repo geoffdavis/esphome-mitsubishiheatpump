@@ -142,7 +142,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(
             "control", "Sending target temp: %.1f",
             *call.get_target_temperature()
-        )
+        );
         hp->setTemperature(*call.get_target_temperature());
         this->target_temperature = *call.get_target_temperature();
         updated = true;
@@ -302,33 +302,6 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     this->target_temperature = currentSettings.temperature;
     ESP_LOGI(TAG, "Target temp is: %f", this->target_temperature);
 
-
-    /*
-     * Compute running state from mode & temperatures
-     */
-    switch (this->mode) {
-        case climate::CLIMATE_MODE_HEAT:
-            if (this->current_temperature < this->target_temperature) {
-                this->action = climate::CLIMATE_ACTION_HEATING;
-            }
-            else {
-                this->action = climate::CLIMATE_ACTION_IDLE;
-            }
-            break;
-        case climate::CLIMATE_MODE_COOL:
-            if (this->current_temperature > this->target_temperature) {
-                this->action = climate::CLIMATE_ACTION_COOLING;
-            }
-            else {
-                this->action = climate::CLIMATE_ACTION_IDLE;
-            }
-            break;
-        case climate::CLIMATE_MODE_DRY:
-            this->action = climate::CLIMATE_ACTION_DRYING;
-        default:
-            this->action = climate::CLIMATE_ACTION_OFF;
-    }
-
     /*
      * ******** Publish state back to ESPHome. ********
      */
@@ -340,6 +313,36 @@ void MitsubishiHeatPump::hpSettingsChanged() {
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
     this->current_temperature = currentStatus.roomTemperature;
+    switch (this->mode) {
+        case climate::CLIMATE_MODE_HEAT:
+            if (currentStatus.operating) {
+                this->action = climate::CLIMATE_ACTION_HEATING;
+            }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
+            break;
+        case climate::CLIMATE_MODE_COOL:
+            if (currentStatus.operating) {
+                this->action = climate::CLIMATE_ACTION_COOLING;
+            }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
+            break;
+        case climate::CLIMATE_MODE_DRY:
+            if (currentStatus.operating) {
+	      this->action = climate::CLIMATE_ACTION_DRYING;
+            }
+            else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
+        case climate::CLIMATE_MODE_FAN_ONLY:
+            this->action = climate::CLIMATE_ACTION_FAN;
+        default:
+            this->action = climate::CLIMATE_ACTION_OFF;
+    }
+
     this->publish_state();
 }
 
