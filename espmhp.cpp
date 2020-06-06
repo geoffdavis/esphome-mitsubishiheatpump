@@ -128,6 +128,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             case climate::CLIMATE_MODE_FAN_ONLY:
                 hp->setModeSetting("FAN");
                 hp->setPowerSetting("ON");
+                this->action = climate::CLIMATE_ACTION_FAN;
                 updated = true;
                 break;
             case climate::CLIMATE_MODE_OFF:
@@ -247,6 +248,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
         } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
             this->mode = climate::CLIMATE_MODE_AUTO;
+            this->action = climate::CLIMATE_ACTION_FAN;
         } else {
             ESP_LOGW(
                     TAG,
