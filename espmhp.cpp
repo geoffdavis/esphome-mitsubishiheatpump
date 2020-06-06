@@ -138,6 +138,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             case climate::CLIMATE_MODE_OFF:
             default:
                 hp->setPowerSetting("OFF");
+                this->action = climate::CLIMATE_ACTION_OFF;
                 updated = true;
                 break;
         }
@@ -266,6 +267,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
         }
     } else {
         this->mode = climate::CLIMATE_MODE_OFF;
+        this->action = climate::CLIMATE_ACTION_OFF;
     }
 
     ESP_LOGI(TAG, "Climate mode is: %i", this->mode);
