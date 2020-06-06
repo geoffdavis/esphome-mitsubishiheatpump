@@ -118,6 +118,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             case climate::CLIMATE_MODE_DRY:
                 hp->setModeSetting("DRY");
                 hp->setPowerSetting("ON");
+                this->action = climate::CLIMATE_ACTION_DRYING;
                 updated = true;
                 break;
             case climate::CLIMATE_MODE_AUTO:
@@ -242,6 +243,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             this->mode = climate::CLIMATE_MODE_HEAT;
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
             this->mode = climate::CLIMATE_MODE_DRY;
+            this->action = climate::CLIMATE_ACTION_DRYING;
         } else if (strcmp(currentSettings.mode, "COOL") == 0) {
             this->mode = climate::CLIMATE_MODE_COOL;
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
@@ -334,13 +336,15 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
             break;
         case climate::CLIMATE_MODE_DRY:
             if (currentStatus.operating) {
-	      this->action = climate::CLIMATE_ACTION_DRYING;
+                this->action = climate::CLIMATE_ACTION_DRYING;
             }
             else {
                 this->action = climate::CLIMATE_ACTION_IDLE;
             }
+            break;
         case climate::CLIMATE_MODE_FAN_ONLY:
             this->action = climate::CLIMATE_ACTION_FAN;
+            break;
         default:
             this->action = climate::CLIMATE_ACTION_OFF;
     }
