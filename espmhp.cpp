@@ -246,9 +246,9 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             this->mode = climate::CLIMATE_MODE_COOL;
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
+            this->action = climate::CLIMATE_ACTION_FAN;
         } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
             this->mode = climate::CLIMATE_MODE_AUTO;
-            this->action = climate::CLIMATE_ACTION_FAN;
         } else {
             ESP_LOGW(
                     TAG,
