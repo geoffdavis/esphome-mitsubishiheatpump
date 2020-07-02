@@ -283,10 +283,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     /* ******** HANDLE MITSUBISHI VANE CHANGES ********
      * const char* VANE_MAP[7]        = {"AUTO", "1", "2", "3", "4", "5", "SWING"};
      */
-    if (
-            (strcmp(currentSettings.vane, "AUTO") == 0)
-            || (strcmp(currentSettings.vane, "SWING") == 0)
-    ) {
+    if (strcmp(currentSettings.vane, "SWING") == 0) {
         this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
     }
     else {
