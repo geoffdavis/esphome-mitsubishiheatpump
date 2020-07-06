@@ -81,7 +81,7 @@ climate::ClimateTraits MitsubishiHeatPump::traits() {
     traits.set_supports_fan_mode_off(false);
     traits.set_supports_fan_mode_auto(true);
     traits.set_supports_fan_mode_focus(false);
-    traits.set_supports_fan_mode_diffuse(false);
+    traits.set_supports_fan_mode_diffuse(true);
     traits.set_supports_fan_mode_low(true);
     traits.set_supports_fan_mode_medium(true);
     traits.set_supports_fan_mode_middle(true);
@@ -158,23 +158,23 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_DIFFUSE:
-                hp->setPowerSetting("QUIET");
+                hp->setFanSpeed("QUIET");
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_LOW:
-                hp->setPowerSetting("1");
+                hp->setFanSpeed("1");
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_MEDIUM:
-                hp->setPowerSetting("2");
+                hp->setFanSpeed("2");
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_MIDDLE:
-                hp->setPowerSetting("3");
+                hp->setFanSpeed("3");
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_HIGH:
-                hp->setPowerSetting("4");
+                hp->setFanSpeed("4");
                 updated = true;
                 break;
             case climate::CLIMATE_FAN_ON:
