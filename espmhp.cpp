@@ -3,9 +3,11 @@
  *
  * Implementation of esphome-mitsubishiheatpump
  *
- * Author: Geoff Davis.<geoff@geoffdavis.com>
+ * Author: Geoff Davis <geoff@geoffdavis.com>
  * Author: Phil Genera @pgenera on Github.
- * Last Updated: 2020-06-02
+ * Author: Barry Loong @loongyh on GitHub.
+ * Author: @am-io on Github.
+ * Last Updated: 2020-07-06
  * License: BSD
  *
  * Requirements:
@@ -462,7 +464,7 @@ void MitsubishiHeatPump::setup() {
 
 /**
  * The ESP only has a few bytes of rtc storage, so instead
- * of storing floats directly, we'll store the number of 
+ * of storing floats directly, we'll store the number of
  * TEMPERATURE_STEPs from MIN_TEMPERATURE.
  **/
 void MitsubishiHeatPump::save(float value, ESPPreferenceObject& storage) {

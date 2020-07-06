@@ -3,8 +3,9 @@
  *
  * Header file for esphome-mitsubishiheatpump
  *
- * Author: Geoff Davis.<geoff@geoffdavis.com>
- * Date: 2020-03-11
+ * Author: Geoff Davis <geoff@geoffdavis.com>
+ * Author: Phil Genera @pgenera on Github.
+ * Last Updated: 2020-07-06
  * License: BSD
  *
  * Requirements:
