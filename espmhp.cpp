@@ -82,16 +82,16 @@ climate::ClimateTraits MitsubishiHeatPump::traits() {
     traits.set_supports_fan_mode_on(false);
     traits.set_supports_fan_mode_off(false);
     traits.set_supports_fan_mode_auto(true);
-    traits.set_supports_fan_mode_focus(false);
+    traits.set_supports_fan_mode_focus(true);
     traits.set_supports_fan_mode_diffuse(true);
     traits.set_supports_fan_mode_low(true);
     traits.set_supports_fan_mode_medium(true);
     traits.set_supports_fan_mode_middle(true);
     traits.set_supports_fan_mode_high(true);
     traits.set_supports_swing_mode_off(true);
-    traits.set_supports_swing_mode_both(false);
+    traits.set_supports_swing_mode_both(true);
     traits.set_supports_swing_mode_vertical(true);
-    traits.set_supports_swing_mode_horizontal(false);
+    traits.set_supports_swing_mode_horizontal(true);
     return traits;
 }
 
