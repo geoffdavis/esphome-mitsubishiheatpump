@@ -38,6 +38,30 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
                                                   //defined by hardware
 static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
+// Supported Modes
+static const bool SUPPORTS_ACTION = true;
+static const bool SUPPORTS_CURRENT_TEMPERATURE = true;
+static const bool SUPPORTS_AUTO_MODE = true;
+static const bool SUPPORTS_COOL_MODE = true;
+static const bool SUPPORTS_HEAT_MODE = true;
+static const bool SUPPORTS_DRY_MODE = true;
+static const bool SUPPORTS_FAN_ONLY_MODE = true;
+static const bool SUPPORTS_TWO_POINT_TARGET_TEMPERATURE = false;
+static const bool SUPPORTS_AWAY = false;
+static const bool SUPPORTS_FAN_MODE_ON = true;
+static const bool SUPPORTS_FAN_MODE_OFF = false;
+static const bool SUPPORTS_FAN_MODE_AUTO = true;
+static const bool SUPPORTS_FAN_MODE_FOCUS = true;
+static const bool SUPPORTS_FAN_MODE_DIFFUSE = true;
+static const bool SUPPORTS_FAN_MODE_LOW = true;
+static const bool SUPPORTS_FAN_MODE_MEDIUM = true;
+static const bool SUPPORTS_FAN_MODE_MIDDLE = true;
+static const bool SUPPORTS_FAN_MODE_HIGH = true;
+static const bool SUPPORTS_SWING_MODE_OFF = true;
+static const bool SUPPORTS_SWING_MODE_BOTH = true;
+static const bool SUPPORTS_SWING_MODE_VERTICAL = true;
+static const bool SUPPORTS_SWING_MODE_HORIZONTAL = true;
+
 
 class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
