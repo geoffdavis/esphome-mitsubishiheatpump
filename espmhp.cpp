@@ -67,31 +67,31 @@ void MitsubishiHeatPump::update() {
  */
 climate::ClimateTraits MitsubishiHeatPump::traits() {
     auto traits = climate::ClimateTraits();
-    traits.set_supports_action(true);
-    traits.set_supports_current_temperature(true);
-    traits.set_supports_auto_mode(true);
-    traits.set_supports_cool_mode(true);
-    traits.set_supports_heat_mode(true);
-    traits.set_supports_dry_mode(true);
-    traits.set_supports_fan_only_mode(true);
-    traits.set_supports_two_point_target_temperature(false);
-    traits.set_supports_away(false);
+    traits.set_supports_action(SUPPORTS_ACTION);
+    traits.set_supports_current_temperature(SUPPORTS_CURRENT_TEMPERATURE);
+    traits.set_supports_auto_mode(SUPPORTS_AUTO_MODE);
+    traits.set_supports_cool_mode(SUPPORTS_COOL_MODE);
+    traits.set_supports_heat_mode(SUPPORTS_HEAT_MODE);
+    traits.set_supports_dry_mode(SUPPORTS_DRY_MODE);
+    traits.set_supports_fan_only_mode(SUPPORTS_FAN_ONLY_MODE);
+    traits.set_supports_two_point_target_temperature(SUPPORTS_TWO_POINT_TARGET_TEMPERATURE);
+    traits.set_supports_away(SUPPORTS_AWAY);
     traits.set_visual_min_temperature(ESPMHP_MIN_TEMPERATURE);
     traits.set_visual_max_temperature(ESPMHP_MAX_TEMPERATURE);
     traits.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
-    traits.set_supports_fan_mode_on(false);
-    traits.set_supports_fan_mode_off(false);
-    traits.set_supports_fan_mode_auto(true);
-    traits.set_supports_fan_mode_focus(true);
-    traits.set_supports_fan_mode_diffuse(true);
-    traits.set_supports_fan_mode_low(true);
-    traits.set_supports_fan_mode_medium(true);
-    traits.set_supports_fan_mode_middle(true);
-    traits.set_supports_fan_mode_high(true);
-    traits.set_supports_swing_mode_off(true);
-    traits.set_supports_swing_mode_both(true);
-    traits.set_supports_swing_mode_vertical(true);
-    traits.set_supports_swing_mode_horizontal(true);
+    traits.set_supports_fan_mode_on(SUPPORTS_FAN_MODE_ON);
+    traits.set_supports_fan_mode_off(SUPPORTS_FAN_MODE_OFF);
+    traits.set_supports_fan_mode_auto(SUPPORTS_FAN_MODE_AUTO);
+    traits.set_supports_fan_mode_focus(SUPPORTS_FAN_MODE_FOCUS);
+    traits.set_supports_fan_mode_diffuse(SUPPORTS_FAN_MODE_DIFFUSE);
+    traits.set_supports_fan_mode_low(SUPPORTS_FAN_MODE_LOW);
+    traits.set_supports_fan_mode_medium(SUPPORTS_FAN_MODE_MEDIUM);
+    traits.set_supports_fan_mode_middle(SUPPORTS_FAN_MODE_MIDDLE);
+    traits.set_supports_fan_mode_high(SUPPORTS_FAN_MODE_HIGH);
+    traits.set_supports_swing_mode_off(SUPPORTS_SWING_MODE_OFF);
+    traits.set_supports_swing_mode_both(SUPPORTS_SWING_MODE_BOTH);
+    traits.set_supports_swing_mode_vertical(SUPPORTS_SWING_MODE_VERTICAL);
+    traits.set_supports_swing_mode_horizontal(SUPPORTS_SWING_MODE_HORIZONTAL);
     return traits;
 }
 
