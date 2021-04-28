@@ -7,12 +7,13 @@
  * Author: Phil Genera @pgenera on Github.
  * Author: Barry Loong @loongyh on GitHub.
  * Author: @am-io on Github.
+ * Author: @nao-pon on Github.
  * Last Updated: 2020-07-06
  * License: BSD
  *
  * Requirements:
  * - https://github.com/SwiCago/HeatPump
- * - ESPHome 1.15.0-dev or greater
+ * - ESPHome 1.15.0 or greater
  */
 
 #include "espmhp.h"
@@ -104,60 +105,73 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     ESP_LOGV(TAG, "Control called.");
 
     bool updated = false;
+    bool has_mode = call.get_mode().has_value();
     bool has_temp = call.get_target_temperature().has_value();
-    if (call.get_mode().has_value()){
+    if (has_mode){
         this->mode = *call.get_mode();
-        switch (*call.get_mode()) {
-            case climate::CLIMATE_MODE_COOL:
-                hp->setModeSetting("COOL");
-                hp->setPowerSetting("ON");
+    }
+    switch (this->mode) {
+        case climate::CLIMATE_MODE_COOL:
+            hp->setModeSetting("COOL");
+            hp->setPowerSetting("ON");
 
+            if (has_mode){
                 if (cool_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(cool_setpoint.value());
                     this->target_temperature = cool_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
-                break;
-            case climate::CLIMATE_MODE_HEAT:
-                hp->setModeSetting("HEAT");
-                hp->setPowerSetting("ON");
+            }
+            break;
+        case climate::CLIMATE_MODE_HEAT:
+            hp->setModeSetting("HEAT");
+            hp->setPowerSetting("ON");
+            if (has_mode){
                 if (heat_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(heat_setpoint.value());
                     this->target_temperature = heat_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
-                break;
-            case climate::CLIMATE_MODE_DRY:
-                hp->setModeSetting("DRY");
-                hp->setPowerSetting("ON");
+            }
+            break;
+        case climate::CLIMATE_MODE_DRY:
+            hp->setModeSetting("DRY");
+            hp->setPowerSetting("ON");
+            if (has_mode){
                 this->action = climate::CLIMATE_ACTION_DRYING;
                 updated = true;
-                break;
-            case climate::CLIMATE_MODE_AUTO:
-                hp->setModeSetting("AUTO");
-                hp->setPowerSetting("ON");
+            }
+            break;
+        case climate::CLIMATE_MODE_AUTO:
+            hp->setModeSetting("AUTO");
+            hp->setPowerSetting("ON");
+            if (has_mode){
                 if (auto_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(auto_setpoint.value());
                     this->target_temperature = auto_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
-                updated = true;
-                break;
-            case climate::CLIMATE_MODE_FAN_ONLY:
-                hp->setModeSetting("FAN");
-                hp->setPowerSetting("ON");
+            }
+            updated = true;
+            break;
+        case climate::CLIMATE_MODE_FAN_ONLY:
+            hp->setModeSetting("FAN");
+            hp->setPowerSetting("ON");
+            if (has_mode){
                 this->action = climate::CLIMATE_ACTION_FAN;
                 updated = true;
-                break;
-            case climate::CLIMATE_MODE_OFF:
-            default:
+            }
+            break;
+        case climate::CLIMATE_MODE_OFF:
+        default:
+            if (has_mode){
                 hp->setPowerSetting("OFF");
                 this->action = climate::CLIMATE_ACTION_OFF;
                 updated = true;
-                break;
-        }
+            }
+            break;
     }
 
     if (has_temp){
