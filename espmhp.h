@@ -5,12 +5,13 @@
  *
  * Author: Geoff Davis <geoff@geoffdavis.com>
  * Author: Phil Genera @pgenera on Github.
- * Last Updated: 2020-07-06
+ * Author: @nao-pon on Github
+ * Last Updated: 2021-04-28
  * License: BSD
  *
  * Requirements:
  * - https://github.com/SwiCago/HeatPump
- * - ESPHome 1.15.0-dev or greater
+ * - ESPHome 1.15.0 or greater
  */
 
 #define USE_CALLBACKS

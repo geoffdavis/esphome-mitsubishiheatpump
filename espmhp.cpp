@@ -7,12 +7,13 @@
  * Author: Phil Genera @pgenera on Github.
  * Author: Barry Loong @loongyh on GitHub.
  * Author: @am-io on Github.
+ * Author: @nao-pon on Github.
  * Last Updated: 2020-07-06
  * License: BSD
  *
  * Requirements:
  * - https://github.com/SwiCago/HeatPump
- * - ESPHome 1.15.0-dev or greater
+ * - ESPHome 1.15.0 or greater
  */
 
 #include "espmhp.h"
