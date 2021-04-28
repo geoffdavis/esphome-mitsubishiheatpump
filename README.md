@@ -11,7 +11,7 @@ ESP32 using the [ESPHome](https://esphome.io) framework.
 
 ## Requirements
 * https://github.com/SwiCago/HeatPump
-* ESPHome 1.15.0-dev or greater
+* ESPHome 1.15.0 or greater
 
 ## Supported Microcontrollers
 This library should work on most ESP8266 or ESP32 platforms. It has been tested
@@ -50,9 +50,9 @@ to the control
 board](https://github.com/SwiCago/HeatPump/issues/13#issuecomment-457897457)
 via CN105.
 
-### Step 2: Use ESPHome 1.15.0-dev or higher
+### Step 2: Use ESPHome 1.15.0 or higher
 
-The code in this repository makes use of a number of features in the as-yet unreleased 1.15.0 version of ESPHome, including various Fan modes.
+The code in this repository makes use of a number of features in the 1.15.0 version of ESPHome, including various Fan modes.
 
 ### Step 3: Clone this repository into your ESPHome configuration directory
 
@@ -120,7 +120,7 @@ esphome:
   # Boards tested: ESP-01S (ESP8266), Wemos D1 Mini (ESP8266); ESP32 Wifi-DevKit2
 
   libraries:
-    - SwiCago/HeatPump
+    - https://github.com/SwiCago/HeatPump
 
   includes:
     - src/esphome-mitsubishiheatpump
@@ -207,7 +207,7 @@ instance if you have HA configured to do so.
 
 There's also the built-in to ESPHome
 [Mitsubishi](https://github.com/esphome/esphome/blob/dev/esphome/components/mitsubishi/mitsubishi.h)
-climate component. It's only in the `dev` branch at the moment (2020-03-11).
+climate component.
 The big drawback with the built-in component is that it uses Infrared Remote
 commands to talk to the Heat Pump. By contrast, the approach used by this
 repository and it's underlying `HeatPump` library allows bi-directional
