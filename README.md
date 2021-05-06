@@ -41,7 +41,7 @@ tested by the author on the following units:
 ### Step 1: Build a control circuit.
 
 Build a control circuit with your MCU as detailed in the [SwiCago/HeatPump
- README](https://github.com/SwiCago/HeatPump/blob/master/README.md).
+ README](https://github.com/SwiCago/HeatPump/blob/master/README.md#demo-circuit).
 You can use either an ESP8266 or an ESP32 for this.
 
 Note: several users have reported that they've been able to get away with
