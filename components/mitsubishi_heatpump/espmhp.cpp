@@ -32,7 +32,15 @@ MitsubishiHeatPump::MitsubishiHeatPump(
 ) :
     PollingComponent{poll_interval}, // member initializers list
     hw_serial_{hw_serial}
-{ }
+{
+    this->traits_.set_supports_action(true);
+    this->traits_.set_supports_current_temperature(true);
+    this->traits_.set_supports_two_point_target_temperature(false);
+    this->traits_.set_supports_away(false);
+    this->traits_.set_visual_min_temperature(ESPMHP_MIN_TEMPERATURE);
+    this->traits_.set_visual_max_temperature(ESPMHP_MAX_TEMPERATURE);
+    this->traits_.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
+}
 
 void MitsubishiHeatPump::check_logger_conflict_() {
 #ifdef USE_LOGGER
@@ -57,7 +65,7 @@ void MitsubishiHeatPump::update() {
 }
 
 /**
- * Define our supported traits.
+ * Get our supported traits.
  *
  * Note:
  * Many of the following traits are only available in the 1.5.0 dev train of
@@ -67,33 +75,17 @@ void MitsubishiHeatPump::update() {
  *   This class' supported climate::ClimateTraits.
  */
 climate::ClimateTraits MitsubishiHeatPump::traits() {
-    auto traits = climate::ClimateTraits();
-    traits.set_supports_action(true);
-    traits.set_supports_current_temperature(true);
-    traits.set_supports_auto_mode(true);
-    traits.set_supports_cool_mode(true);
-    traits.set_supports_heat_mode(true);
-    traits.set_supports_dry_mode(true);
-    traits.set_supports_fan_only_mode(true);
-    traits.set_supports_two_point_target_temperature(false);
-    traits.set_supports_away(false);
-    traits.set_visual_min_temperature(ESPMHP_MIN_TEMPERATURE);
-    traits.set_visual_max_temperature(ESPMHP_MAX_TEMPERATURE);
-    traits.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
-    traits.set_supports_fan_mode_on(false);
-    traits.set_supports_fan_mode_off(false);
-    traits.set_supports_fan_mode_auto(true);
-    traits.set_supports_fan_mode_focus(false);
-    traits.set_supports_fan_mode_diffuse(true);
-    traits.set_supports_fan_mode_low(true);
-    traits.set_supports_fan_mode_medium(true);
-    traits.set_supports_fan_mode_middle(true);
-    traits.set_supports_fan_mode_high(true);
-    traits.set_supports_swing_mode_off(true);
-    traits.set_supports_swing_mode_both(false);
-    traits.set_supports_swing_mode_vertical(true);
-    traits.set_supports_swing_mode_horizontal(false);
-    return traits;
+    return traits_;
+}
+
+/**
+ * Modify our supported traits.
+ *
+ * Returns:
+ *   A reference to this class' supported climate::ClimateTraits.
+ */
+climate::ClimateTraits& MitsubishiHeatPump::config_traits() {
+    return traits_;
 }
 
 /**
