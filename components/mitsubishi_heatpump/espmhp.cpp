@@ -64,6 +64,10 @@ void MitsubishiHeatPump::update() {
 #endif
 }
 
+void MitsubishiHeatPump::set_baud_rate(int baud) {
+    this->baud_ = baud;
+}
+
 /**
  * Get our supported traits.
  *
@@ -443,7 +447,7 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGCONFIG(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
-    if (hp->connect(this->get_hw_serial_())) {
+    if (hp->connect(this->get_hw_serial_(), this->baud_)) {
         hp->sync();
     }
     else {

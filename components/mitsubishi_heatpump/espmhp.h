@@ -62,6 +62,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
                     ESPMHP_VERSION);
         }
 
+        // Set the baud rate. Must be called before setup() to have any effect.
+        void set_baud_rate(int);
+
         // print the current configuration
         void dump_config() override;
 
@@ -124,7 +127,7 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
-
+        int baud_ = 0;
 };
 
 #endif

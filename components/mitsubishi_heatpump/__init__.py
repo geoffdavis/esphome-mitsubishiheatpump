@@ -5,6 +5,7 @@ from esphome.components.logger import HARDWARE_UART_TO_SERIAL
 from esphome.const import (
     CONF_ID,
     CONF_HARDWARE_UART,
+    CONF_BAUD_RATE,
     CONF_UPDATE_INTERVAL,
     CONF_MODE,
     CONF_FAN_MODE,
@@ -37,6 +38,7 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
+        cv.Optional(CONF_BAUD_RATE): cv.positive_int,
 
         # If polling interval is greater than 9 seconds, the HeatPump library
         # reconnects, but doesn't then follow up with our data request.
@@ -64,6 +66,9 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
 def to_code(config):
     serial = HARDWARE_UART_TO_SERIAL[config[CONF_HARDWARE_UART]]
     var = cg.new_Pvariable(config[CONF_ID], cg.RawExpression(f'&{serial}'))
+
+    if CONF_BAUD_RATE in config:
+        cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
 
     traits = []
     for mode in config[CONF_SUPPORTS][CONF_MODE]:
