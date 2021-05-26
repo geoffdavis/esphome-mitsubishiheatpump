@@ -180,6 +180,27 @@ mitsubishi_heatpump:
   hardware_uart: UART0
 ```
 
+# Advanced
+
+Some models of heat pump require different baud rates or don't support all
+possible modes of operation. You can configure pretty much everything in YAML
+to match what your hardware supports. For example:
+
+```yaml
+mitsubishi_heatpump:
+  name: "My heat pump"
+  hardware_uart: UART2
+  baud_rate: 9600
+  supports:
+    mode: [AUTO, COOL, HEAT, FAN_ONLY]
+    fan_mode: [AUTO, LOW, MEDIUM, HIGH]
+    swing_mode: [OFF, VERTICAL]
+  visual:
+    min_temperature: 16
+    max_temperature: 31
+    temperature_step: 1.0
+```
+
 # See Also
 
 ## Other Implementations
