@@ -69,14 +69,15 @@ external_components:
 Add a `mitsubishi_heatpump` to your ESPHome config:
 
 ```yaml
-mitsubishi_heatpump:
-  name: "My Heat Pump"
+climate:
+  - platform: mitsubishi_heatpump
+    name: "My Heat Pump"
 
-  # Optional
-  hardware_uart: UART0
+    # Optional
+    hardware_uart: UART0
 
-  # Optional
-  update_period: 500ms
+    # Optional
+    update_period: 500ms
 ```
 
 On ESP8266 you'll need to disable logging to serial because it conflicts with
@@ -171,13 +172,14 @@ sensor:
 external_components:
   - source: github://geoffdavis/esphome-mitsubishiheatpump
 
-mitsubishi_heatpump:
-  name: "Den Heat Pump"
+climate:
+  - platform: mitsubishi_heatpump
+    name: "Den Heat Pump"
 
-  # ESP32 only - change UART0 to UART1 or UART2 and remove the
-  # logging:baud_rate above to allow the built-in UART0 to function for
-  # logging.
-  hardware_uart: UART0
+    # ESP32 only - change UART0 to UART1 or UART2 and remove the
+    # logging:baud_rate above to allow the built-in UART0 to function for
+    # logging.
+    hardware_uart: UART0
 ```
 
 # Advanced
@@ -187,18 +189,19 @@ possible modes of operation. You can configure pretty much everything in YAML
 to match what your hardware supports. For example:
 
 ```yaml
-mitsubishi_heatpump:
-  name: "My heat pump"
-  hardware_uart: UART2
-  baud_rate: 9600
-  supports:
-    mode: [AUTO, COOL, HEAT, FAN_ONLY]
-    fan_mode: [AUTO, LOW, MEDIUM, HIGH]
-    swing_mode: [OFF, VERTICAL]
-  visual:
-    min_temperature: 16
-    max_temperature: 31
-    temperature_step: 1.0
+climate:
+  - platform: mitsubishi_heatpump
+    name: "My heat pump"
+    hardware_uart: UART2
+    baud_rate: 9600
+    supports:
+      mode: [AUTO, COOL, HEAT, FAN_ONLY]
+      fan_mode: [AUTO, LOW, MEDIUM, HIGH]
+      swing_mode: [OFF, VERTICAL]
+    visual:
+      min_temperature: 16
+      max_temperature: 31
+      temperature_step: 1.0
 ```
 
 # See Also
