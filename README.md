@@ -11,7 +11,7 @@ ESP32 using the [ESPHome](https://esphome.io) framework.
 
 ## Requirements
 * https://github.com/SwiCago/HeatPump
-* ESPHome 1.15.0 or greater
+* ESPHome 1.18.0 or greater
 
 ## Supported Microcontrollers
 This library should work on most ESP8266 or ESP32 platforms. It has been tested
@@ -50,52 +50,45 @@ to the control
 board](https://github.com/SwiCago/HeatPump/issues/13#issuecomment-457897457)
 via CN105.
 
-### Step 2: Use ESPHome 1.15.0 or higher
+### Step 2: Use ESPHome 1.18.0 or higher
 
-The code in this repository makes use of a number of features in the 1.15.0 version of ESPHome, including various Fan modes.
+The code in this repository makes use of a number of features in the 1.18.0
+version of ESPHome, including various Fan modes and external components.
 
-### Step 3: Clone this repository into your ESPHome configuration directory
+### Step 3: Add this repository as an external component
 
-This repository needs to live in your ESPHome configuration directory, as it
-doesn't work correctly when used as a Platform.IO library, and there doesn't
-seem to be an analog for that functionality for ESPHome code.
-
-On Hass.IO, you'll want to do something like:
-
-* Change directories to your esphome configuration directory.
-* `mkdir -p src`
-* `cd src`
-* `git clone https://github.com/geoffdavis/esphome-mitsubishiheatpump.git`
-
-### Step 4: Configure your ESPHome device with YAML
-
-Create an ESPHome YAML configuration with the following sections:
- * `esphome: libraries: [https://github.com/SwiCago/HeatPump]`
- * `esphome: includes: [src/esphome-mitsubishiheatpump]`
- * `climate:` - set up a custom climate entry, change the Serial port as needed.
- * ESP8266 only: `logger: baud_rate: 0` - disable serial port logging on the
-   sole ESP8266 hardware UART
-
-The custom climate definition should use `platform: custom` and contain a
-`lambda` block, where you instanciate an instance of the MitsubishiHeatPump
-class, and then register it with ESPHome. It should allso contain a "climates"
-entry. On ESP32 you
-can change `&Serial` to `&Serial1` or `&Serial2` and re-enable logging to the
-main serial port.
-
-If that's all greek to you, here's an example. Change "My Heat Pump" to
-whatever you want.
+Add this repository to your ESPHome config:
 
 ```yaml
-climate:
-  - platform: custom
-    lambda: |-
-      auto my_heatpump = new MitsubishiHeatPump(&Serial);
-      App.register_component(my_heatpump);
-      return {my_heatpump};
-    climates:
-      - name: "My Heat Pump"
+external_components:
+  - source: github://geoffdavis/esphome-mitsubishiheatpump
 ```
+
+### Step 4: Configure the heatpump
+
+Add a `mitsubishi_heatpump` to your ESPHome config:
+
+```yaml
+mitsubishi_heatpump:
+  name: "My Heat Pump"
+
+  # Optional
+  hardware_uart: UART0
+
+  # Optional
+  update_period: 500ms
+```
+
+On ESP8266 you'll need to disable logging to serial because it conflicts with
+the heatpump UART:
+
+```yaml
+logger:
+  baud_rate: 0
+```
+
+On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
+enabled on the main serial port.
 
 Note: this component DOES NOT use the ESPHome `uart` component, as it requires
 direct access to a hardware UART via the Arduino `HardwareSerial` class. The
@@ -118,12 +111,6 @@ esphome:
   platform: ESP8266
   board: esp01_1m
   # Boards tested: ESP-01S (ESP8266), Wemos D1 Mini (ESP8266); ESP32 Wifi-DevKit2
-
-  libraries:
-    - https://github.com/SwiCago/HeatPump
-
-  includes:
-    - src/esphome-mitsubishiheatpump
 
 wifi:
   ssid: !secret wifi_ssid
@@ -181,18 +168,16 @@ sensor:
     name: denheatpump WiFi Signal
     update_interval: 60s
 
+external_components:
+  - source: github://geoffdavis/esphome-mitsubishiheatpump
 
-climate:
-  - platform: custom
-    # ESP32 only - change &Serial to &Serial1 or &Serial2 and remove the
-    # logging:baud_rate above to allow the built-in UART0 to function for
-    # logging.
-    lambda: |-
-      auto my_heatpump = new MitsubishiHeatPump(&Serial);
-      App.register_component(my_heatpump);
-      return {my_heatpump};
-    climates:
-      - name: "Den Heat Pump"
+mitsubishi_heatpump:
+  name: "Den Heat Pump"
+
+  # ESP32 only - change UART0 to UART1 or UART2 and remove the
+  # logging:baud_rate above to allow the built-in UART0 to function for
+  # logging.
+  hardware_uart: UART0
 ```
 
 # See Also
