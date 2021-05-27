@@ -6,12 +6,13 @@
  * Author: Geoff Davis <geoff@geoffdavis.com>
  * Author: Phil Genera @pgenera on Github.
  * Author: @nao-pon on Github
- * Last Updated: 2021-04-28
+ * Author: Simon Knopp @sijk on Github
+ * Last Updated: 2021-05-27
  * License: BSD
  *
  * Requirements:
  * - https://github.com/SwiCago/HeatPump
- * - ESPHome 1.15.0 or greater
+ * - ESPHome 1.18.0 or greater
  */
 
 #define USE_CALLBACKS
@@ -27,7 +28,7 @@ using namespace esphome;
 
 static const char* TAG = "MitsubishiHeatPump"; // Logging tag
 
-static const char* ESPMHP_VERSION = "1.3.1";
+static const char* ESPMHP_VERSION = "2.0.0";
 
 /* If polling interval is greater than 9 seconds, the HeatPump
 library reconnects, but doesn't then follow up with our data request.*/
@@ -62,6 +63,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
                     ESPMHP_VERSION);
         }
 
+        // Set the baud rate. Must be called before setup() to have any effect.
+        void set_baud_rate(int);
+
         // print the current configuration
         void dump_config() override;
 
@@ -80,6 +84,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         // Configure the climate object with traits that we support.
         climate::ClimateTraits traits() override;
 
+        // Get a mutable reference to the traits that we support.
+        climate::ClimateTraits& config_traits();
+
         // Debugging function to print the object's state.
         void dump_state();
 
@@ -89,6 +96,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
     protected:
         // HeatPump object using the underlying Arduino library.
         HeatPump* hp;
+
+        // The ClimateTraits supported by this HeatPump.
+        climate::ClimateTraits traits_;
 
         // Allow the HeatPump class to use get_hw_serial_
         friend class HeatPump;
@@ -118,7 +128,7 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
-
+        int baud_ = 0;
 };
 
 #endif
