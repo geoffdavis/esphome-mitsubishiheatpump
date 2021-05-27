@@ -77,7 +77,7 @@ climate:
     hardware_uart: UART0
 
     # Optional
-    update_period: 500ms
+    update_interval: 500ms
 ```
 
 On ESP8266 you'll need to disable logging to serial because it conflicts with
