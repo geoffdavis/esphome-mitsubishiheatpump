@@ -272,6 +272,60 @@ climate:
   Component](https://esphome.io/components/climate/index.html) documentation for
   details.
 
+## Remote temperature
+
+It is possible to use an external temperature sensor to tell the heat pump what
+the room temperature is, rather than relying on its internal temperature
+sensor. You can do this by calling `set_remote_temperature(float temp)` on the
+`mitsubishi_heatpump` object in a lambda. Note that you can call
+`set_remote_temperature(0)` to switch back to the internal temperature sensor.
+
+There are several ways you could make use of this functionality. One is to use
+a sensor automation:
+
+```yaml
+climate:
+  - platform: mitsubishi_heatpump
+    name: "Lounge heat pump"
+    id: hp
+
+sensor:
+  # You could use a Bluetooth temperature sensor
+  - platform: atc_mithermometer
+    mac_address: "XX:XX:XX:XX:XX:XX"
+    temperature:
+      name: "Lounge temperature"
+      on_value:
+        then:
+          - lambda: 'id(hp).set_remote_temperature(x);'
+
+  # Or you could use a HomeAssistant sensor
+  - platform: homeassistant
+    name: "Temperature Sensor From Home Assistant"
+    entity_id: sensor.temperature_sensor
+    on_value:
+      then:
+        - lambda: 'id(hp).set_remote_temperature(x);'
+```
+
+Alternatively you could define a
+[service](https://www.esphome.io/components/api.html#user-defined-services)
+that HomeAssistant can call:
+
+```yaml
+api:
+  services:
+    - service: set_remote_temperature
+      variables:
+        temperature: float
+      then:
+        - lambda: 'id(hp).set_remote_temperature(temperature);'
+
+    - service: use_internal_temperature
+      then:
+        - lambda: 'id(hp).set_remote_temperature(0);'
+```
+
 # See Also
 
 ## Other Implementations

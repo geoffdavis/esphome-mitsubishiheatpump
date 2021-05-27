@@ -406,6 +406,11 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
     this->publish_state();
 }
 
+void MitsubishiHeatPump::set_remote_temperature(float temp) {
+    ESP_LOGD(TAG, "Setting remote temp: %.1f", temp);
+    this->hp->setRemoteTemperature(temp);
+}
+
 void MitsubishiHeatPump::setup() {
     // This will be called by App.setup()
     this->banner();
