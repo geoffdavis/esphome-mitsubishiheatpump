@@ -28,7 +28,7 @@ using namespace esphome;
 
 static const char* TAG = "MitsubishiHeatPump"; // Logging tag
 
-static const char* ESPMHP_VERSION = "2.0.0";
+static const char* ESPMHP_VERSION = "2.1.0";
 
 /* If polling interval is greater than 9 seconds, the HeatPump
 library reconnects, but doesn't then follow up with our data request.*/
@@ -92,8 +92,8 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
         // Handle a request from the user to change settings.
         void control(const climate::ClimateCall &call) override;
-  
-        // Use the temperature from an external sensor. Use 
+
+        // Use the temperature from an external sensor. Use
         // set_remote_temp(0) to switch back to the internal sensor.
         void set_remote_temperature(float);
 
