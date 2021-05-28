@@ -138,8 +138,13 @@ indicators and permit over the air updates. You'll need to create a
 various items prefixed with `!secret`.
 
 ```yaml
+substitutions:
+  name: hptest
+  friendly_name: Test Heatpump
+
+
 esphome:
-  name: denheatpump
+  name: ${name}
   platform: ESP8266
   board: esp01_1m
   # Boards tested: ESP-01S (ESP8266), Wemos D1 Mini (ESP8266); ESP32 Wifi-DevKit2
@@ -150,15 +155,15 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Denheatpump Fallback Hotspot"
+    ssid: "${friendly_name} Fallback Hotspot"
     password: !secret fallback_password
 
 # Note: if upgrading from 1.x releases of esphome-mitsubishiheatpump, be sure
 # to remove any old entries from the `libraries` and `includes` section.
-libraries:
+#libraries:
   # Remove reference to SwiCago/HeatPump
 
-includes:
+#includes:
   # Remove reference to src/esphome-mitsubishiheatpump
 
 captive_portal:
@@ -187,25 +192,25 @@ time:
 text_sensor:
   # Expose ESPHome version as sensor.
   - platform: version
-    name: denheatpump ESPHome Version
+    name: ${name} ESPHome Version
   # Expose WiFi information as sensors.
   - platform: wifi_info
     ip_address:
-      name: denheatpump IP
+      name: ${name} IP
     ssid:
-      name: denheatpump SSID
+      name: ${name} SSID
     bssid:
-      name: denheatpump BSSID
+      name: ${name} BSSID
 
 # Sensors with general information.
 sensor:
   # Uptime sensor.
   - platform: uptime
-    name: denheatpump Uptime
+    name: ${name} Uptime
 
   # WiFi Signal sensor.
   - platform: wifi_signal
-    name: denheatpump WiFi Signal
+    name: ${name} WiFi Signal
     update_interval: 60s
 
 external_components:
@@ -213,7 +218,7 @@ external_components:
 
 climate:
   - platform: mitsubishi_heatpump
-    name: "Den Heat Pump"
+    name: "${friendly_name}"
 
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
