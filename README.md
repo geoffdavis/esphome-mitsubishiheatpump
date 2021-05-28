@@ -155,10 +155,10 @@ wifi:
 
 # Note: if upgrading from 1.x releases of esphome-mitsubishiheatpump, be sure
 # to remove any old entries from the `libraries` and `includes` section.
-libraries:
+#libraries:
   # Remove reference to SwiCago/HeatPump
 
-includes:
+#includes:
   # Remove reference to src/esphome-mitsubishiheatpump
 
 captive_portal:
