@@ -119,7 +119,7 @@ logger:
   baud_rate: 0
 ```
 
-On ESP32 you can change `hardware\_uart` to `UART1` or `UART2` and keep logging
+On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
 enabled on the main serial port.
 
 *Note:* this component DOES NOT use the ESPHome `uart` component, as it
