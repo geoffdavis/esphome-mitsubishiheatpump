@@ -117,7 +117,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                     hp->setTemperature(cool_setpoint.value());
                     this->target_temperature = cool_setpoint.value();
                 }
-                this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
             }
             break;
@@ -129,7 +128,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                     hp->setTemperature(heat_setpoint.value());
                     this->target_temperature = heat_setpoint.value();
                 }
-                this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
             }
             break;
@@ -137,7 +135,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             hp->setModeSetting("DRY");
             hp->setPowerSetting("ON");
             if (has_mode){
-                this->action = climate::CLIMATE_ACTION_DRYING;
                 updated = true;
             }
             break;
@@ -149,15 +146,13 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                     hp->setTemperature(auto_setpoint.value());
                     this->target_temperature = auto_setpoint.value();
                 }
-                this->action = climate::CLIMATE_ACTION_IDLE;
+                updated = true;
             }
-            updated = true;
             break;
         case climate::CLIMATE_MODE_FAN_ONLY:
             hp->setModeSetting("FAN");
             hp->setPowerSetting("ON");
             if (has_mode){
-                this->action = climate::CLIMATE_ACTION_FAN;
                 updated = true;
             }
             break;
@@ -165,7 +160,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         default:
             if (has_mode){
                 hp->setPowerSetting("OFF");
-                this->action = climate::CLIMATE_ACTION_OFF;
                 updated = true;
             }
             break;
@@ -236,7 +230,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                 break;
             default:
                 ESP_LOGW(TAG, "control - received unsupported swing mode request.");
-
         }
     }
     ESP_LOGD(TAG, "control - Was HeatPump updated? %s", YESNO(updated));
@@ -276,7 +269,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 heat_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, heat_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            this->action = climate::CLIMATE_ACTION_HEATING;
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
             this->mode = climate::CLIMATE_MODE_DRY;
             this->action = climate::CLIMATE_ACTION_DRYING;
@@ -286,7 +279,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 cool_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, cool_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            this->action = climate::CLIMATE_ACTION_COOLING;
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
             this->action = climate::CLIMATE_ACTION_FAN;
@@ -296,7 +289,13 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 auto_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, auto_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            if (this->current_temperature > this->target_temperature) {
+                this->action = climate::CLIMATE_ACTION_COOLING;
+            } else if (this->current_temperature < this->target_temperature) {
+                this->action = climate::CLIMATE_ACTION_HEATING;
+            } else {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            }
         } else {
             ESP_LOGW(
                     TAG,
@@ -514,3 +513,5 @@ void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO");
 }
+
+/* vim: se et: */
