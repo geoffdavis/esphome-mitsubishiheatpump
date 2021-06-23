@@ -11,7 +11,7 @@ ESP32 using the [ESPHome](https://esphome.io) framework.
 
 ## Requirements
 * https://github.com/SwiCago/HeatPump
-* ESPHome 1.18.0 or greater
+* ESPHome 1.19.1 or greater
 
 ## Supported Microcontrollers
 This library should work on most ESP8266 or ESP32 platforms. It has been tested

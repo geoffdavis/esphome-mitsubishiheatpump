@@ -7,12 +7,12 @@
  * Author: Phil Genera @pgenera on Github.
  * Author: @nao-pon on Github
  * Author: Simon Knopp @sijk on Github
- * Last Updated: 2021-05-27
+ * Last Updated: 2021-06-23
  * License: BSD
  *
  * Requirements:
  * - https://github.com/SwiCago/HeatPump
- * - ESPHome 1.18.0 or greater
+ * - ESPHome 1.19.1 or greater
  */
 
 #define USE_CALLBACKS
@@ -28,7 +28,7 @@ using namespace esphome;
 
 static const char* TAG = "MitsubishiHeatPump"; // Logging tag
 
-static const char* ESPMHP_VERSION = "2.1.1";
+static const char* ESPMHP_VERSION = "2.2.0";
 
 /* If polling interval is greater than 9 seconds, the HeatPump
 library reconnects, but doesn't then follow up with our data request.*/
