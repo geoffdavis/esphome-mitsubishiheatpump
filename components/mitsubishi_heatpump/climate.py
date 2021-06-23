@@ -16,7 +16,7 @@ from esphome.core import CORE, coroutine
 AUTO_LOAD = ["climate"]
 
 CONF_SUPPORTS = "supports"
-DEFAULT_CLIMATE_MODES = ['AUTO', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']
+DEFAULT_CLIMATE_MODES = ['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']
 DEFAULT_FAN_MODES = ['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']
 DEFAULT_SWING_MODES = ['OFF', 'VERTICAL']
 
