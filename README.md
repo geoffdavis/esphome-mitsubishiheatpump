@@ -239,7 +239,7 @@ climate:
     hardware_uart: UART2
     baud_rate: 9600
     supports:
-      mode: [AUTO, COOL, HEAT, FAN_ONLY]
+      mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
       fan_mode: [AUTO, LOW, MEDIUM, HIGH]
       swing_mode: [OFF, VERTICAL]
     visual:
@@ -261,7 +261,7 @@ climate:
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
 * *supports* (_Optional_): Supported features for the device.  ** *mode*
   (_Optional_, list): Supported climate modes for the HeatPump. Default:
-  `['AUTO', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
+  `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
   ** *fan_mode* (_Optional_, list):
 	Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
 	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
