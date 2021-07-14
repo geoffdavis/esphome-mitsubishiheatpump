@@ -70,17 +70,19 @@ def to_code(config):
     if CONF_BAUD_RATE in config:
         cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
 
-    traits = []
-    for mode in config[CONF_SUPPORTS][CONF_MODE]:
+    supports = config[CONF_SUPPORTS]
+    traits = var.config_traits()
+
+    for mode in supports[CONF_MODE]:
         if mode == 'OFF':
             continue
-        traits.append(f'set_supports_{mode.lower()}_mode')
-    for mode in config[CONF_SUPPORTS][CONF_FAN_MODE]:
-        traits.append(f'set_supports_fan_mode_{mode.lower()}')
-    for mode in config[CONF_SUPPORTS][CONF_SWING_MODE]:
-        traits.append(f'set_supports_swing_mode_{mode.lower()}')
-    for trait in traits:
-        cg.add(getattr(var.config_traits(), trait)(True))
+        cg.add(traits.add_supported_mode(climate.CLIMATE_MODES[mode]))
+
+    for mode in supports[CONF_FAN_MODE]:
+        cg.add(traits.add_supported_fan_mode(climate.CLIMATE_FAN_MODES[mode]))
+
+    for mode in supports[CONF_SWING_MODE]:
+        cg.add(traits.add_supported_swing_mode(climate.CLIMATE_SWING_MODES[mode]))
 
     yield cg.register_component(var, config)
     yield climate.register_climate(var, config)
