@@ -469,9 +469,9 @@ void MitsubishiHeatPump::setup() {
     }
 
     // create various setpoint persistence:
-    cool_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 1);
-    heat_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 2);
-    auto_storage = global_preferences.make_preference<uint8_t>(this->get_object_id_hash() + 3);
+    cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
+    heat_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 2);
+    auto_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 3);
 
     // load values from storage:
     cool_setpoint = load(cool_storage);
