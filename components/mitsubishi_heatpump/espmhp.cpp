@@ -258,7 +258,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * mode, but that isn't working right yet.
          */
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time.");
-        delay(10);
+        esphome::delay(10);
         return;
     }
 
