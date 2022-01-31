@@ -80,9 +80,10 @@ things compile correctly, you will need to:
    Files")
 5. You may also have to delete the _esphomenodename_ directory that
    corresponds with your _esphomenodename.yaml_ configuration file
-   completely. Testing with ESPHome 0.18.x showed this to be necessary to get
-   the cached copy of src/esphome-mitsubishiheatpump to go away entirely, as
-   the "Clean Build Files" isn't as thorough as one would like.
+   completely. This directory may exist in your base config directory,
+   or in `config/.esphome/build`.  Testing with ESPHome 0.18.x showed this 
+   to be necessary to get the cached copy of src/esphome-mitsubishiheatpump to
+   go away entirely, as the "Clean Build Files" isn't as thorough as one would like.
 
 *Note:* Failure to delete the old source directory and remove the `includes`
 and `libraries` lines will likely result in compilation errors complaining
