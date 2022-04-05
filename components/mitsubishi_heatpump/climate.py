@@ -16,16 +16,18 @@ from esphome.core import CORE, coroutine
 AUTO_LOAD = ["climate"]
 
 CONF_SUPPORTS = "supports"
-DEFAULT_CLIMATE_MODES = ['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']
-DEFAULT_FAN_MODES = ['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']
-DEFAULT_SWING_MODES = ['OFF', 'VERTICAL']
+DEFAULT_CLIMATE_MODES = ["HEAT_COOL", "COOL", "HEAT", "DRY", "FAN_ONLY"]
+DEFAULT_FAN_MODES = ["AUTO", "DIFFUSE", "LOW", "MEDIUM", "MIDDLE", "HIGH"]
+DEFAULT_SWING_MODES = ["OFF", "VERTICAL"]
 
-MitsubishiHeatPump = cg.global_ns.class_("MitsubishiHeatPump", climate.Climate, cg.PollingComponent)
+MitsubishiHeatPump = cg.global_ns.class_(
+    "MitsubishiHeatPump", climate.Climate, cg.PollingComponent
+)
 
 
 def valid_uart(uart):
     if CORE.is_esp8266:
-        uarts = ["UART0"] # UART1 is tx-only
+        uarts = ["UART0"]  # UART1 is tx-only
     elif CORE.is_esp32:
         uarts = ["UART0", "UART1", "UART2"]
     else:
@@ -39,14 +41,11 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
         cv.Optional(CONF_BAUD_RATE): cv.positive_int,
-
         # If polling interval is greater than 9 seconds, the HeatPump library
         # reconnects, but doesn't then follow up with our data request.
         cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.All(
-            cv.update_interval,
-            cv.Range(max=cv.TimePeriod(milliseconds=9000))
+            cv.update_interval, cv.Range(max=cv.TimePeriod(milliseconds=9000))
         ),
-
         # Optionally override the supported ClimateTraits.
         cv.Optional(CONF_SUPPORTS, default={}): cv.Schema(
             {
@@ -65,7 +64,7 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
 @coroutine
 def to_code(config):
     serial = HARDWARE_UART_TO_SERIAL[config[CONF_HARDWARE_UART]]
-    var = cg.new_Pvariable(config[CONF_ID], cg.RawExpression(f'&{serial}'))
+    var = cg.new_Pvariable(config[CONF_ID], cg.RawExpression(f"&{serial}"))
 
     if CONF_BAUD_RATE in config:
         cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
@@ -74,7 +73,7 @@ def to_code(config):
     traits = var.config_traits()
 
     for mode in supports[CONF_MODE]:
-        if mode == 'OFF':
+        if mode == "OFF":
             continue
         cg.add(traits.add_supported_mode(climate.CLIMATE_MODES[mode]))
 
@@ -82,9 +81,14 @@ def to_code(config):
         cg.add(traits.add_supported_fan_mode(climate.CLIMATE_FAN_MODES[mode]))
 
     for mode in supports[CONF_SWING_MODE]:
-        cg.add(traits.add_supported_swing_mode(climate.CLIMATE_SWING_MODES[mode]))
+        cg.add(traits.add_supported_swing_mode(
+            climate.CLIMATE_SWING_MODES[mode]
+        ))
 
     yield cg.register_component(var, config)
     yield climate.register_climate(var, config)
-    cg.add_library("https://github.com/SwiCago/HeatPump", None)
-
+    cg.add_library(
+        name="HeatPump",
+        repository="https://github.com/SwiCago/HeatPump",
+        version="ed3b700dd4b110253368cc9f6960516d228e33d8",
+    )
