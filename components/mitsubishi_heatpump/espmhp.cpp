@@ -229,8 +229,16 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                 hp->setVaneSetting("AUTO");
                 updated = true;
                 break;
-            case climate::CLIMATE_SWING_VERTICAL:
+            case climate::CLIMATE_SWING_BOTH:
                 hp->setVaneSetting("SWING");
+                updated = true;
+                break;
+            case climate::CLIMATE_SWING_HORIZONTAL:
+                hp->setVaneSetting("2");
+                updated = true;
+                break;
+            case climate::CLIMATE_SWING_VERTICAL:
+                hp->setVaneSetting("5");
                 updated = true;
                 break;
             default:
