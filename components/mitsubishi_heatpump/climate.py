@@ -16,6 +16,7 @@ from esphome.core import CORE, coroutine
 AUTO_LOAD = ["climate"]
 
 CONF_SUPPORTS = "supports"
+CONF_TEMPERATURE_OFFSET = "temperature_offset"
 DEFAULT_CLIMATE_MODES = ["HEAT_COOL", "COOL", "HEAT", "DRY", "FAN_ONLY"]
 DEFAULT_FAN_MODES = ["AUTO", "DIFFUSE", "LOW", "MEDIUM", "MIDDLE", "HIGH"]
 DEFAULT_SWING_MODES = ["OFF", "VERTICAL"]
@@ -57,6 +58,7 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
                     cv.ensure_list(climate.validate_climate_swing_mode),
             }
         ),
+        cv.Optional(CONF_TEMPERATURE_OFFSET, default=0): cv.temperature,
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -68,6 +70,9 @@ def to_code(config):
 
     if CONF_BAUD_RATE in config:
         cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
+
+    if CONF_TEMPERATURE_OFFSET in config:
+        cg.add(var.set_temperature_offset(config[CONF_TEMPERATURE_OFFSET]))
 
     supports = config[CONF_SUPPORTS]
     traits = var.config_traits()

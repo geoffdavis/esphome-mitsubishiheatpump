@@ -68,6 +68,10 @@ void MitsubishiHeatPump::set_baud_rate(int baud) {
     this->baud_ = baud;
 }
 
+void MitsubishiHeatPump::set_temperature_offset(float temperature_offset) {
+    this->temperature_offset_ = temperature_offset;
+}
+
 /**
  * Get our supported traits.
  *
@@ -359,7 +363,12 @@ void MitsubishiHeatPump::hpSettingsChanged() {
  * Report changes in the current temperature sensed by the HeatPump.
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
-    this->current_temperature = currentStatus.roomTemperature;
+    if (this->temperature_offset_.has_value()) {
+        ESP_LOGD(TAG, "Adding offset: %.1f to temperature reported from heatpump: %.1f", this->temperature_offset_.value(), currentStatus.roomTemperature);
+        this->current_temperature = currentStatus.roomTemperature + this->temperature_offset_.value();
+    } else {
+        this->current_temperature = currentStatus.roomTemperature;
+    }
     switch (this->mode) {
         case climate::CLIMATE_MODE_HEAT:
             if (currentStatus.operating) {
