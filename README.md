@@ -405,7 +405,7 @@ climate:
   Component](https://esphome.io/components/climate/index.html) documentation for
   details.
 
-## Remote temperature
+### Remote temperature
 
 It is possible to use an external temperature sensor to tell the heat pump what
 the room temperature is, rather than relying on its internal temperature
