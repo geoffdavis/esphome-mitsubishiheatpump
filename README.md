@@ -107,6 +107,7 @@ climate:
 
     # Optional
     hardware_uart: UART0
+    baud_rate: 4800
 
     # Optional
     update_interval: 500ms
@@ -121,7 +122,8 @@ logger:
 ```
 
 On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
-enabled on the main serial port.
+enabled on the main serial port. This may require specifying baud_rate on some
+ESP32 boards.
 
 *Note:* this component DOES NOT use the ESPHome `uart` component, as it
 requires direct access to a hardware UART via the Arduino `HardwareSerial`
@@ -223,8 +225,10 @@ climate:
 
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
-    # logging.
+    # logging. 
+    # Some ESP32 boards will require the baud_rate setting if hardware_uart is specified.
     hardware_uart: UART0
+    baud_rate: 4800
 ```
 
 # Advanced configuration
@@ -256,7 +260,8 @@ climate:
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
 * *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
-  `9600`. Default: `4800`
+  `2400` or `9600`. Some ESP32 boards will require the baud_rate setting if 
+  hardware_uart is specified. Default: `4800`.
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
