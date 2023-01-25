@@ -225,6 +225,9 @@ climate:
     # logging:baud_rate above to allow the built-in UART0 to function for
     # logging.
     hardware_uart: UART0
+
+    # Add a offset to all temperatures, useful if the value you get from your heatpump isn't accurate.
+    temperature_offset: -2C
 ```
 
 # Advanced configuration
