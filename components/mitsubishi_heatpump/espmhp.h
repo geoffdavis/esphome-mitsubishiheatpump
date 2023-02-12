@@ -66,6 +66,12 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         // Set the baud rate. Must be called before setup() to have any effect.
         void set_baud_rate(int);
 
+        // Set the RX pin. Must be called before setup() to have any effect.
+        void set_rx_pin(int);
+
+        // Set the TX pin. Must be called before setup() to have any effect.
+        void set_tx_pin(int);
+
         // print the current configuration
         void dump_config() override;
 
@@ -133,6 +139,8 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
         int baud_ = 0;
+        int rx_pin_ = -1;
+        int tx_pin_ = -1;
 };
 
 #endif

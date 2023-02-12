@@ -332,6 +332,8 @@ climate:
     name: "My heat pump"
     hardware_uart: UART2
     baud_rate: 9600
+    rx_pin: 9
+    tx_pin: 10
     supports:
       mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
       fan_mode: [AUTO, LOW, MEDIUM, HIGH]
@@ -350,6 +352,10 @@ climate:
 * *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
   `9600`. Default: `4800`
+* *rx\_pin* (_Optional_): pin number to use as RX for the specified hardware
+  UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
+* *tx\_pin* (_Optional_): pin number to use as TX for the specified hardware
+  UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
