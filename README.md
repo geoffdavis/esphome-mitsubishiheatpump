@@ -240,9 +240,10 @@ climate:
     hardware_uart: UART2
     baud_rate: 9600
     supports:
-      mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
-      fan_mode: [AUTO, LOW, MEDIUM, HIGH]
-      swing_mode: [OFF, VERTICAL]
+      mode: ["HEAT_COOL", "COOL", "HEAT", "FAN_ONLY"]
+      fan_mode: ["AUTO", "LOW", "MEDIUM", "HIGH"]
+      swing_mode: ["OFF", "VERTICAL"]
+
     visual:
       min_temperature: 16
       max_temperature: 31
@@ -260,14 +261,13 @@ climate:
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
-* *supports* (_Optional_): Supported features for the device.  ** *mode*
-  (_Optional_, list): Supported climate modes for the HeatPump. Default:
-  `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
-  ** *fan_mode* (_Optional_, list):
-	Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
-	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
-	fan swing modes. Most Mitsubishi units only support the default. Default:
-    `['OFF', 'VERTICAL']`
+* *supports* (_Optional_): Supported features for the device. 
+  * *mode* (_Optional_, list): Supported climate modes for the HeatPump. Default:
+    `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
+  * *fan_mode* (_Optional_, list): Supported fan speeds for the HeatPump.
+    Default: `['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']`
+  * *swing_mode* (_Optional_, list): Supported fan swing modes. Most Mitsubishi
+    units only support the default. Default: `['OFF', 'VERTICAL']`
 
 ## Other configuration
 
