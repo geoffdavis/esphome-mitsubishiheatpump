@@ -9,7 +9,8 @@
  * Author: @am-io on Github.
  * Author: @nao-pon on Github.
  * Author: Simon Knopp @sijk on Github
- * Last Updated: 2021-05-27
+ * Author: Paul Murphy @donutsoft on GitHub
+ * Last Updated: 2023-04-22
  * License: BSD
  *
  * Requirements:
@@ -40,6 +41,10 @@ MitsubishiHeatPump::MitsubishiHeatPump(
     this->traits_.set_visual_min_temperature(ESPMHP_MIN_TEMPERATURE);
     this->traits_.set_visual_max_temperature(ESPMHP_MAX_TEMPERATURE);
     this->traits_.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
+
+    // Assume a succesful connection was made to the ESPHome controller on
+    // launch.
+    this->ping();
 }
 
 void MitsubishiHeatPump::check_logger_conflict_() {
@@ -62,6 +67,7 @@ void MitsubishiHeatPump::update() {
     heatpumpStatus currentStatus = hp->getStatus();
     this->hpStatusChanged(currentStatus);
 #endif
+    this->enforce_remote_temperature_sensor_timeout();
 }
 
 void MitsubishiHeatPump::set_baud_rate(int baud) {
@@ -402,12 +408,68 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
             this->action = climate::CLIMATE_ACTION_OFF;
     }
 
+    this->operating_ = currentStatus.operating;
+
     this->publish_state();
 }
 
 void MitsubishiHeatPump::set_remote_temperature(float temp) {
     ESP_LOGD(TAG, "Setting remote temp: %.1f", temp);
+    if (temp > 0) {
+        last_remote_temperature_update_ = std::chrono::steady_clock::now();
+    } else {
+        last_remote_temperature_update_.reset();
+    }
+
     this->hp->setRemoteTemperature(temp);
+}
+
+void MitsubishiHeatPump::ping() {
+    ESP_LOGD(TAG, "Ping request received");
+    last_ping_request_ = std::chrono::steady_clock::now();
+}
+
+void MitsubishiHeatPump::set_remote_operating_timeout_minutes(int minutes) {
+    ESP_LOGD(TAG, "Setting remote operating timeout time: %d minutes", minutes);
+    remote_operating_timeout_ = std::chrono::minutes(minutes);
+}
+
+void MitsubishiHeatPump::set_remote_idle_timeout_minutes(int minutes) {
+    ESP_LOGD(TAG, "Setting remote idle timeout time: %d minutes", minutes);
+    remote_idle_timeout_ = std::chrono::minutes(minutes);
+}
+
+void MitsubishiHeatPump::set_remote_ping_timeout_minutes(int minutes) {
+    ESP_LOGD(TAG, "Setting remote ping timeout time: %d minutes", minutes);
+    remote_ping_timeout_ = std::chrono::minutes(minutes);
+}
+
+void MitsubishiHeatPump::enforce_remote_temperature_sensor_timeout() {
+    // Handle ping timeouts.    
+    if (remote_ping_timeout_.has_value() && last_ping_request_.has_value()) {
+        auto time_since_last_ping = 
+            std::chrono::steady_clock::now() - last_ping_request_.value();
+        if(time_since_last_ping > remote_ping_timeout_.value()) {
+            ESP_LOGW(TAG, "Ping timeout.");
+            this->set_remote_temperature(0);
+            last_ping_request_.reset();
+            return;
+        }
+    }
+
+    // Handle set_remote_temperature timeouts.
+    auto remote_set_temperature_timeout = 
+        this->operating_ ? remote_operating_timeout_ : remote_idle_timeout_;
+    if (remote_set_temperature_timeout.has_value() && 
+            last_remote_temperature_update_.has_value()) {
+        auto time_since_last_temperature_update = 
+            std::chrono::steady_clock::now() - last_remote_temperature_update_.value();
+        if (time_since_last_temperature_update > remote_set_temperature_timeout.value()) {
+            ESP_LOGW(TAG, "Set remote temperature timeout, operating=%d", this->operating_);
+            this->set_remote_temperature(0);
+            return;            
+        }
+    }
 }
 
 void MitsubishiHeatPump::setup() {
