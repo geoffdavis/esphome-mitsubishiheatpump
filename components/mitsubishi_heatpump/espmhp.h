@@ -19,6 +19,7 @@
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
+#include <chrono>
 
 #include "HeatPump.h"
 
@@ -99,6 +100,22 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         // set_remote_temp(0) to switch back to the internal sensor.
         void set_remote_temperature(float);
 
+        // Used to validate that a connection is present between the controller
+        // and this heatpump.
+        void ping();
+
+        // Number of minutes before the heatpump reverts back to the internal
+        // temperature sensor if the machine is currently operating.
+        void set_remote_operating_timeout_minutes(int);
+
+        // Number of minutes before the heatpump reverts back to the internal
+        // temperature sensor if the machine is currently idle.
+        void set_remote_idle_timeout_minutes(int);
+
+        // Number of minutes before the heatpump reverts back to the internal
+        // temperature sensor if a ping isn't received from the controller.
+        void set_remote_ping_timeout_minutes(int);
+
     protected:
         // HeatPump object using the underlying Arduino library.
         HeatPump* hp;
@@ -132,11 +149,20 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         static esphome::optional<float> load(esphome::ESPPreferenceObject& storage);
 
     private:
+        void enforce_remote_temperature_sensor_timeout();
+
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
         int baud_ = 0;
         int rx_pin_ = -1;
         int tx_pin_ = -1;
+        bool operating_ = false;
+        
+        optional<std::chrono::duration<long long, std::ratio<60>>> remote_operating_timeout_;
+        optional<std::chrono::duration<long long, std::ratio<60>>> remote_idle_timeout_;
+        optional<std::chrono::duration<long long, std::ratio<60>>> remote_ping_timeout_;
+        optional<std::chrono::time_point<std::chrono::steady_clock>> last_remote_temperature_sensor_update_;
+        optional<std::chrono::time_point<std::chrono::steady_clock>> last_ping_request_;
 };
 
 #endif
