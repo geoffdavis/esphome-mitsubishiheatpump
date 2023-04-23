@@ -6,6 +6,8 @@ from esphome.const import (
     CONF_ID,
     CONF_HARDWARE_UART,
     CONF_BAUD_RATE,
+    CONF_RX_PIN,
+    CONF_TX_PIN,
     CONF_UPDATE_INTERVAL,
     CONF_MODE,
     CONF_FAN_MODE,
@@ -46,10 +48,14 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
         cv.Optional(CONF_BAUD_RATE): cv.positive_int,
+        cv.Optional(CONF_RX_PIN): cv.positive_int,
+        cv.Optional(CONF_TX_PIN): cv.positive_int,
+
         cv.Optional(CONF_REMOTE_OPERATING_TIMEOUT): cv.positive_int,
         cv.Optional(CONF_REMOTE_IDLE_TIMEOUT): cv.positive_int,
         cv.Optional(CONF_REMOTE_PING_TIMEOUT): cv.positive_int,
         
+
         # If polling interval is greater than 9 seconds, the HeatPump library
         # reconnects, but doesn't then follow up with our data request.
         cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.All(
@@ -78,6 +84,12 @@ def to_code(config):
     if CONF_BAUD_RATE in config:
         cg.add(var.set_baud_rate(config[CONF_BAUD_RATE]))
 
+    if CONF_RX_PIN in config:
+        cg.add(var.set_rx_pin(config[CONF_RX_PIN]))
+
+    if CONF_TX_PIN in config:
+        cg.add(var.set_tx_pin(config[CONF_TX_PIN]))
+
     if CONF_REMOTE_OPERATING_TIMEOUT in config:
         cg.add(var.set_remote_operating_timeout_minutes(config[CONF_REMOTE_OPERATING_TIMEOUT]))
 
@@ -86,7 +98,6 @@ def to_code(config):
 
     if CONF_REMOTE_PING_TIMEOUT in config:
         cg.add(var.set_remote_ping_timeout_minutes(config[CONF_REMOTE_PING_TIMEOUT]))
-
 
     supports = config[CONF_SUPPORTS]
     traits = var.config_traits()
