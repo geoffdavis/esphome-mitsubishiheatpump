@@ -268,6 +268,21 @@ climate:
 	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
 	fan swing modes. Most Mitsubishi units only support the default. Default:
     `['OFF', 'VERTICAL']`
+* *remote_temperature_operating_timeout_minutes* (_Optional_): The number of
+  minutes before a set_remote_temperature request becomes stale, while the
+  heatpump is heating or cooling. Unless a new set_remote_temperature 
+  request was made within the time duration, the heatpump will revert back to it's
+  internal temperature sensor.
+* *remote_temperature_idle_timeout_minutes* (_Optional_): The number of
+  minutes before a set_remote_temperature request becomes stale while the heatpump
+  is idle. Unless a new set_remote_temperature request is made within the time duration,
+  the heatpump will revert back to it's internal temperature sensor.
+* *remote_temperature_ping_timeout_minutes* (_Optional_): The number of
+  minutes before a set_remote_temperature request becomes stale, if a ping
+  request wasn't received from your ESPHome controller. This will result
+  in the heatpump reverting to it's internal temperature sensor if the heatpump
+  loses it's WiFi connection.
+
 
 ## Other configuration
 
@@ -331,6 +346,39 @@ api:
       then:
         - lambda: 'id(hp).set_remote_temperature(0);'
 ```
+
+It's also possible to configure timeouts which will revert the heatpump
+back to it's internal temperature sensor in the event that an external sensor
+becomes unavailable. All three settings are optional, but it's recommended
+that you configure both operating and idle timeout. Both can be configured to the same
+value.
+
+```yaml
+climate:
+  - platform: mitsubishi_heatpump
+    remote_temperature_operating_timeout_minutes: 65
+    remote_temperature_idle_timeout_minutes: 120
+    remote_temperature_ping_timeout_minutes: 20
+
+api:
+  services:
+    - service: ping
+      then:
+        - lambda: 'id(hp).ping();'
+```
+
+There is an explicit distinction between an operating timeout and an idle timeout.
+* **Operating timeout** The heatpump is currently pumping heat, and the expectation is that
+  the temperature should shift within a certain time period. Recommended value: 60 minutes.
+* **Idle timeout** The heatpump is not currently pumping heat, so temperature shifts are expected
+  to happen less frequently. Recommended value depends on the implementation details of your temperature
+  sensor. Some will only provide updates on temperature changes, others such as Aqara will provide
+  an update at least once every hour.
+* **Ping timeout** Detects if a connection is lost between HomeAssistant and the heatpump, or if your
+  home assistant instance is down. Recommended value is 20 minutes, with a ping being sent every 5 minutes.
+
+Do not enable ping timeout until you have the logic in place to call the ping service at a regular interval. You
+can view the ESPHome logs to ensure this is taking place.
 
 # See Also
 
