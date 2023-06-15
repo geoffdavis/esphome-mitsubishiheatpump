@@ -232,7 +232,9 @@ climate:
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
     # logging.
+    # For ESP32 specifying baud_rate is mandatory, otherwise a boot loop occurs!
     hardware_uart: UART0
+    baud_rate: 9600
 ```
 
 ## ESP32 Example Configuration
