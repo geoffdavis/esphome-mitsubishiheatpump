@@ -53,6 +53,11 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 #endif
 }
 
+void MitsubishiHeatPump::banner() {
+    ESP_LOGI(TAG, "ESPHome MitsubishiHeatPump version %s",
+            ESPMHP_VERSION);
+}
+
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     //this->dump_config();
@@ -66,6 +71,14 @@ void MitsubishiHeatPump::update() {
 
 void MitsubishiHeatPump::set_baud_rate(int baud) {
     this->baud_ = baud;
+}
+
+void MitsubishiHeatPump::set_rx_pin(int rx_pin) {
+    this->rx_pin_ = rx_pin;
+}
+
+void MitsubishiHeatPump::set_tx_pin(int tx_pin) {
+    this->tx_pin_ = tx_pin;
 }
 
 /**
@@ -451,12 +464,11 @@ void MitsubishiHeatPump::setup() {
             "hw_serial(%p) is &Serial(%p)? %s",
             this->get_hw_serial_(),
             &Serial,
-            YESNO(this->get_hw_serial_() == &Serial)
+            YESNO((void *)this->get_hw_serial_() == (void *)&Serial)
     );
 
     ESP_LOGCONFIG(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
-
-    if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
+    if (hp->connect(this->get_hw_serial_(), this->baud_, this->rx_pin_, this->tx_pin_)) {
         hp->sync();
     }
     else {

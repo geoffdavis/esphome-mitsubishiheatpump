@@ -113,6 +113,8 @@ climate:
     update_interval: 500ms
 ```
 
+#### ESP8266 platforms
+
 On ESP8266 you'll need to disable logging to serial because it conflicts with
 the heatpump UART:
 
@@ -121,9 +123,13 @@ logger:
   baud_rate: 0
 ```
 
+#### ESP32 platforms
+
 On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
-enabled on the main serial port. This may require specifying baud_rate on some
+enabled on the main serial port. This may require specifying `baud_rate` on some
 ESP32 boards.
+
+#### UART Notes
 
 *Note:* this component DOES NOT use the ESPHome `uart` component, as it
 requires direct access to a hardware UART via the Arduino `HardwareSerial`
@@ -133,12 +139,14 @@ software serial libraries, including the one in ESPHome. There's currently no
 way to guarantee access to a hardware UART nor retrieve the `HardwareSerial`
 handle from the `uart` component within the ESPHome framework.
 
-# Example configuration
+# Example configurations
 
 Below is an example configuration which will include wireless strength
 indicators and permit over the air updates. You'll need to create a
 `secrets.yaml` file inside of your `esphome` directory with entries for the
 various items prefixed with `!secret`.
+
+## ESP8266 Example Configuration
 
 ```yaml
 substitutions:
@@ -231,6 +239,91 @@ climate:
     baud_rate: 4800
 ```
 
+## ESP32 Example Configuration
+
+```yaml
+substitutions:
+  name: hptest
+  friendly_name: Test Heatpump
+
+
+esphome:
+  name: ${name}
+
+esp32:
+  board: lolin_s2_mini
+  variant: ESP32S2
+  framework:
+    type: arduino
+    version: 2.0.3
+    platform_version: 5.0.0
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendly_name} Fallback Hotspot"
+    password: !secret fallback_password
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+# Enable Web server.
+web_server:
+  port: 80
+
+  # Sync time with Home Assistant.
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+# Text sensors with general information.
+text_sensor:
+  # Expose ESPHome version as sensor.
+  - platform: version
+    name: ${name} ESPHome Version
+  # Expose WiFi information as sensors.
+  - platform: wifi_info
+    ip_address:
+      name: ${name} IP
+    ssid:
+      name: ${name} SSID
+    bssid:
+      name: ${name} BSSID
+
+# Sensors with general information.
+sensor:
+  # Uptime sensor.
+  - platform: uptime
+    name: ${name} Uptime
+
+  # WiFi Signal sensor.
+  - platform: wifi_signal
+    name: ${name} WiFi Signal
+    update_interval: 60s
+
+external_components:
+  - source: github://geoffdavis/esphome-mitsubishiheatpump
+
+climate:
+  - platform: mitsubishi_heatpump
+    name: "${friendly_name}"
+
+    # ESP32 only - change UART0 to UART1 or UART2 and remove the
+    # logging:baud_rate above to allow the built-in UART0 to function for
+    # logging.
+    hardware_uart: UART1
+```
+
 # Advanced configuration
 
 Some models of heat pump require different baud rates or don't support all
@@ -243,10 +336,13 @@ climate:
     name: "My heat pump"
     hardware_uart: UART2
     baud_rate: 9600
+    rx_pin: 9
+    tx_pin: 10
     supports:
-      mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
-      fan_mode: [AUTO, LOW, MEDIUM, HIGH]
-      swing_mode: [OFF, VERTICAL]
+      mode: ["HEAT_COOL", "COOL", "HEAT", "FAN_ONLY"]
+      fan_mode: ["AUTO", "LOW", "MEDIUM", "HIGH"]
+      swing_mode: ["OFF", "VERTICAL"]
+
     visual:
       min_temperature: 16
       max_temperature: 31
@@ -262,17 +358,20 @@ climate:
   HeatPump. Most systems use the default value of `4800` baud, but some use
   `2400` or `9600`. Some ESP32 boards will require the baud_rate setting if 
   hardware_uart is specified. Default: `4800`.
+* *rx\_pin* (_Optional_): pin number to use as RX for the specified hardware
+  UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
+* *tx\_pin* (_Optional_): pin number to use as TX for the specified hardware
+  UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
-* *supports* (_Optional_): Supported features for the device.  ** *mode*
-  (_Optional_, list): Supported climate modes for the HeatPump. Default:
-  `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
-  ** *fan_mode* (_Optional_, list):
-	Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
-	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
-	fan swing modes. Most Mitsubishi units only support the default. Default:
-    `['OFF', 'VERTICAL']`
+* *supports* (_Optional_): Supported features for the device. 
+  * *mode* (_Optional_, list): Supported climate modes for the HeatPump. Default:
+    `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
+  * *fan_mode* (_Optional_, list): Supported fan speeds for the HeatPump.
+    Default: `['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']`
+  * *swing_mode* (_Optional_, list): Supported fan swing modes. Most Mitsubishi
+    units only support the default. Default: `['OFF', 'VERTICAL']`
 
 ## Other configuration
 

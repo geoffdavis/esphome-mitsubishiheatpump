@@ -21,7 +21,6 @@
 #include "esphome/core/preferences.h"
 
 #include "HeatPump.h"
-using namespace esphome;
 
 #ifndef ESPMHP_H
 #define ESPMHP_H
@@ -41,7 +40,7 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
 static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
 
-class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
+class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::climate::Climate {
 
     public:
 
@@ -58,13 +57,16 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         );
 
         // Print a banner with library information.
-        void banner() {
-            ESP_LOGI(TAG, "ESPHome MitsubishiHeatPump version %s",
-                    ESPMHP_VERSION);
-        }
+        void banner();
 
         // Set the baud rate. Must be called before setup() to have any effect.
         void set_baud_rate(int);
+
+        // Set the RX pin. Must be called before setup() to have any effect.
+        void set_rx_pin(int);
+
+        // Set the TX pin. Must be called before setup() to have any effect.
+        void set_tx_pin(int);
 
         // print the current configuration
         void dump_config() override;
@@ -82,16 +84,16 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         void update() override;
 
         // Configure the climate object with traits that we support.
-        climate::ClimateTraits traits() override;
+        esphome::climate::ClimateTraits traits() override;
 
         // Get a mutable reference to the traits that we support.
-        climate::ClimateTraits& config_traits();
+        esphome::climate::ClimateTraits& config_traits();
 
         // Debugging function to print the object's state.
         void dump_state();
 
         // Handle a request from the user to change settings.
-        void control(const climate::ClimateCall &call) override;
+        void control(const esphome::climate::ClimateCall &call) override;
 
         // Use the temperature from an external sensor. Use
         // set_remote_temp(0) to switch back to the internal sensor.
@@ -102,7 +104,7 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         HeatPump* hp;
 
         // The ClimateTraits supported by this HeatPump.
-        climate::ClimateTraits traits_;
+        esphome::climate::ClimateTraits traits_;
 
         // Allow the HeatPump class to use get_hw_serial_
         friend class HeatPump;
@@ -118,21 +120,23 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
         // various prefs to save mode-specific temperatures, akin to how the IR
         // remote works.
-        ESPPreferenceObject cool_storage;
-        ESPPreferenceObject heat_storage;
-        ESPPreferenceObject auto_storage;
+        esphome::ESPPreferenceObject cool_storage;
+        esphome::ESPPreferenceObject heat_storage;
+        esphome::ESPPreferenceObject auto_storage;
 
-        optional<float> cool_setpoint;
-        optional<float> heat_setpoint;
-        optional<float> auto_setpoint;
+        esphome::optional<float> cool_setpoint;
+        esphome::optional<float> heat_setpoint;
+        esphome::optional<float> auto_setpoint;
 
-        static void save(float value, ESPPreferenceObject& storage);
-        static optional<float> load(ESPPreferenceObject& storage);
+        static void save(float value, esphome::ESPPreferenceObject& storage);
+        static esphome::optional<float> load(esphome::ESPPreferenceObject& storage);
 
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
         int baud_ = 0;
+        int rx_pin_ = -1;
+        int tx_pin_ = -1;
 };
 
 #endif
