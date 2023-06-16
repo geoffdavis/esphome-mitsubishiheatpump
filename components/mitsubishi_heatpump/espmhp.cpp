@@ -58,6 +58,11 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 #endif
 }
 
+void MitsubishiHeatPump::banner() {
+    ESP_LOGI(TAG, "ESPHome MitsubishiHeatPump version %s",
+            ESPMHP_VERSION);
+}
+
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     //this->dump_config();

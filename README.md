@@ -107,6 +107,7 @@ climate:
 
     # Optional
     hardware_uart: UART0
+    baud_rate: 4800
 
     # Optional
     update_interval: 500ms
@@ -125,7 +126,8 @@ logger:
 #### ESP32 platforms
 
 On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
-enabled on the main serial port.
+enabled on the main serial port. This may require specifying `baud_rate` on some
+ESP32 boards.
 
 #### UART Notes
 
@@ -231,8 +233,10 @@ climate:
 
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
-    # logging.
+    # logging. 
+    # Some ESP32 boards will require the baud_rate setting if hardware_uart is specified.
     hardware_uart: UART0
+    baud_rate: 4800
 ```
 
 ## ESP32 Example Configuration
@@ -335,9 +339,10 @@ climate:
     rx_pin: 9
     tx_pin: 10
     supports:
-      mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
-      fan_mode: [AUTO, LOW, MEDIUM, HIGH]
-      swing_mode: [OFF, VERTICAL]
+      mode: ["HEAT_COOL", "COOL", "HEAT", "FAN_ONLY"]
+      fan_mode: ["AUTO", "LOW", "MEDIUM", "HIGH"]
+      swing_mode: ["OFF", "VERTICAL"]
+
     visual:
       min_temperature: 16
       max_temperature: 31
@@ -351,7 +356,8 @@ climate:
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
 * *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
-  `9600`. Default: `4800`
+  `2400` or `9600`. Some ESP32 boards will require the baud_rate setting if 
+  hardware_uart is specified. Default: `4800`.
 * *rx\_pin* (_Optional_): pin number to use as RX for the specified hardware
   UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
 * *tx\_pin* (_Optional_): pin number to use as TX for the specified hardware
@@ -359,12 +365,15 @@ climate:
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
-* *supports* (_Optional_): Supported features for the device.  ** *mode*
+
+* *supports* (_Optional_): Supported features for the device.
+  ** *mode*
   (_Optional_, list): Supported climate modes for the HeatPump. Default:
   `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
   ** *fan_mode* (_Optional_, list):
 	Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
-	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
+	'MEDIUM', 'MIDDLE', 'HIGH']` 
+  ** *swing_mode* (_Optional_, list): Supported
 	fan swing modes. Most Mitsubishi units only support the default. Default:
     `['OFF', 'VERTICAL']`
 * *remote_temperature_operating_timeout_minutes* (_Optional_): The number of
