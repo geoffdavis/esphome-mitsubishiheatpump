@@ -107,6 +107,7 @@ climate:
 
     # Optional
     hardware_uart: UART0
+    baud_rate: 4800
 
     # Optional
     update_interval: 500ms
@@ -125,7 +126,8 @@ logger:
 #### ESP32 platforms
 
 On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
-enabled on the main serial port.
+enabled on the main serial port. This may require specifying `baud_rate` on some
+ESP32 boards.
 
 #### UART Notes
 
@@ -231,10 +233,10 @@ climate:
 
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
-    # logging.
-    # For ESP32 specifying baud_rate is mandatory, otherwise a boot loop occurs!
+    # logging. 
+    # Some ESP32 boards will require the baud_rate setting if hardware_uart is specified.
     hardware_uart: UART0
-    baud_rate: 9600
+    baud_rate: 4800
 ```
 
 ## ESP32 Example Configuration
@@ -354,7 +356,8 @@ climate:
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
 * *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
-  `9600`. Default: `4800`
+  `2400` or `9600`. Some ESP32 boards will require the baud_rate setting if 
+  hardware_uart is specified. Default: `4800`.
 * *rx\_pin* (_Optional_): pin number to use as RX for the specified hardware
   UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
 * *tx\_pin* (_Optional_): pin number to use as TX for the specified hardware
