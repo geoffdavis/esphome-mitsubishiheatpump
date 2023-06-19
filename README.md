@@ -4,23 +4,28 @@ Wirelessly control your Mitsubishi Comfort HVAC equipment with an ESP8266 or
 ESP32 using the [ESPHome](https://esphome.io) framework.
 
 ## Features
-* Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
-* Direct control without the remote.
-* Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino
+
+- Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
+- Direct control without the remote.
+- Uses the [SwiCago/HeatPump](https://github.com/SwiCago/HeatPump) Arduino
   libary to talk to the unit directly via the internal `CN105` connector.
 
 ## Requirements
-* https://github.com/SwiCago/HeatPump
-* ESPHome 1.19.1 or greater
+
+- https://github.com/SwiCago/HeatPump
+- ESPHome 1.19.1 or greater
 
 ## Supported Microcontrollers
+
 This library should work on most ESP8266 or ESP32 platforms. It has been tested
 with the following MCUs:
-* Generic ESP-01S board (ESP8266)
-* WeMos D1 Mini (ESP8266)
-* Generic ESP32 Dev Kit (ESP32)
+
+- Generic ESP-01S board (ESP8266)
+- WeMos D1 Mini (ESP8266)
+- Generic ESP32 Dev Kit (ESP32)
 
 ## Supported Mitsubishi Climate Units
+
 The underlying HeatPump library works with a number of Mitsubishi HVAC
 units. Basically, if the unit has a `CN105` header on the main board, it should
 work with this library. The [HeatPump
@@ -34,14 +39,17 @@ available.
 
 The whole integration with this libary and the underlying HeatPump has been
 tested by the author on the following units:
-* `MSZ-GL06NA`
-* `MFZ-KA09NA`
+
+- `MSZ-GL06NA`
+- `MFZ-KA09NA`
+- `MSZ-FH35V`
 
 ## Usage
+
 ### Step 1: Build a control circuit.
 
 Build a control circuit with your MCU as detailed in the [SwiCago/HeatPump
- README](https://github.com/SwiCago/HeatPump/blob/master/README.md#demo-circuit).
+README](https://github.com/SwiCago/HeatPump/blob/master/README.md#demo-circuit).
 You can use either an ESP8266 or an ESP32 for this.
 
 Note: several users have reported that they've been able to get away with
@@ -70,6 +78,7 @@ external_components:
 Version 2.0 and greater of this libary use the ESPHome `external_components`
 feature, which is a huge step forward in terms of usability. In order to make
 things compile correctly, you will need to:
+
 1. Remove the `libraries` section that imports
    `https://github.com/SwiCago/HeatPump`, as this is handled by the
    `external_component` section of manifest.
@@ -81,15 +90,16 @@ things compile correctly, you will need to:
 5. You may also have to delete the _esphomenodename_ directory that
    corresponds with your _esphomenodename.yaml_ configuration file
    completely. This directory may exist in your base config directory,
-   or in `config/.esphome/build`.  Testing with ESPHome 0.18.x showed this 
+   or in `config/.esphome/build`. Testing with ESPHome 0.18.x showed this
    to be necessary to get the cached copy of src/esphome-mitsubishiheatpump to
    go away entirely, as the "Clean Build Files" isn't as thorough as one would like.
 
-*Note:* Failure to delete the old source directory and remove the `includes`
+_Note:_ Failure to delete the old source directory and remove the `includes`
 and `libraries` lines will likely result in compilation errors complaining
 about duplicate declarations of `MitsubishiHeatPump::traits()`.
 
 ##### Example error
+
 ```
 Linking /data/bedroom_east_heatpump/.pioenvs/bedroom_east_heatpump/firmware.elf
 /root/.platformio/packages/toolchain-xtensa/bin/../lib/gcc/xtensa-lx106-elf/4.8.2/../../../../xtensa-lx106-elf/bin/ld: /data/bedroom_east_heatpump/.pioenvs/bedroom_east_heatpump/src/esphome/components/mitsubishi_heatpump/espmhp.cpp.o: in function `MitsubishiHeatPump::traits()':
@@ -123,10 +133,10 @@ logger:
 On ESP32 you can change `hardware_uart` to `UART1` or `UART2` and keep logging
 enabled on the main serial port.
 
-*Note:* this component DOES NOT use the ESPHome `uart` component, as it
+_Note:_ this component DOES NOT use the ESPHome `uart` component, as it
 requires direct access to a hardware UART via the Arduino `HardwareSerial`
 class. The Mitsubishi Heatpump units use an atypical serial port setting ("even
-parity").  Parity bit support is not implemented in any of the existing
+parity"). Parity bit support is not implemented in any of the existing
 software serial libraries, including the one in ESPHome. There's currently no
 way to guarantee access to a hardware UART nor retrieve the `HardwareSerial`
 handle from the `uart` component within the ESPHome framework.
@@ -142,7 +152,6 @@ various items prefixed with `!secret`.
 substitutions:
   name: hptest
   friendly_name: Test Heatpump
-
 
 esphome:
   name: ${name}
@@ -162,10 +171,10 @@ wifi:
 # Note: if upgrading from 1.x releases of esphome-mitsubishiheatpump, be sure
 # to remove any old entries from the `libraries` and `includes` section.
 #libraries:
-  # Remove reference to SwiCago/HeatPump
+# Remove reference to SwiCago/HeatPump
 
 #includes:
-  # Remove reference to src/esphome-mitsubishiheatpump
+# Remove reference to src/esphome-mitsubishiheatpump
 
 captive_portal:
 
@@ -225,6 +234,10 @@ climate:
     # logging:baud_rate above to allow the built-in UART0 to function for
     # logging.
     hardware_uart: UART0
+    horizontal_vane_select:
+      name: Horizontal Vane Position
+    vertical_vane_select:
+      name: Horizontal Vane Position
 ```
 
 # Advanced configuration
@@ -242,7 +255,7 @@ climate:
     supports:
       mode: [HEAT_COOL, COOL, HEAT, FAN_ONLY]
       fan_mode: [AUTO, LOW, MEDIUM, HIGH]
-      swing_mode: [OFF, VERTICAL]
+      swing_mode: [OFF, VERTICAL, HORIZONTAL, BOTH]
     visual:
       min_temperature: 16
       max_temperature: 31
@@ -251,29 +264,30 @@ climate:
 
 ## Configuration variables that affect this library directly
 
-* *hardware\_uart* (_Optional_): the hardware UART instance to use for
+- _hardware_uart_ (_Optional_): the hardware UART instance to use for
   communcation with the heatpump. On ESP8266, only `UART0` is usable. On ESP32,
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
-* *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
+- _baud_rate_ (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
   `9600`. Default: `4800`
-* *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
+- _update_interval_ (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
-* *supports* (_Optional_): Supported features for the device.  ** *mode*
-  (_Optional_, list): Supported climate modes for the HeatPump. Default:
+- _supports_ (_Optional_): Supported features for the device.  
+   ** _mode_ (_Optional_, list): Supported climate modes for the HeatPump. Default:
   `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
-  ** *fan_mode* (_Optional_, list):
-	Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
-	'MEDIUM', 'MIDDLE', 'HIGH']` ** *swing_mode* (_Optional_, list): Supported
-	fan swing modes. Most Mitsubishi units only support the default. Default:
-    `['OFF', 'VERTICAL']`
+  ** _fan_mode_ (_Optional_, list):
+  Supported fan speeds for the HeatPump. Default: `['AUTO', 'DIFFUSE', 'LOW',
+'MEDIUM', 'MIDDLE', 'HIGH']` \*\* _swing_mode_ (_Optional_, list): Supported
+  fan swing modes. Most Mitsubishi units only support the default. Default:
+  `['OFF', 'VERTICAL', 'HORIZONTAL', 'BOTH']`
+-
 
 ## Other configuration
 
-* *id* (_Optional_): used to identify multiple instances, e.g. "denheatpump"
-* *name* (_Required_): The name of the climate component, e.g. "Den Heatpump"
-* *visual* (_Optional_): The core `Climate` component has several *visual*
+- _id_ (_Optional_): used to identify multiple instances, e.g. "denheatpump"
+- _name_ (_Required_): The name of the climate component, e.g. "Den Heatpump"
+- _visual_ (_Optional_): The core `Climate` component has several _visual_
   options that can be set. See the [Climate
   Component](https://esphome.io/components/climate/index.html) documentation for
   details.
@@ -303,7 +317,7 @@ sensor:
       name: "Lounge temperature"
       on_value:
         then:
-          - lambda: 'id(hp).set_remote_temperature(x);'
+          - lambda: "id(hp).set_remote_temperature(x);"
 
   # Or you could use a HomeAssistant sensor
   - platform: homeassistant
@@ -311,7 +325,7 @@ sensor:
     entity_id: sensor.temperature_sensor
     on_value:
       then:
-        - lambda: 'id(hp).set_remote_temperature(x);'
+        - lambda: "id(hp).set_remote_temperature(x);"
 ```
 
 Alternatively you could define a
@@ -325,16 +339,17 @@ api:
       variables:
         temperature: float
       then:
-        - lambda: 'id(hp).set_remote_temperature(temperature);'
+        - lambda: "id(hp).set_remote_temperature(temperature);"
 
     - service: use_internal_temperature
       then:
-        - lambda: 'id(hp).set_remote_temperature(0);'
+        - lambda: "id(hp).set_remote_temperature(0);"
 ```
 
 # See Also
 
 ## Other Implementations
+
 The [gysmo38/mitsubishi2MQTT](https://github.com/gysmo38/mitsubishi2MQTT)
 Arduino sketch also uses the `SwiCago/HeatPump`
 library, and works with MQTT directly. The author of this implementation found
@@ -354,7 +369,8 @@ the settings via an IR remote.
 ## Reference documentation
 
 The author referred to the following documentation repeatedly:
-* [ESPHome Custom Sensors Reference](https://esphome.io/components/sensor/custom.html)
-* [ESPHome Custom Climate Components Reference](https://esphome.io/components/climate/custom.html)
-* [ESPHome External Components Reference](https://esphome.io/components/external_components.html)
-* [Source for ESPHome's Climate Component](https://github.com/esphome/esphome/tree/master/esphome/components/climate)
+
+- [ESPHome Custom Sensors Reference](https://esphome.io/components/sensor/custom.html)
+- [ESPHome Custom Climate Components Reference](https://esphome.io/components/climate/custom.html)
+- [ESPHome External Components Reference](https://esphome.io/components/external_components.html)
+- [Source for ESPHome's Climate Component](https://github.com/esphome/esphome/tree/master/esphome/components/climate)

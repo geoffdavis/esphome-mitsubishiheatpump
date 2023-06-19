@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import climate
+from esphome.components import climate, select
 from esphome.components.logger import HARDWARE_UART_TO_SERIAL
 from esphome.const import (
     CONF_ID,
@@ -11,17 +11,35 @@ from esphome.const import (
     CONF_FAN_MODE,
     CONF_SWING_MODE,
 )
-from esphome.core import CORE, coroutine
+from esphome.core import CORE
 
-AUTO_LOAD = ["climate"]
+AUTO_LOAD = ["climate", "select"]
 
 CONF_SUPPORTS = "supports"
+CONF_HORIZONTAL_SWING_SELECT = "horizontal_vane_select"
+CONF_VERTICAL_SWING_SELECT = "vertical_vane_select"
+
 DEFAULT_CLIMATE_MODES = ["HEAT_COOL", "COOL", "HEAT", "DRY", "FAN_ONLY"]
 DEFAULT_FAN_MODES = ["AUTO", "DIFFUSE", "LOW", "MEDIUM", "MIDDLE", "HIGH"]
-DEFAULT_SWING_MODES = ["OFF", "VERTICAL"]
+DEFAULT_SWING_MODES = ["OFF", "VERTICAL", "HORIZONTAL", "BOTH"]
+HORIZONTAL_SWING_OPTIONS = [
+    "auto",
+    "swing",
+    "left",
+    "left_center",
+    "center",
+    "right_center",
+    "right",
+]
+VERTICAL_SWING_OPTIONS = ["swing", "auto", "up", "up_center", "center", "down_center", "down"]
+
 
 MitsubishiHeatPump = cg.global_ns.class_(
     "MitsubishiHeatPump", climate.Climate, cg.PollingComponent
+)
+
+MitsubishiACSelect = cg.global_ns.class_(
+    "MitsubishiACSelect", select.Select, cg.Component
 )
 
 
@@ -36,6 +54,11 @@ def valid_uart(uart):
     return cv.one_of(*uarts, upper=True)(uart)
 
 
+SELECT_SCHEMA = select.SELECT_SCHEMA.extend(
+    {cv.GenerateID(CONF_ID): cv.declare_id(MitsubishiACSelect)}
+)
+
+
 CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
@@ -46,8 +69,11 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         cv.Optional(CONF_UPDATE_INTERVAL, default="500ms"): cv.All(
             cv.update_interval, cv.Range(max=cv.TimePeriod(milliseconds=9000))
         ),
+       # Add selects for vertical and horizontal vane positions
+       cv.Optional(CONF_HORIZONTAL_SWING_SELECT): SELECT_SCHEMA,
+       cv.Optional(CONF_VERTICAL_SWING_SELECT): SELECT_SCHEMA,
         # Optionally override the supported ClimateTraits.
-        cv.Optional(CONF_SUPPORTS, default={}): cv.Schema(
+       cv.Optional(CONF_SUPPORTS, default={}): cv.Schema(
             {
                 cv.Optional(CONF_MODE, default=DEFAULT_CLIMATE_MODES):
                     cv.ensure_list(climate.validate_climate_mode),
@@ -61,8 +87,8 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
 ).extend(cv.COMPONENT_SCHEMA)
 
 
-@coroutine
-def to_code(config):
+
+async def to_code(config):
     serial = HARDWARE_UART_TO_SERIAL[config[CONF_HARDWARE_UART]]
     var = cg.new_Pvariable(config[CONF_ID], cg.RawExpression(f"&{serial}"))
 
@@ -85,8 +111,21 @@ def to_code(config):
             climate.CLIMATE_SWING_MODES[mode]
         ))
 
-    yield cg.register_component(var, config)
-    yield climate.register_climate(var, config)
+    if CONF_HORIZONTAL_SWING_SELECT in config:
+        conf = config[CONF_HORIZONTAL_SWING_SELECT]
+        swing_select = await select.new_select(conf, options=HORIZONTAL_SWING_OPTIONS)
+        await cg.register_component(swing_select, conf)
+        cg.add(var.set_horizontal_vane_select(swing_select))
+
+    if CONF_VERTICAL_SWING_SELECT in config:
+        conf = config[CONF_VERTICAL_SWING_SELECT]
+        swing_select = await select.new_select(conf, options=VERTICAL_SWING_OPTIONS)
+        await cg.register_component(swing_select, conf)
+        cg.add(var.set_vertical_vane_select(swing_select))
+
+
+    await cg.register_component(var, config)
+    await climate.register_climate(var, config)
     cg.add_library(
         name="HeatPump",
         repository="https://github.com/SwiCago/HeatPump",

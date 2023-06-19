@@ -33,3 +33,5 @@
 
 # Python cache
 __pycache__
+
+.vscode
