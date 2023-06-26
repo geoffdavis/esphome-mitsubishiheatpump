@@ -254,9 +254,11 @@ climate:
 * *hardware\_uart* (_Optional_): the hardware UART instance to use for
   communcation with the heatpump. On ESP8266, only `UART0` is usable. On ESP32,
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
-* *baud\_rate* (_Optional_): Serial BAUD rate used to communicate with the
+* *baud\_rate* (_Optional_): Serial baud rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
-  `9600`. Default: `4800`
+  `2400` or `9600`. Check [here](https://github.com/SwiCago/HeatPump/issues/13)
+  for discussion of whether your particular model requires a non-default baud rate.
+  Default: `4800`
 * *update\_interval* (_Optional_, range: 0ms to 9000ms): How often this
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
