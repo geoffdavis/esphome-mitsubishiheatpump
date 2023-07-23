@@ -283,7 +283,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 heat_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, heat_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            // this->action = climate::CLIMATE_ACTION_IDLE;
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
             this->mode = climate::CLIMATE_MODE_DRY;
             this->action = climate::CLIMATE_ACTION_DRYING;
@@ -293,7 +293,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 cool_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, cool_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            // this->action = climate::CLIMATE_ACTION_IDLE;
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
             this->action = climate::CLIMATE_ACTION_FAN;
@@ -303,7 +303,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
                 auto_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, auto_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            // this->action = climate::CLIMATE_ACTION_IDLE;
         } else {
             ESP_LOGW(
                     TAG,
