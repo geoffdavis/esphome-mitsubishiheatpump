@@ -20,6 +20,7 @@
 #include "espmhp.h"
 using namespace esphome;
 
+
 /**
  * Create a new MitsubishiHeatPump object
  *
@@ -408,9 +409,9 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 void MitsubishiHeatPump::setup() {
     // This will be called by App.setup()
     this->banner();
-    ESP_LOGCONFIG(TAG, "Setting up UART...");
+    ESP_LOGD(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
-        ESP_LOGCONFIG(
+        ESP_LOGW(
             TAG,
             "No HardwareSerial was provided. "
             "Software serial ports are unsupported by this component."
@@ -420,7 +421,7 @@ void MitsubishiHeatPump::setup() {
     }
     this->check_logger_conflict_();
 
-    ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
+    ESP_LOGD(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
     this->current_temperature = NAN;
     this->target_temperature = NAN;
@@ -441,7 +442,7 @@ void MitsubishiHeatPump::setup() {
     );
 #endif
 
-    ESP_LOGCONFIG(
+    ESP_LOGD(
         TAG,
         "hw_serial(%p) is &Serial(%p)? %s",
         this->get_hw_serial_(),
@@ -449,12 +450,12 @@ void MitsubishiHeatPump::setup() {
         YESNO(this->get_hw_serial_() == &Serial)
     );
 
-    ESP_LOGCONFIG(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
+    ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
-        ESP_LOGCONFIG(
+        ESP_LOGE(
             TAG,
             "Connection to HeatPump failed."
             " Marking MitsubishiHeatPump component as failed."
@@ -505,7 +506,11 @@ void MitsubishiHeatPump::dump_config() {
 
 void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
-    ESP_LOGI(TAG, "HELLO");
+
+    ESP_LOGI("", "MitsubishiHeatPump Climate", this);
+
+    ESP_LOGI(TAG, "HELLO from echavet");
+
 #ifndef USE_CALLBACKS
     ESP_LOGI(TAG, "Not using callbacks");
 #else
