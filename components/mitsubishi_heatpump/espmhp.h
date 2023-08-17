@@ -15,7 +15,7 @@
  * - ESPHome 1.19.1 or greater
  */
 
-#define USE_CALLBACKS
+#define DO_NOT_USE_CALLBACKS
 
 
 #include "esphome.h"
