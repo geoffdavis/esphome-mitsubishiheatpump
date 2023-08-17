@@ -15,8 +15,8 @@
  * - ESPHome 1.19.1 or greater
  */
 
-#define DO_NOT_USE_CALLBACKS
-
+#define USE_CALLBACKS
+#define ESPHOME_LOG_LEVEL ESPHOME_LOG_LEVEL_VERBOSE
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
