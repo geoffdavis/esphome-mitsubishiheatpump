@@ -358,7 +358,11 @@ void MitsubishiHeatPump::hpSettingsChanged() {
  * Report changes in the current temperature sensed by the HeatPump.
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
+
+    ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
+
     this->current_temperature = currentStatus.roomTemperature;
+    ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
     switch (this->mode) {
     case climate::CLIMATE_MODE_HEAT:
         if (currentStatus.operating) {
@@ -434,6 +438,8 @@ void MitsubishiHeatPump::setup() {
             this->hpSettingsChanged();
         }
     );
+
+    ESP_LOGD(TAG, "Setting callback status changed function...");
 
     hp->setStatusChangedCallback(
         [this](heatpumpStatus currentStatus) {
