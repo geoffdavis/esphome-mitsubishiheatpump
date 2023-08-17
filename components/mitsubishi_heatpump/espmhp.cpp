@@ -506,4 +506,9 @@ void MitsubishiHeatPump::dump_config() {
 void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO");
+#ifndef USE_CALLBACKS
+    ESP_LOGI(TAG, "Not using callbacks");
+#else
+    ESP_LOGI(TAG, "Using callbacks");
+#endif
 }
