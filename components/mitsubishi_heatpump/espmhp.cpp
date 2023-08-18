@@ -430,18 +430,14 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Setting up UART...");
     ESP_LOGD(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
-        ESP_LOGW(
-            TAG,
-            "No HardwareSerial was provided. "
-            "Software serial ports are unsupported by this component."
-        );
+        ESP_LOGW(TAG, "No HardwareSerial was provided. Software serial ports are unsupported by this component.");
         this->mark_failed();
         return;
     }
     this->check_logger_conflict_();
 
     ESP_LOGD(TAG, "Intializing new HeatPump object.");
-    ESP_LOGD(TAG, "Intializing new HeatPump object.");
+
     this->hp = new HeatPump();
     this->current_temperature = NAN;
     this->target_temperature = NAN;
