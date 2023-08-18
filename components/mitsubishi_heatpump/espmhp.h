@@ -15,8 +15,7 @@
  * - ESPHome 1.19.1 or greater
  */
 
-#define DO_NOT_USE_CALLBACKS
-#define ESPHOME_LOG_LEVEL ESPHOME_LOG_LEVEL_VERBOSE
+#define USE_CALLBACKS
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
@@ -73,8 +72,14 @@ public:
     // handle a change in settings as detected by the HeatPump library.
     void hpSettingsChanged();
 
+    // being notified when the connection is ok.
+    void hpDidConnect();
+
     // Handle a change in status as detected by the HeatPump library.
     void hpStatusChanged(heatpumpStatus currentStatus);
+
+    // Handle room temperature change
+    void roomTempChanged(float currentRoomTemperature);
 
     // Set up the component, initializing the HeatPump object.
     void setup() override;

@@ -33,3 +33,9 @@
 
 # Python cache
 __pycache__
+.esphome
+secrets.yaml
+hpsejour.yaml
+.gitignore
+.gitignore
+.vscode/settings.json
