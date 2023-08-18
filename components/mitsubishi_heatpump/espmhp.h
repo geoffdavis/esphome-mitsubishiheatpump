@@ -79,7 +79,7 @@ public:
     void hpStatusChanged(heatpumpStatus currentStatus);
 
     // Handle room temperature change
-    void roomTempChanged(float currentRoomTemperature);
+    void hpRoomTempChanged(float currentRoomTemperature);
 
     // Set up the component, initializing the HeatPump object.
     void setup() override;

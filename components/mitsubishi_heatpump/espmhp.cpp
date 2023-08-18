@@ -358,7 +358,7 @@ void MitsubishiHeatPump::hpDidConnect() {
     ESP_LOGI(TAG, "Connection à la clim établie");
 }
 
-void MitsubishiHeatPump::roomTempChanged(float currentRoomTemperature) {
+void MitsubishiHeatPump::hpRoomTempChanged(float currentRoomTemperature) {
     ESP_LOGD(TAG, "roomTempChanged %f", currentRoomTemperature);
     this->current_temperature = currentRoomTemperature;
     this->dump_state();
@@ -469,7 +469,7 @@ void MitsubishiHeatPump::setup() {
 
     hp->setRoomTempChangedCallback(
         [this](float currentRoomTemperature) {
-            this->hpStatusChanged(currentRoomTemperature);
+            this->hpRoomTempChanged(currentRoomTemperature);
         }
     );
 
