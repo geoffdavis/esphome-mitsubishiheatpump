@@ -420,10 +420,6 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 
 void MitsubishiHeatPump::setup() {
 
-    ESP_LOGD(TAG, "SETUP HeatPump...");
-    ESP_LOGD(TAG, "Waiting for 10 seconds...");
-    esphome::delay(10000);
-
     ESP_LOGD(TAG, "SETUP starting...");
 
     // This will be called by App.setup()
@@ -507,6 +503,11 @@ void MitsubishiHeatPump::setup() {
     auto_setpoint = load(auto_storage);
 
     this->dump_config();
+    ESP_LOGI(TAG, "heatpump connected:", hp->isConnected());
+    ESP_LOGD(TAG, "heatpump room temp: %f", hp->getRoomTemperature);
+    ESP_LOGI(TAG, "heatpump room temp: %f", hp->getRoomTemperature);
+    ESP_LOGD(TAG, "heatpump operating: ", hp->getOperating());
+
 }
 
 /**
