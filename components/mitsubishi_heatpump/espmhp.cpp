@@ -431,11 +431,10 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
         ESP_LOGW(
-            ESP_LOGW(
-                TAG,
-                "No HardwareSerial was provided. "
-                "Software serial ports are unsupported by this component."
-            );
+            TAG,
+            "No HardwareSerial was provided. "
+            "Software serial ports are unsupported by this component."
+        );
         this->mark_failed();
         return;
     }
