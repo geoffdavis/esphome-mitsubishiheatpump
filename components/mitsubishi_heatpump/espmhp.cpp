@@ -561,9 +561,9 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGI(TAG, "HELLO from echavet");
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
-    if (this->cpt_ == 0) {
+    //if (this->cpt_ == 0) {
         this->setup();
-        this->cpt_++;
-    }
+        //this->cpt_++;
+    //}
 
 }
