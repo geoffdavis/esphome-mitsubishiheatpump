@@ -504,8 +504,8 @@ void MitsubishiHeatPump::setup() {
 
     this->dump_config();
     ESP_LOGI(TAG, "heatpump connected:", hp->isConnected());
-    ESP_LOGD(TAG, "heatpump room temp: %f", hp->getRoomTemperature);
-    ESP_LOGI(TAG, "heatpump room temp: %f", hp->getRoomTemperature);
+    ESP_LOGD(TAG, "heatpump room temp: %f", hp->getRoomTemperature());
+    ESP_LOGI(TAG, "heatpump room temp: %f", hp->getRoomTemperature());
     ESP_LOGD(TAG, "heatpump operating: ", hp->getOperating());
 
 }
