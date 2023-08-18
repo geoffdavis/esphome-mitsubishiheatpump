@@ -259,7 +259,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * mode, but that isn't working right yet.
          */
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time.");
-        esphome::delay(10);
+        esphome::delay(50);
         return;
     }
 
@@ -368,14 +368,8 @@ void MitsubishiHeatPump::hpRoomTempChanged(float currentRoomTemperature) {
  * Report changes in the current temperature sensed by the HeatPump.
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
-
     ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
-
-
-    ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
-
     this->current_temperature = currentStatus.roomTemperature;
-    ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
     ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
     switch (this->mode) {
     case climate::CLIMATE_MODE_HEAT:
@@ -427,7 +421,6 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 void MitsubishiHeatPump::setup() {
     // This will be called by App.setup()
     this->banner();
-    ESP_LOGD(TAG, "Setting up UART...");
     ESP_LOGD(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
         ESP_LOGW(TAG, "No HardwareSerial was provided. Software serial ports are unsupported by this component.");
@@ -530,25 +523,18 @@ optional<float> MitsubishiHeatPump::load(ESPPreferenceObject& storage) {
 void MitsubishiHeatPump::dump_config() {
     this->banner();
     ESP_LOGI(TAG, "  Version de Eric Chavet 1.0");
-    ESP_LOGI(TAG, "  Version de Eric Chavet 1.0");
     ESP_LOGI(TAG, "  Supports HEAT: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports COOL: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports AWAY mode: %s", YESNO(false));
     ESP_LOGI(TAG, "  Saved heat: %.1f", heat_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved cool: %.1f", cool_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved auto: %.1f", auto_setpoint.value_or(-1));
+    this->dump_state();
 }
 
 void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
-
     ESP_LOGI("", "MitsubishiHeatPump Climate", this);
-
-    ESP_LOGI(TAG, "HELLO from echavet");
-
-
-    ESP_LOGI("", "MitsubishiHeatPump Climate", this);
-
     ESP_LOGI(TAG, "HELLO from echavet");
 
 #ifndef USE_CALLBACKS
