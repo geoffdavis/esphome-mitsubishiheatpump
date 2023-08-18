@@ -21,6 +21,7 @@
 using namespace esphome;
 
 
+
 /**
  * Create a new MitsubishiHeatPump object
  *
@@ -370,7 +371,11 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
 
     ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
 
+
+    ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
+
     this->current_temperature = currentStatus.roomTemperature;
+    ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
     ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
     switch (this->mode) {
     case climate::CLIMATE_MODE_HEAT:
@@ -423,17 +428,20 @@ void MitsubishiHeatPump::setup() {
     // This will be called by App.setup()
     this->banner();
     ESP_LOGD(TAG, "Setting up UART...");
+    ESP_LOGD(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
         ESP_LOGW(
-            TAG,
-            "No HardwareSerial was provided. "
-            "Software serial ports are unsupported by this component."
-        );
+            ESP_LOGW(
+                TAG,
+                "No HardwareSerial was provided. "
+                "Software serial ports are unsupported by this component."
+            );
         this->mark_failed();
         return;
     }
     this->check_logger_conflict_();
 
+    ESP_LOGD(TAG, "Intializing new HeatPump object.");
     ESP_LOGD(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
     this->current_temperature = NAN;
@@ -456,6 +464,8 @@ void MitsubishiHeatPump::setup() {
         }
     );
 
+    ESP_LOGD(TAG, "Setting callback status changed function...");
+
     hp->setStatusChangedCallback(
         [this](heatpumpStatus currentStatus) {
             this->hpStatusChanged(currentStatus);
@@ -471,23 +481,26 @@ void MitsubishiHeatPump::setup() {
 #endif
 
     ESP_LOGD(
-        TAG,
-        "hw_serial(%p) is &Serial(%p)? %s",
-        this->get_hw_serial_(),
-        &Serial,
-        YESNO(this->get_hw_serial_() == &Serial)
-    );
+        ESP_LOGD(
+            TAG,
+            "hw_serial(%p) is &Serial(%p)? %s",
+            this->get_hw_serial_(),
+            &Serial,
+            YESNO(this->get_hw_serial_() == &Serial)
+        );
 
+    ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
         ESP_LOGE(
-            TAG,
-            "Connection to HeatPump failed."
-            " Marking MitsubishiHeatPump component as failed."
-        );
+            ESP_LOGE(
+                TAG,
+                "Connection to HeatPump failed."
+                " Marking MitsubishiHeatPump component as failed."
+            );
         this->mark_failed();
     }
 
@@ -525,6 +538,7 @@ optional<float> MitsubishiHeatPump::load(ESPPreferenceObject& storage) {
 void MitsubishiHeatPump::dump_config() {
     this->banner();
     ESP_LOGI(TAG, "  Version de Eric Chavet 1.0");
+    ESP_LOGI(TAG, "  Version de Eric Chavet 1.0");
     ESP_LOGI(TAG, "  Supports HEAT: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports COOL: %s", YESNO(true));
     ESP_LOGI(TAG, "  Supports AWAY mode: %s", YESNO(false));
@@ -535,6 +549,11 @@ void MitsubishiHeatPump::dump_config() {
 
 void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
+
+    ESP_LOGI("", "MitsubishiHeatPump Climate", this);
+
+    ESP_LOGI(TAG, "HELLO from echavet");
+
 
     ESP_LOGI("", "MitsubishiHeatPump Climate", this);
 
