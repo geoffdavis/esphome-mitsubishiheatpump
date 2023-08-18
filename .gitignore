@@ -37,5 +37,4 @@ __pycache__
 secrets.yaml
 hpsejour.yaml
 .gitignore
-.gitignore
 .vscode/settings.json

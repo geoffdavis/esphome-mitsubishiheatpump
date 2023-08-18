@@ -140,6 +140,7 @@ private:
     // Retrieve the HardwareSerial pointer from friend and subclasses.
     HardwareSerial* hw_serial_;
     int baud_ = 0;
+    // compteur pour n'appeler setup() qu'une fois de plus
     int cpt_ = 0;
 };
 
