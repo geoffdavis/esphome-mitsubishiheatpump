@@ -474,28 +474,25 @@ void MitsubishiHeatPump::setup() {
     );
 
 #endif
-
     ESP_LOGD(
-        ESP_LOGD(
-            TAG,
-            "hw_serial(%p) is &Serial(%p)? %s",
-            this->get_hw_serial_(),
-            &Serial,
-            YESNO(this->get_hw_serial_() == &Serial)
-        );
+        TAG,
+        "hw_serial(%p) is &Serial(%p)? %s",
+        this->get_hw_serial_(),
+        &Serial,
+        YESNO(this->get_hw_serial_() == &Serial)
+    );
 
-    ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
+
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
         ESP_LOGE(
-            ESP_LOGE(
-                TAG,
-                "Connection to HeatPump failed."
-                " Marking MitsubishiHeatPump component as failed."
-            );
+            TAG,
+            "Connection to HeatPump failed."
+            " Marking MitsubishiHeatPump component as failed."
+        );
         this->mark_failed();
     }
 
