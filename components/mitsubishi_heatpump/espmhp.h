@@ -16,7 +16,7 @@
  */
 
 #define DO_NOT_USE_CALLBACKS
-
+#define ESPHOME_LOG_LEVEL ESPHOME_LOG_LEVEL_VERBOSE
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
