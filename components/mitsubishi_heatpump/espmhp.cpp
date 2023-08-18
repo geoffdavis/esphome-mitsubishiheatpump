@@ -504,7 +504,7 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGI(TAG, "calling dump config:");
 
-    this->dump_config();
+    //this->dump_config();
 
 
 
@@ -561,5 +561,9 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGI(TAG, "HELLO from echavet");
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
+    if (this->cpt_ == 0) {
+        this->setup();
+        this->cpt_++;
+    }
 
 }
