@@ -419,6 +419,13 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 }
 
 void MitsubishiHeatPump::setup() {
+
+    ESP_LOGD(TAG, "SETUP HeatPump...");
+    ESP_LOGD(TAG, "Waiting for 10 seconds...");
+    esphome::delay(10000);
+
+    ESP_LOGD(TAG, "SETUP starting...");
+
     // This will be called by App.setup()
     this->banner();
     ESP_LOGD(TAG, "Setting up UART...");
@@ -432,7 +439,7 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Intializing new HeatPump object.");
 
     this->hp = new HeatPump();
-    this->current_temperature = NAN;
+    //this->current_temperature = NAN;
     this->target_temperature = NAN;
     this->fan_mode = climate::CLIMATE_FAN_OFF;
     this->swing_mode = climate::CLIMATE_SWING_OFF;
@@ -529,6 +536,13 @@ void MitsubishiHeatPump::dump_config() {
     ESP_LOGI(TAG, "  Saved heat: %.1f", heat_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved cool: %.1f", cool_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved auto: %.1f", auto_setpoint.value_or(-1));
+
+#ifndef USE_CALLBACKS
+    ESP_LOGI(TAG, "Not using callbacks");
+#else
+    ESP_LOGI(TAG, "Using callbacks");
+#endif
+
     this->dump_state();
 }
 
@@ -536,10 +550,4 @@ void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO from echavet");
-
-#ifndef USE_CALLBACKS
-    ESP_LOGI(TAG, "Not using callbacks");
-#else
-    ESP_LOGI(TAG, "Using callbacks");
-#endif
 }
