@@ -469,7 +469,7 @@ void MitsubishiHeatPump::setup() {
 
     hp->setRoomTempChangedCallback(
         [this](float currentRoomTemperature) {
-            this->hpStatusChanged(currentStatus);
+            this->hpStatusChanged(currentRoomTemperature);
         }
     );
 
