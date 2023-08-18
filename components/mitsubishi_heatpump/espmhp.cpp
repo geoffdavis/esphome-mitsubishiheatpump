@@ -502,11 +502,14 @@ void MitsubishiHeatPump::setup() {
     heat_setpoint = load(heat_storage);
     auto_setpoint = load(auto_storage);
 
+    ESP_LOGI(TAG, "calling dump config:");
+
     this->dump_config();
-    ESP_LOGI(TAG, "heatpump connected:", hp->isConnected());
-    ESP_LOGD(TAG, "heatpump room temp: %f", hp->getRoomTemperature());
-    ESP_LOGI(TAG, "heatpump room temp: %f", hp->getRoomTemperature());
-    ESP_LOGD(TAG, "heatpump operating: ", hp->getOperating());
+
+    ESP_LOGI(TAG, "heatpump connected:", this->hp->isConnected());
+    ESP_LOGD(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
+    ESP_LOGI(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
+    ESP_LOGD(TAG, "heatpump operating: ", this->hp->getOperating());
 
 }
 
@@ -537,6 +540,9 @@ void MitsubishiHeatPump::dump_config() {
     ESP_LOGI(TAG, "  Saved heat: %.1f", heat_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved cool: %.1f", cool_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  Saved auto: %.1f", auto_setpoint.value_or(-1));
+    ESP_LOGI(TAG, "  ---- ");
+    ESP_LOGI(TAG, "  hp : ", this->hp);
+    ESP_LOGI(TAG, "  ---- ");
 
 #ifndef USE_CALLBACKS
     ESP_LOGI(TAG, "Not using callbacks");
