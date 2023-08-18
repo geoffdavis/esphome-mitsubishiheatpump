@@ -506,10 +506,7 @@ void MitsubishiHeatPump::setup() {
 
     this->dump_config();
 
-    ESP_LOGI(TAG, "heatpump connected:", this->hp->isConnected());
-    ESP_LOGD(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
-    ESP_LOGI(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
-    ESP_LOGD(TAG, "heatpump operating: ", this->hp->getOperating());
+
 
 }
 
@@ -542,6 +539,10 @@ void MitsubishiHeatPump::dump_config() {
     ESP_LOGI(TAG, "  Saved auto: %.1f", auto_setpoint.value_or(-1));
     ESP_LOGI(TAG, "  ---- ");
     ESP_LOGI(TAG, "  hp : ", this->hp);
+    ESP_LOGI(TAG, "heatpump connected:", this->hp->isConnected());
+    ESP_LOGD(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
+    ESP_LOGI(TAG, "heatpump room temp: %f", this->hp->getRoomTemperature());
+    ESP_LOGD(TAG, "heatpump operating: ", this->hp->getOperating());
     ESP_LOGI(TAG, "  ---- ");
 
 #ifndef USE_CALLBACKS
