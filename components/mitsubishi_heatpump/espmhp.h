@@ -140,6 +140,7 @@ private:
     // Retrieve the HardwareSerial pointer from friend and subclasses.
     HardwareSerial* hw_serial_;
     int baud_ = 0;
+    int cpt_ = 0;
 };
 
 #endif
