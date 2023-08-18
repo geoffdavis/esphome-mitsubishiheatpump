@@ -555,7 +555,11 @@ void MitsubishiHeatPump::dump_config() {
 }
 
 void MitsubishiHeatPump::dump_state() {
+
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO from echavet");
+
+    ESP_LOGI(TAG, "  component state : %d", this->component_state_);
+
 }
