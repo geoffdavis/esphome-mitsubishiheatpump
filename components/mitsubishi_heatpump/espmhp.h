@@ -141,7 +141,7 @@ private:
     HardwareSerial* hw_serial_;
     int baud_ = 0;
     // compteur pour n'appeler setup() qu'une fois de plus
-    //int cpt_ = 0;
+    int cpt_ = 0;
 };
 
-//#endif
+#endif
