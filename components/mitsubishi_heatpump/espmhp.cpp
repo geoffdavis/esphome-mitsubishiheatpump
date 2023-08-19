@@ -447,7 +447,7 @@ void MitsubishiHeatPump::setup() {
         }
     );
 
-    ESP_LOGD(TAG, "Setting callback status changed function...");
+    ESP_LOGD(TAG, "Setting callback onConnect changed function...");
 
     hp->setOnConnectCallback(
         [this]() {
@@ -484,12 +484,13 @@ void MitsubishiHeatPump::setup() {
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
+        hp->sync();
         ESP_LOGE(
             TAG,
             "Connection to HeatPump failed."
             " Marking MitsubishiHeatPump component as failed."
         );
-        this->mark_failed();
+        //this->mark_failed();
     }
 
     // create various setpoint persistence:
@@ -562,7 +563,7 @@ void MitsubishiHeatPump::dump_state() {
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
     if (this->cpt_ == 0) {
-        this->setup();
+        //this->setup();
         this->cpt_++;
     }
 

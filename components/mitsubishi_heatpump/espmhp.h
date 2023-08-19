@@ -15,15 +15,15 @@
  * - ESPHome 1.19.1 or greater
  */
 
-#define USE_CALLBACKS
-
+ //#define USE_CALLBACKS
+#define ESP32
 #include "esphome.h"
 #include "esphome/core/preferences.h"
 
 #include "HeatPump.h"
 using namespace esphome;
 
-#ifndef ESPMHP_H 
+//#ifndef ESPMHP_H 
 #define ESPMHP_H
 
 
@@ -144,4 +144,4 @@ private:
     int cpt_ = 0;
 };
 
-#endif
+//#endif
