@@ -23,7 +23,7 @@ using namespace esphome;
 
 #ifdef ESP32
 #include <WiFi.h>
-#else
+#endif
 
 /**
  * Create a new MitsubishiHeatPump object
