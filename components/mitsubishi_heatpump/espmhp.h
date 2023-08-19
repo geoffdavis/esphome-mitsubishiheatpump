@@ -23,7 +23,7 @@
 #include "HeatPump.h"
 using namespace esphome;
 
-//#ifndef ESPMHP_H 
+#ifndef ESPMHP_H 
 #define ESPMHP_H
 
 
