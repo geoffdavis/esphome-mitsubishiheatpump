@@ -23,7 +23,7 @@
 #include "HeatPump.h"
 using namespace esphome;
 
-//#ifndef ESPMHP_H 
+#ifndef ESPMHP_H 
 #define ESPMHP_H
 
 
@@ -144,4 +144,4 @@ private:
     int cpt_ = 0;
 };
 
-//#endif
+#endif

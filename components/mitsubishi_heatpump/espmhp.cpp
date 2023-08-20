@@ -487,12 +487,12 @@ void MitsubishiHeatPump::setup() {
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
-        hp->sync();
         ESP_LOGE(
             TAG,
             "Connection to HeatPump failed."
             " Marking MitsubishiHeatPump component as failed."
         );
+        hp->sync();
         //this->mark_failed();
     }
 
@@ -508,7 +508,7 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGI(TAG, "calling dump config:");
 
-    //this->dump_config();
+    this->dump_config();
 
 
 
@@ -555,7 +555,6 @@ void MitsubishiHeatPump::dump_config() {
     ESP_LOGI(TAG, "Using callbacks");
 #endif
 
-    this->dump_state();
 }
 
 void MitsubishiHeatPump::dump_state() {
