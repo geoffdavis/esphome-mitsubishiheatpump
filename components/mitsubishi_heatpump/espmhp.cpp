@@ -59,8 +59,9 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
-    //this->dump_config();
+
     this->hp->sync();
+    this->dump_state();
 #ifndef USE_CALLBACKS
     this->hpSettingsChanged();
     heatpumpStatus currentStatus = hp->getStatus();
@@ -262,7 +263,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * mode, but that isn't working right yet.
          */
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time.");
-        esphome::delay(50);
+        esphome::delay(10);
         return;
     }
 
@@ -358,7 +359,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     this->publish_state();
 }
 void MitsubishiHeatPump::hpDidConnect() {
-    ESP_LOGI(TAG, "Connection à la clim établie");
+    ESP_LOGD(TAG, "Connection à la clim établie");
 }
 
 void MitsubishiHeatPump::hpRoomTempChanged(float currentRoomTemperature) {
