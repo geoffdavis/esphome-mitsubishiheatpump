@@ -59,7 +59,7 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
-
+    ESP_LOGD(TAG, "update() called");
     this->hp->sync();
     this->dump_state();
 #ifndef USE_CALLBACKS
@@ -424,6 +424,7 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 
 void MitsubishiHeatPump::setup() {
 
+
     ESP_LOGD(TAG, "SETUP starting...");
 
     // This will be called by App.setup()
@@ -482,10 +483,11 @@ void MitsubishiHeatPump::setup() {
         YESNO(this->get_hw_serial_() == &Serial)
     );
 
-
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
-    if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
+    hp->connect(this->get_hw_serial_(), this->baud_, -1, -1));
+
+    /*if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
         ESP_LOGE(
@@ -495,7 +497,7 @@ void MitsubishiHeatPump::setup() {
         );
         //hp->sync();
         this->mark_failed();
-    }
+    }*/
 
     // create various setpoint persistence:
     cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
@@ -565,8 +567,11 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGI(TAG, "HELLO from echavet");
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
+
     if (this->cpt_ == 0) {
         //this->setup();
+
+        //this->call();
         this->cpt_++;
     }
 
