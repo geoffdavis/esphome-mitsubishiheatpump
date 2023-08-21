@@ -61,7 +61,9 @@ void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     ESP_LOGD(TAG, "update() called");
     this->hp->sync();
-    //heatpumpSettings settings = hp.getSettings();
+
+
+
     this->dump_state();
 #ifndef USE_CALLBACKS
     this->hpSettingsChanged();
@@ -263,16 +265,14 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * to punt on the update. Likely not an issue when run in callback
          * mode, but that isn't working right yet.
          */
-        ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time.");
+        ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. %d", this->cpt_);
         esphome::delay(10);
 
         if (this->cpt_ == 30) {
             ESP_LOGW(TAG, "30 tries, calling setup() again.");
-            this->status_clear_warning();
-            this->status_clear_error();
+            this->component_state_ = 0;
             this->cpt_++;
-            this->call_setup();
-            // this->call();
+            this->call();
             // this->cpt_ = 0;
         }
         this->cpt_++;
@@ -572,8 +572,22 @@ void MitsubishiHeatPump::dump_config() {
 void MitsubishiHeatPump::dump_state() {
 
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
-    ESP_LOGI("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO from echavet");
+
+    heatpumpSettings settings = this->hp->getSettings();
+    heatpumpStatus status = this->hp->getStatus();
+
+    ESP_LOGI(TAG, "HP settings");
+
+    ESP_LOGI(TAG, "power: %s", settings.power);
+    ESP_LOGI(TAG, "fan: %s", settings.fan);
+    ESP_LOGI(TAG, "temperature: %f", settings.temperature);
+    ESP_LOGI(TAG, "mode: %s", settings.mode);
+    ESP_LOGI(TAG, "mode: %s", setting);
+
+    ESP_LOGI(TAG, "HP status");
+    ESP_LOGI(TAG, "operating: %d", status.operating);
+    ESP_LOGI(TAG, "room temp : %f", status.roomTemperature);
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
 
