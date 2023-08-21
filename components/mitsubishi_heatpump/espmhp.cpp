@@ -266,8 +266,8 @@ void MitsubishiHeatPump::hpSettingsChanged() {
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. %d", this->cpt_);
         esphome::delay(10);
 
-        if (this->cpt_ == 30) {
-            ESP_LOGW(TAG, "30 tries, calling setup() again.");
+        if (this->cpt_ == 50) {
+            ESP_LOGW(TAG, "50 tries, calling setup() again.");
             this->component_state_ = 0;
             this->cpt_++;
             this->setup();
@@ -585,10 +585,10 @@ void MitsubishiHeatPump::dump_state() {
         ESP_LOGE(TAG, "settings.power est NULL");
     }
 
-    /*ESP_LOGI(TAG, "HP status:");
+    ESP_LOGI(TAG, "HP status:");
 
     ESP_LOGD(TAG, "operating: %d", status.operating);
-    ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);*/
+    ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);
 
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
 
