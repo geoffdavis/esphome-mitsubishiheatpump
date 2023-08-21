@@ -62,14 +62,12 @@ void MitsubishiHeatPump::update() {
     ESP_LOGD(TAG, "update() called");
     this->hp->sync();
 
-
-
-    this->dump_state();
 #ifndef USE_CALLBACKS
     this->hpSettingsChanged();
     heatpumpStatus currentStatus = hp->getStatus();
     this->hpStatusChanged(currentStatus);
 #endif
+    this->dump_state();
 }
 
 void MitsubishiHeatPump::set_baud_rate(int baud) {
@@ -272,7 +270,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             ESP_LOGW(TAG, "30 tries, calling setup() again.");
             this->component_state_ = 0;
             this->cpt_++;
-            this->call();
+            this->setup();
             // this->cpt_ = 0;
         }
         this->cpt_++;
@@ -571,24 +569,25 @@ void MitsubishiHeatPump::dump_config() {
 
 void MitsubishiHeatPump::dump_state() {
 
-    LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO from echavet");
+    LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
 
     heatpumpSettings settings = this->hp->getSettings();
     heatpumpStatus status = this->hp->getStatus();
 
-    ESP_LOGI(TAG, "HP settings");
+    ESP_LOGI(TAG, "HP settings:");
+    if (settings != NULL) {
+        ESP_LOGD(TAG, "power: %s", settings.power);
+        ESP_LOGD(TAG, "fan: %s", settings.fan);
+        ESP_LOGD(TAG, "temperature: %f", settings.temperature);
+        ESP_LOGD(TAG, "mode: %s", settings.mode);
+    }
 
-    ESP_LOGI(TAG, "power: %s", settings.power);
-    ESP_LOGI(TAG, "fan: %s", settings.fan);
-    ESP_LOGI(TAG, "temperature: %f", settings.temperature);
-    ESP_LOGI(TAG, "mode: %s", settings.mode);
-
-
-    ESP_LOGI(TAG, "HP status");
-    ESP_LOGI(TAG, "operating: %d", status.operating);
-    ESP_LOGI(TAG, "room temp : %f", status.roomTemperature);
-
+    ESP_LOGI(TAG, "HP status:");
+    if (settings != NULL) {
+        ESP_LOGD(TAG, "operating: %d", status.operating);
+        ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);
+    }
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
 
 }
