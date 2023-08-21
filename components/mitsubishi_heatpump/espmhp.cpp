@@ -270,8 +270,8 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             ESP_LOGW(TAG, "30 tries, calling setup() again.");
             this->status_clear_warning();
             this->status_clear_error();
+            this->cpt_++;
             this->call_setup();
-
             // this->call();
             // this->cpt_ = 0;
         }
