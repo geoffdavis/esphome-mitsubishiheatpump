@@ -583,7 +583,7 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGI(TAG, "fan: %s", settings.fan);
     ESP_LOGI(TAG, "temperature: %f", settings.temperature);
     ESP_LOGI(TAG, "mode: %s", settings.mode);
-    ESP_LOGI(TAG, "mode: %s", setting);
+
 
     ESP_LOGI(TAG, "HP status");
     ESP_LOGI(TAG, "operating: %d", status.operating);
