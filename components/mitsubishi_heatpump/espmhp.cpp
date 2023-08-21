@@ -266,17 +266,17 @@ void MitsubishiHeatPump::hpSettingsChanged() {
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time.");
         esphome::delay(10);
 
-        if (this->cpt_ >= 10) {
-            ESP_LOGW(TAG, "10 tries, calling setup() again.");
+        if (this->cpt_ == 30) {
+            ESP_LOGW(TAG, "30 tries, calling setup() again.");
             this->status_clear_warning();
             this->status_clear_error();
             this->call_setup();
 
-            //this->call();
-            this->cpt_ = 0;
-        } else {
-            this->cpt_++;
+            // this->call();
+            // this->cpt_ = 0;
         }
+        this->cpt_++;
+
         return;
     }
 
