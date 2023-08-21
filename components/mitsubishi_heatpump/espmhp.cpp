@@ -576,18 +576,20 @@ void MitsubishiHeatPump::dump_state() {
     heatpumpStatus status = this->hp->getStatus();
 
     ESP_LOGI(TAG, "HP settings:");
-    if (settings != NULL) {
+    if (settings.power != NULL) {
         ESP_LOGD(TAG, "power: %s", settings.power);
         ESP_LOGD(TAG, "fan: %s", settings.fan);
         ESP_LOGD(TAG, "temperature: %f", settings.temperature);
         ESP_LOGD(TAG, "mode: %s", settings.mode);
+    } else {
+        ESP_LOGE(TAG, "settings.power est NULL");
     }
 
-    ESP_LOGI(TAG, "HP status:");
-    if (settings != NULL) {
-        ESP_LOGD(TAG, "operating: %d", status.operating);
-        ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);
-    }
+    /*ESP_LOGI(TAG, "HP status:");
+
+    ESP_LOGD(TAG, "operating: %d", status.operating);
+    ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);*/
+
     ESP_LOGI(TAG, "  component state : %d", this->component_state_);
 
 }
