@@ -61,6 +61,7 @@ void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     ESP_LOGD(TAG, "update() called");
     this->hp->sync();
+    //heatpumpSettings settings = hp.getSettings();
     this->dump_state();
 #ifndef USE_CALLBACKS
     this->hpSettingsChanged();
@@ -440,6 +441,9 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Intializing new HeatPump object.");
 
     this->hp = new HeatPump();
+    //hp->enableAutoUpdate();
+    hp->enableExternalUpdate(); // does enable autoUpdate too
+
     this->current_temperature = NAN;
     this->target_temperature = NAN;
     this->fan_mode = climate::CLIMATE_FAN_OFF;
@@ -451,30 +455,25 @@ void MitsubishiHeatPump::setup() {
             this->hpSettingsChanged();
         }
     );
-
     ESP_LOGD(TAG, "Setting callback onConnect changed function...");
-
     hp->setOnConnectCallback(
         [this]() {
             this->hpDidConnect();
         }
     );
-
     ESP_LOGD(TAG, "Setting callback status changed function...");
-
     hp->setStatusChangedCallback(
         [this](heatpumpStatus currentStatus) {
             this->hpStatusChanged(currentStatus);
         }
     );
-
     hp->setRoomTempChangedCallback(
         [this](float currentRoomTemperature) {
             this->hpRoomTempChanged(currentRoomTemperature);
         }
     );
-
 #endif
+
     ESP_LOGD(
         TAG,
         "hw_serial(%p) is &Serial(%p)? %s",
@@ -485,7 +484,7 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
-    hp->connect(this->get_hw_serial_(), this->baud_, -1, -1);
+    hp->connect(this->get_hw_serial_(), this->baud_);
 
     /*if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
@@ -512,9 +511,6 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGI(TAG, "calling dump config:");
 
     this->dump_config();
-
-
-
 }
 
 /**
