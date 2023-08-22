@@ -778,6 +778,8 @@ int HeatPump::readPacket() {
         ESP_LOGW("HeatPump", "chkSUM error");
       }
     }
+  } else {
+    ESP_LOGW("HeatPump", "AUCUNE donnée disponible!");
   }
 
   return RCVD_PKT_FAIL;

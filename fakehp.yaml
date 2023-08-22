@@ -99,7 +99,7 @@ climate:
       temperature_step: 0.5
 
     # Optional
-    # hardware_uart: UART0
+    hardware_uart: UART0
 
     # Optional
-    # update_interval: 500ms
+    update_interval: 100ms
