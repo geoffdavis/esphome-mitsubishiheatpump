@@ -120,7 +120,7 @@ public:
 class HeatPump {
 private:
   static const int PACKET_LEN = 22;
-  static const int PACKET_SENT_INTERVAL_MS = 1000;
+  static const int PACKET_SENT_INTERVAL_MS = 5000;
   static const int PACKET_INFO_INTERVAL_MS = 2000;
   static const int PACKET_TYPE_DEFAULT = 99;
   static const int AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS = 30000;

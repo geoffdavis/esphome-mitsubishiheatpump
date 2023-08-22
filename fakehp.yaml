@@ -102,4 +102,4 @@ climate:
     hardware_uart: UART0
 
     # Optional
-    update_interval: 100ms
+    update_interval: 500ms
