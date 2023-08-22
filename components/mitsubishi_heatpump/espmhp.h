@@ -21,6 +21,7 @@
 #include "esphome/core/preferences.h"
 
 #include "HeatPump.h"
+
 using namespace esphome;
 
 #ifndef ESPMHP_H 
