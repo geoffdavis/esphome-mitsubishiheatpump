@@ -6,6 +6,7 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
 
+
 esp8266:
   board: esp01_1m
 
@@ -55,6 +56,12 @@ time:
 external_components:
   - source: github://echavet/esphome-mitsubishiheatpump
     refresh: 0s
+
+##external_components:
+##  - source: 
+##      type: local
+##      path: components/mitsubishi_heatpump
+
 
         # Text sensors with general information.
 text_sensor:
