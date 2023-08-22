@@ -17,7 +17,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "HeatPump.h"
-using namespace esphome;
 
 // Structures //////////////////////////////////////////////////////////////////
 
@@ -87,9 +86,6 @@ HeatPump::HeatPump() {
 // Public Methods //////////////////////////////////////////////////////////////
 
 bool HeatPump::connect(HardwareSerial* serial) {
-
-  ESP_LOGD("HeatPump", "FONCTION CONNECT APPELEE Sur HeatPump.cpp");
-
   return connect(serial, -1, -1);
 }
 
