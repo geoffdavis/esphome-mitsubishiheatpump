@@ -125,14 +125,14 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   }
 
   // settle before we start sending packets
-  delay(2000);
+  esphome::delay(2000);
 
   // send the CONNECT packet twice - need to copy the CONNECT packet locally
   byte packet[CONNECT_LEN];
   memcpy(packet, CONNECT, CONNECT_LEN);
   //for(int count = 0; count < 2; count++) {
   writePacket(packet, CONNECT_LEN);
-  while (!canRead()) { delay(10); }
+  while (!canRead()) { esphome::delay(10); }
   int packetType = readPacket();
   if (packetType != RCVD_PKT_CONNECT_SUCCESS && retry) {
     return connect(serial, 9600, rx, tx);
@@ -142,7 +142,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 }
 
 bool HeatPump::update() {
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
 
   // Flush the serial buffer before updating settings to clear out
   // any remaining responses that would prevent us from receiving
@@ -153,14 +153,14 @@ bool HeatPump::update() {
   createPacket(packet, wantedSettings);
   writePacket(packet, PACKET_LEN);
 
-  while (!canRead()) { delay(10); }
+  while (!canRead()) { esphome::delay(10); }
   int packetType = readPacket();
 
   if (packetType == RCVD_PKT_UPDATE_SUCCESS) {
     // call sync() to get the latest settings from the heatpump for autoUpdate, which should now have the updated settings
     if (autoUpdate) { //this sync will happen regardless, but autoUpdate needs it sooner than later.
       while (!canSend(true)) {
-        delay(10);
+        esphome::delay(10);
       }
       sync(RQST_PKT_SETTINGS);
     } else {
@@ -297,7 +297,7 @@ void HeatPump::setRemoteTemperature(float setting) {
   // add the checksum
   byte chkSum = checkSum(packet, 21);
   packet[21] = chkSum;
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
   writePacket(packet, PACKET_LEN);
 }
 
@@ -313,7 +313,7 @@ void HeatPump::setFanSpeed(const char* setting) {
   } else {
     wantedSettings.fan = FAN_MAP[0];
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 const char* HeatPump::getVaneSetting() {
@@ -327,7 +327,7 @@ void HeatPump::setVaneSetting(const char* setting) {
   } else {
     wantedSettings.vane = VANE_MAP[0];
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 const char* HeatPump::getWideVaneSetting() {
@@ -341,7 +341,7 @@ void HeatPump::setWideVaneSetting(const char* setting) {
   } else {
     wantedSettings.wideVane = WIDEVANE_MAP[0];
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 bool HeatPump::getIseeBool() { //no setter yet
@@ -392,7 +392,7 @@ void HeatPump::setRoomTempChangedCallback(ROOM_TEMP_CHANGED_CALLBACK_SIGNATURE) 
 
 //#### WARNING, THE FOLLOWING METHOD CAN F--K YOUR HP UP, USE WISELY ####
 void HeatPump::sendCustomPacket(byte data[], int packetLength) {
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
 
   packetLength += 2; // +2 for first header byte and checksum
   packetLength = (packetLength > PACKET_LEN) ? PACKET_LEN : packetLength; // ensure we are not exceeding PACKET_LEN
@@ -451,11 +451,11 @@ int HeatPump::lookupByteMapValue(const int valuesMap[], const byte byteMap[], in
 }
 
 bool HeatPump::canSend(bool isInfo) {
-  return (millis() - (isInfo ? PACKET_INFO_INTERVAL_MS : PACKET_SENT_INTERVAL_MS)) > lastSend;
+  return (esphome::millis() - (isInfo ? PACKET_INFO_INTERVAL_MS : PACKET_SENT_INTERVAL_MS)) > lastSend;
 }
 
 bool HeatPump::canRead() {
-  return (waitForRead && (millis() - PACKET_SENT_INTERVAL_MS) > lastSend);
+  return (waitForRead && (esphome::millis() - PACKET_SENT_INTERVAL_MS) > lastSend);
 }
 
 byte HeatPump::checkSum(byte bytes[], int len) {
@@ -540,7 +540,7 @@ void HeatPump::writePacket(byte* packet, int length) {
     packetCallback(packet, length, (char*)"packetSent");
   }
   waitForRead = true;
-  lastSend = millis();
+  lastSend = esphome::millis();
 }
 
 int HeatPump::readPacket() {
@@ -559,7 +559,7 @@ int HeatPump::readPacket() {
       header[0] = _HardSerial->read();
       if (header[0] == HEADER[0]) {
         foundStart = true;
-        delay(100); // found that this delay increases accuracy when reading, might not be needed though
+        esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
       }
     }
 
@@ -597,7 +597,7 @@ int HeatPump::readPacket() {
       checksum = (0xfc - dataSum) & 0xff;
 
       if (data[dataLength] == checksum) {
-        lastRecv = millis();
+        lastRecv = esphome::millis();
         if (packetCallback) {
           byte packet[37]; // we are going to put header[5] and data[32] into this, so the whole packet is sent to the callback
           for (int i = 0; i < INFOHEADER_LEN; i++) {
@@ -640,7 +640,7 @@ int HeatPump::readPacket() {
 
             // if this is the first time we have synced with the heatpump, set wantedSettings to receivedSettings
             // hack: add grace period of a few seconds before respecting external changes
-            if (firstRun || (autoUpdate && externalUpdate && millis() - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
+            if (firstRun || (autoUpdate && externalUpdate && esphome::millis() - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
               wantedSettings = currentSettings;
               firstRun = false;
             }
@@ -787,18 +787,18 @@ heatpumpFunctions HeatPump::getFunctions() {
   packet2[5] = FUNCTIONS_GET_PART2;
   packet2[21] = checkSum(packet2, 21);
 
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
   writePacket(packet1, PACKET_LEN);
   readPacket();
 
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
   writePacket(packet2, PACKET_LEN);
   readPacket();
 
   // retry reading a few times in case responses were related
   // to other requests
   for (int i = 0; i < 5 && !functions.isValid(); ++i) {
-    delay(100);
+    esphome::delay(100);
     readPacket();
   }
 
@@ -835,11 +835,11 @@ bool HeatPump::setFunctions(heatpumpFunctions const& functions) {
   packet1[21] = checkSum(packet1, 21);
   packet2[21] = checkSum(packet2, 21);
 
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
   writePacket(packet1, PACKET_LEN);
   readPacket();
 
-  while (!canSend(false)) { delay(10); }
+  while (!canSend(false)) { esphome::delay(10); }
   writePacket(packet2, PACKET_LEN);
   readPacket();
 
