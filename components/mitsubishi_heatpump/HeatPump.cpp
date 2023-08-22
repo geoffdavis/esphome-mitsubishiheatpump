@@ -87,9 +87,6 @@ HeatPump::HeatPump() {
 // Public Methods //////////////////////////////////////////////////////////////
 
 bool HeatPump::connect(HardwareSerial* serial) {
-
-  ESP_LOGD("HeatPump", "FONCTION CONNECT APPELEE Sur HeatPump.cpp");
-
   return connect(serial, -1, -1);
 }
 
@@ -102,11 +99,16 @@ bool HeatPump::connect(HardwareSerial* serial, int rx, int tx) {
 }
 
 bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
+
+  ESP_LOGD("HeatPump", "connection à HP");
+
   if (serial != NULL) {
+    ESP_LOGD("HeatPump", "Serial est null...");
     _HardSerial = serial;
   }
   bool retry = false;
   if (bitrate == 0) {
+    ESP_LOGD("HeatPump", "BitRate est à 0, true->retry et test 2400 et 9600");
     bitrate = 2400;
     retry = true;
   }
@@ -121,6 +123,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
     _HardSerial->begin(bitrate, SERIAL_8E1);
   }
   if (onConnectCallback) {
+    ESP_LOGD("HeatPump", "Appel de onConnectCallback()...");
     onConnectCallback();
   }
 
@@ -128,15 +131,30 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   esphome::delay(2000);
 
   // send the CONNECT packet twice - need to copy the CONNECT packet locally
+
+  ESP_LOGD("HeatPump", "Envoie du packet de connexion...");
+
   byte packet[CONNECT_LEN];
   memcpy(packet, CONNECT, CONNECT_LEN);
+
   //for(int count = 0; count < 2; count++) {
   writePacket(packet, CONNECT_LEN);
-  while (!canRead()) { esphome::delay(10); }
+
+  ESP_LOGD("HeatPump", "Attente de la réponse...");
+
+  while (!canRead()) {
+    ESP_LOGD("HeatPump", ".");
+    esphome::delay(10);
+  }
+
   int packetType = readPacket();
+  ESP_LOGD("HeatPump", "lecture du packet Type: %d", packetType);
+
   if (packetType != RCVD_PKT_CONNECT_SUCCESS && retry) {
+    ESP_LOGD("HeatPump", "packetType != RCVD_PKT_CONNECT_SUCCESS et retry");
     return connect(serial, 9600, rx, tx);
   }
+
   return packetType == RCVD_PKT_CONNECT_SUCCESS;
   //}
 }
@@ -559,11 +577,13 @@ int HeatPump::readPacket() {
       header[0] = _HardSerial->read();
       if (header[0] == HEADER[0]) {
         foundStart = true;
+        ESP_LOGD("HeatPump", "found start");
         esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
       }
     }
 
     if (!foundStart) {
+      ESP_LOGW("HeatPump", "did not find any start, returning an error...");
       return RCVD_PKT_FAIL;
     }
 
@@ -571,10 +591,15 @@ int HeatPump::readPacket() {
     for (int i = 1;i < 5;i++) {
       header[i] = _HardSerial->read();
     }
+    ESP_LOGD("HeatPump", "read header %d %d %d %d", header[1], header[2], header[3], header[4]);
 
     //check header
     if (header[0] == HEADER[0] && header[2] == HEADER[2] && header[3] == HEADER[3]) {
+      ESP_LOGD("HeatPump", "header matches to HEADER");
+
       dataLength = header[4];
+
+      ESP_LOGD("HeatPump", "reading data..");
 
       for (int i = 0;i < dataLength;i++) {
         data[i] = _HardSerial->read();
@@ -595,6 +620,7 @@ int HeatPump::readPacket() {
 
       // calculate checksum
       checksum = (0xfc - dataSum) & 0xff;
+      ESP_LOGD("HeatPump", "chkSUM...");
 
       if (data[dataLength] == checksum) {
         lastRecv = esphome::millis();
@@ -744,6 +770,8 @@ int HeatPump::readPacket() {
           connected = true;
           return RCVD_PKT_CONNECT_SUCCESS;
         }
+      } else {
+        ESP_LOGW("HeatPump", "chkSUM error");
       }
     }
   }

@@ -266,14 +266,14 @@ void MitsubishiHeatPump::hpSettingsChanged() {
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. %d", this->cpt_);
         esphome::delay(10);
 
-        if (this->cpt_ == 50) {
+        /*if (this->cpt_ == 50) {
             ESP_LOGW(TAG, "50 tries, calling setup() again.");
             this->component_state_ = 0;
             this->cpt_++;
             this->setup();
             // this->cpt_ = 0;
         }
-        this->cpt_++;
+        this->cpt_++;*/
 
         return;
     }
@@ -495,9 +495,9 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
-    hp->connect(this->get_hw_serial_(), this->baud_);
+    //hp->connect(this->get_hw_serial_(), this->baud_);
 
-    /*if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
+    if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         hp->sync();
     } else {
         ESP_LOGE(
@@ -505,9 +505,8 @@ void MitsubishiHeatPump::setup() {
             "Connection to HeatPump failed."
             " Marking MitsubishiHeatPump component as failed."
         );
-        //hp->sync();
         this->mark_failed();
-    }*/
+    }
 
     // create various setpoint persistence:
     cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
