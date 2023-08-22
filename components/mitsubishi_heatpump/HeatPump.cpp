@@ -71,10 +71,10 @@ bool operator!=(const heatpumpTimers& lhs, const heatpumpTimers& rhs) {
 // Constructor /////////////////////////////////////////////////////////////////
 
 HeatPump::HeatPump() {
-  lastWanted = millis();
+  lastWanted = esphome::millis();
   lastSend = 0;
   infoMode = 0;
-  lastRecv = millis() - (PACKET_SENT_INTERVAL_MS * 10);
+  lastRecv = esphome::millis() - (PACKET_SENT_INTERVAL_MS * 10);
   autoUpdate = false;
   firstRun = true;
   tempMode = false;
@@ -175,7 +175,7 @@ bool HeatPump::update() {
 }
 
 void HeatPump::sync(byte packetType) {
-  if ((!connected) || (millis() - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
+  if ((!connected) || (esphome::millis() - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
     connect(NULL);
   } else if (canRead()) {
     readAllPackets();
@@ -228,7 +228,7 @@ bool HeatPump::getPowerSettingBool() {
 
 void HeatPump::setPowerSetting(bool setting) {
   wantedSettings.power = lookupByteMapIndex(POWER_MAP, 2, POWER_MAP[setting ? 1 : 0]) > -1 ? POWER_MAP[setting ? 1 : 0] : POWER_MAP[0];
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 const char* HeatPump::getPowerSetting() {
@@ -242,7 +242,7 @@ void HeatPump::setPowerSetting(const char* setting) {
   } else {
     wantedSettings.power = POWER_MAP[0];
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 const char* HeatPump::getModeSetting() {
@@ -256,7 +256,7 @@ void HeatPump::setModeSetting(const char* setting) {
   } else {
     wantedSettings.mode = MODE_MAP[0];
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 float HeatPump::getTemperature() {
@@ -272,7 +272,7 @@ void HeatPump::setTemperature(float setting) {
     setting = setting / 2;
     wantedSettings.temperature = setting < 10 ? 10 : (setting > 31 ? 31 : setting);
   }
-  lastWanted = millis();
+  lastWanted = esphome::millis();
 }
 
 void HeatPump::setRemoteTemperature(float setting) {
