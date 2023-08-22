@@ -80,6 +80,9 @@ public:
     // Handle a change in status as detected by the HeatPump library.
     void hpStatusChanged(heatpumpStatus currentStatus);
 
+    // handle packet response from hp
+    void hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection);
+
     // Handle room temperature change
     void hpRoomTempChanged(float currentRoomTemperature);
 

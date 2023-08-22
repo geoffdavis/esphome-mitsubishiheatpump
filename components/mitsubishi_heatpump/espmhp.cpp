@@ -373,6 +373,18 @@ void MitsubishiHeatPump::hpDidConnect() {
     ESP_LOGD(TAG, "Connection à la clim établie");
 }
 
+void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
+    String message;
+    for (unsigned int idx = 0; idx < length; idx++) {
+        if (packet[idx] < 16) {
+            message += "0"; // pad single hex digits with a 0
+        }
+        message += String(packet[idx], HEX) + " ";
+    }
+    ESP_LOGD(TAG, "hpPacketDebug %s", message);
+
+}
+
 void MitsubishiHeatPump::hpRoomTempChanged(float currentRoomTemperature) {
     ESP_LOGD(TAG, "roomTempChanged %f", currentRoomTemperature);
     this->current_temperature = currentRoomTemperature;
@@ -480,6 +492,12 @@ void MitsubishiHeatPump::setup() {
     hp->setRoomTempChangedCallback(
         [this](float currentRoomTemperature) {
             this->hpRoomTempChanged(currentRoomTemperature);
+        }
+    );
+
+    hp->setPacketCallback(
+        [this](byte* packet, unsigned int length, const char* packetDirection) {
+            this->hpPacketDebug(packet, length, packetDirection);
         }
     );
 #endif
