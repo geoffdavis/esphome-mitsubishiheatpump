@@ -49,12 +49,15 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         # Optionally override the supported ClimateTraits.
         cv.Optional(CONF_SUPPORTS, default={}): cv.Schema(
             {
-                cv.Optional(CONF_MODE, default=DEFAULT_CLIMATE_MODES):
-                    cv.ensure_list(climate.validate_climate_mode),
-                cv.Optional(CONF_FAN_MODE, default=DEFAULT_FAN_MODES):
-                    cv.ensure_list(climate.validate_climate_fan_mode),
-                cv.Optional(CONF_SWING_MODE, default=DEFAULT_SWING_MODES):
-                    cv.ensure_list(climate.validate_climate_swing_mode),
+                cv.Optional(CONF_MODE, default=DEFAULT_CLIMATE_MODES): cv.ensure_list(
+                    climate.validate_climate_mode
+                ),
+                cv.Optional(CONF_FAN_MODE, default=DEFAULT_FAN_MODES): cv.ensure_list(
+                    climate.validate_climate_fan_mode
+                ),
+                cv.Optional(
+                    CONF_SWING_MODE, default=DEFAULT_SWING_MODES
+                ): cv.ensure_list(climate.validate_climate_swing_mode),
             }
         ),
     }
@@ -81,14 +84,12 @@ def to_code(config):
         cg.add(traits.add_supported_fan_mode(climate.CLIMATE_FAN_MODES[mode]))
 
     for mode in supports[CONF_SWING_MODE]:
-        cg.add(traits.add_supported_swing_mode(
-            climate.CLIMATE_SWING_MODES[mode]
-        ))
+        cg.add(traits.add_supported_swing_mode(climate.CLIMATE_SWING_MODES[mode]))
 
     yield cg.register_component(var, config)
     yield climate.register_climate(var, config)
-    cg.add_library(
-        name="HeatPump",
-        repository="https://github.com/SwiCago/HeatPump",
-        version="cea90c5ed48d24a904835f8918bd88cbc84cb1be",
-    )
+    ## cg.add_library(
+    ##    name="HeatPump",
+    ##    repository="https://github.com/SwiCago/HeatPump",
+    ##    version="cea90c5ed48d24a904835f8918bd88cbc84cb1be",
+    ## )
