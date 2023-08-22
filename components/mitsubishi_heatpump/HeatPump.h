@@ -18,13 +18,13 @@
 #include <stdint.h>
 #include <math.h>
 #include <HardwareSerial.h>
+#include "esphome/components/logger/logger.h"
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
 #endif
-
-using namespace esphome;
 
 /*
  * Callback function definitions. Code differs for the ESP8266 platform, which requires the functional library.
