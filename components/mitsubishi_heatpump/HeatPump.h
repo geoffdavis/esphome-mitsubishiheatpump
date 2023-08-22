@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <HardwareSerial.h>
-
+#include "esphome.h"
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"

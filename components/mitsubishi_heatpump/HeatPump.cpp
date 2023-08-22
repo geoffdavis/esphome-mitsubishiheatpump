@@ -86,6 +86,9 @@ HeatPump::HeatPump() {
 // Public Methods //////////////////////////////////////////////////////////////
 
 bool HeatPump::connect(HardwareSerial* serial) {
+
+  ESP_LOGD("HeatPump", "FONCTION CONNECT APPELEE Sur HeatPump.cpp");
+
   return connect(serial, -1, -1);
 }
 
