@@ -103,7 +103,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   ESP_LOGD("HeatPump", "connection à HP");
 
   if (serial != NULL) {
-    ESP_LOGD("HeatPump", "Serial est null...");
+    ESP_LOGD("HeatPump", "Serial est OK...");
     _HardSerial = serial;
   }
   bool retry = false;
@@ -122,13 +122,16 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   } else {
     _HardSerial->begin(bitrate, SERIAL_8E1);
   }
+
+  ESP_LOGD("HeatPump", "settle 2s before we start sending packets...");
+
+  // settle before we start sending packets
+  esphome::delay(2000);
+
   if (onConnectCallback) {
     ESP_LOGD("HeatPump", "Appel de onConnectCallback()...");
     onConnectCallback();
   }
-
-  // settle before we start sending packets
-  esphome::delay(2000);
 
   // send the CONNECT packet twice - need to copy the CONNECT packet locally
 
@@ -572,6 +575,7 @@ int HeatPump::readPacket() {
   waitForRead = false;
 
   if (_HardSerial->available() > 0) {
+    ESP_LOGD("HeatPump", "des données sont disponibles");
     // read until we get start byte 0xfc
     while (_HardSerial->available() > 0 && !foundStart) {
       header[0] = _HardSerial->read();
