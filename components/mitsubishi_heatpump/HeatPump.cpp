@@ -100,7 +100,7 @@ bool HeatPump::connect(HardwareSerial* serial, int rx, int tx) {
 
 bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 
-  ESP_LOGD("HeatPump", "connection à HP");
+  ESP_LOGD("HeatPump", "connection au module HP");
 
   if (serial != NULL) {
     ESP_LOGD("HeatPump", "Serial est OK...");
@@ -163,18 +163,26 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 }
 
 bool HeatPump::update() {
+  ESP_LOGD("HeatPump", "HeatPump::update() called");
+
   while (!canSend(false)) { esphome::delay(10); }
 
   // Flush the serial buffer before updating settings to clear out
   // any remaining responses that would prevent us from receiving
   // RCVD_PKT_UPDATE_SUCCESS
+  ESP_LOGD("HeatPump", "readAllPackets();");
   readAllPackets();
 
   byte packet[PACKET_LEN] = {};
+
   createPacket(packet, wantedSettings);
+  ESP_LOGD("HeatPump", "writePacket();");
   writePacket(packet, PACKET_LEN);
 
   while (!canRead()) { esphome::delay(10); }
+
+  ESP_LOGD("HeatPump", "readPacket();");
+
   int packetType = readPacket();
 
   if (packetType == RCVD_PKT_UPDATE_SUCCESS) {
@@ -185,18 +193,24 @@ bool HeatPump::update() {
       }
       sync(RQST_PKT_SETTINGS);
     } else {
+      ESP_LOGD("HeatPump", "autoupdate if OFF");
       // No auto update, but the next time we sync, fetch the updated settings first
       infoMode = 0;
     }
 
     return true;
   } else {
+    ESP_LOGD("HeatPump", "(else ->NOT packetType == RCVD_PKT_UPDATE_SUCCESS) update() returning false");
+    // No auto update, but the next time we sync, fetch the updated settings first
     return false;
   }
 }
 
 void HeatPump::sync(byte packetType) {
+  ESP_LOGD("HeatPump", "sync function called");
+
   if ((!connected) || (esphome::millis() - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
+    ESP_LOGD("HeatPump", "we are not connected to module");
     connect(NULL);
   } else if (canRead()) {
     readAllPackets();
@@ -524,6 +538,7 @@ void HeatPump::createPacket(byte* packet, heatpumpSettings settings) {
 }
 
 void HeatPump::createInfoPacket(byte* packet, byte packetType) {
+  ESP_LOGD("HeatPump", "creating Info packet");
   // add the header to the packet
   for (int i = 0; i < INFOHEADER_LEN; i++) {
     packet[i] = INFOHEADER[i];
@@ -553,6 +568,7 @@ void HeatPump::createInfoPacket(byte* packet, byte packetType) {
 }
 
 void HeatPump::writePacket(byte* packet, int length) {
+  ESP_LOGD("HeatPump", "writing packet");
   for (int i = 0; i < length; i++) {
     _HardSerial->write((uint8_t)packet[i]);
   }
@@ -786,6 +802,7 @@ int HeatPump::readPacket() {
 }
 
 void HeatPump::readAllPackets() {
+  ESP_LOGD("HeatPump", "reading all packet from module");
   while (_HardSerial->available() > 0) {
     readPacket();
   }
