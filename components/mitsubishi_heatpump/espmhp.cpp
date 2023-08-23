@@ -521,7 +521,7 @@ void MitsubishiHeatPump::setup() {
     int nb = 1;
     bool success = false;
     while ((!(success = hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) && (nb < 6))) {
-        ESP_LOGD(TAG, "test %d delaying 5 sec...", ++nb);
+        ESP_LOGI(TAG, "test %d delaying 5 sec...", ++nb);
         ESP_LOGD(TAG, "Calling again hp->connect(%p)", this->get_hw_serial_());
         esphome::delay(5000);
     }
