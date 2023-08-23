@@ -381,7 +381,7 @@ void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const 
         }
         message += String(packet[idx], HEX) + " ";
     }
-    ESP_LOGD(TAG, "hpPacketDebug %s", message);
+    ESP_LOGD(TAG, "hpPacketDebug %s: %s", packetDirection, message);
 
 }
 
