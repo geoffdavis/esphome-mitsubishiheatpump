@@ -511,7 +511,7 @@ void MitsubishiHeatPump::setup() {
     );
 
     ESP_LOGD(TAG, "delaying 10 sec...");
-    esp::delay(10000);
+    esphome::delay(10000);
 
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
@@ -519,7 +519,7 @@ void MitsubishiHeatPump::setup() {
 
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         ESP_LOGD(TAG, "delaying 4 sec...");
-        esp::delay(4);
+        esphome::delay(4);
         hp->sync();
     } else {
         ESP_LOGE(
