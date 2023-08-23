@@ -144,11 +144,10 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   writePacket(packet, CONNECT_LEN);
 
   ESP_LOGD("HeatPump", "Attente de la réponse...");
-
   while (!canRead()) {
-    ESP_LOGD("HeatPump", ".");
     esphome::delay(10);
   }
+  ESP_LOGD("HeatPump", "-->");
 
   int packetType = readPacket();
   ESP_LOGD("HeatPump", "lecture du packet Type: %d", packetType);
