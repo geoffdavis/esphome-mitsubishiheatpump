@@ -158,7 +158,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
     ESP_LOGD("HeatPump", "packetType != RCVD_PKT_CONNECT_SUCCESS et retry");
     return connect(serial, 9600, rx, tx);
   }
-
+  connected = true;
   return packetType == RCVD_PKT_CONNECT_SUCCESS;
   //}
 }
