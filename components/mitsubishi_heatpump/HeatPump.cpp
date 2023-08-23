@@ -595,10 +595,13 @@ int HeatPump::readPacket() {
     // read until we get start byte 0xfc
     while (_HardSerial->available() > 0 && !foundStart) {
       header[0] = _HardSerial->read();
+
       if (header[0] == HEADER[0]) {
         foundStart = true;
         ESP_LOGD("HeatPump", "found start");
         esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
+      } else {
+        ESP_LOGD("HeatPump", "read %d was expecting %d", header[0], HEADER[0]));
       }
     }
 
