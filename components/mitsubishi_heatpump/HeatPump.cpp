@@ -601,7 +601,7 @@ int HeatPump::readPacket() {
         ESP_LOGD("HeatPump", "found start");
         esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
       } else {
-        ESP_LOGD("HeatPump", "read %d was expecting %d", header[0], HEADER[0]));
+        ESP_LOGD("HeatPump", "read %d was expecting %d", header[0], HEADER[0]);
       }
     }
 
