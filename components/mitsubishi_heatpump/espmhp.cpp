@@ -518,10 +518,19 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
     //hp->connect(this->get_hw_serial_(), this->baud_);
+    while (!hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
+        ESP_LOGD(TAG, "delaying 5 sec...");
+        esphome::delay(5000);
+        ESP_LOGD(TAG, "Calling again hp->connect(%p)", this->get_hw_serial_());
+    }
 
-    if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
-        ESP_LOGD(TAG, "delaying 4 sec...");
-        esphome::delay(4);
+    ESP_LOGD(TAG, "delaying 2 sec...");
+    esphome::delay(2000);
+    hp->sync();
+
+    /*if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
+        ESP_LOGD(TAG, "delaying 6 sec...");
+        esphome::delay(6000);
         hp->sync();
     } else {
         ESP_LOGE(
@@ -530,7 +539,7 @@ void MitsubishiHeatPump::setup() {
             //" Marking MitsubishiHeatPump component as failed."
         );
         //this->mark_failed();
-    }
+    }*/
 
     // create various setpoint persistence:
     cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
