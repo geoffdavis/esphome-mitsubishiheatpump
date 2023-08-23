@@ -510,6 +510,8 @@ void MitsubishiHeatPump::setup() {
         YESNO(this->get_hw_serial_() == &Serial)
     );
 
+    ESP_LOGD(TAG, "bauds: %d", this->baud_);
+
     ESP_LOGD(TAG, "delaying 10 sec...");
     esphome::delay(10000);
 

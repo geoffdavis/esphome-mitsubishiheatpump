@@ -100,7 +100,7 @@ bool HeatPump::connect(HardwareSerial* serial, int rx, int tx) {
 
 bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 
-  ESP_LOGD("HeatPump", "connection au module HP");
+  ESP_LOGD("HeatPump", "connection au module HP à %d bauds sur rx:%d tx:%d", bitrate, rx, tx);
 
   if (serial != NULL) {
     ESP_LOGD("HeatPump", "Serial est OK...");
