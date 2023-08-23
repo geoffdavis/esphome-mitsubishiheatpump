@@ -518,15 +518,25 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "Calling hp->connect(%p)", this->get_hw_serial_());
 
     //hp->connect(this->get_hw_serial_(), this->baud_);
-    while (!hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
-        ESP_LOGD(TAG, "delaying 5 sec...");
-        esphome::delay(5000);
+    int nb = 1;
+    bool success = false;
+    while (!(success = hp->connect(this->get_hw_serial_(), this->baud_, -1, -1) && (nb < 6))) {
+        ESP_LOGD(TAG, "test %d delaying 5 sec...", ++i);
         ESP_LOGD(TAG, "Calling again hp->connect(%p)", this->get_hw_serial_());
+        esphome::delay(5000);
     }
-
-    ESP_LOGD(TAG, "delaying 2 sec...");
-    esphome::delay(2000);
-    hp->sync();
+    if (success) {
+        ESP_LOGD(TAG, "delaying 2 sec...");
+        esphome::delay(2000);
+        hp->sync();
+    } else {
+        ESP_LOGE(
+            TAG,
+            "Connection to HeatPump failed."
+            " Marking MitsubishiHeatPump component as failed."
+        );
+        this->mark_failed();
+    }
 
     /*if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         ESP_LOGD(TAG, "delaying 6 sec...");
