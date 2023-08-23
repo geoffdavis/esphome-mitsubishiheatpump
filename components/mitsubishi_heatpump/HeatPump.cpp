@@ -135,7 +135,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 
   // send the CONNECT packet twice - need to copy the CONNECT packet locally
 
-  ESP_LOGD("HeatPump", "Envoie du packet de connexion...");
+  ESP_LOGD("HeatPump", "Envoi du packet de connexion...");
 
   byte packet[CONNECT_LEN];
   memcpy(packet, CONNECT, CONNECT_LEN);
