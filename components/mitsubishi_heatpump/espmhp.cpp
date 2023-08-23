@@ -546,9 +546,10 @@ void MitsubishiHeatPump::setup() {
         ESP_LOGE(
             TAG,
             "Connection to HeatPump failed."
-            " Marking MitsubishiHeatPump component as failed."
+            //" Marking MitsubishiHeatPump component as failed."
         );
-        this->mark_failed();
+        //this->mark_failed();
+        hp->sync();
     }
 
     // create various setpoint persistence:
