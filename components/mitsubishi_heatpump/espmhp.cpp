@@ -385,7 +385,7 @@ void MitsubishiHeatPump::hpDidConnect() {
 
 }*/
 void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
-    char buffer[3];
+    char buffer[6];
     char outputBuffer[length * 5 + 1];
 
     strcpy(outputBuffer, "Packet ");
@@ -400,7 +400,7 @@ void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const 
         strcat(outputBuffer, buffer);
     }
 
-    ESP_LOGD("MitsubishiHeatPump", "%s", outputBuffer);
+    ESP_LOGD(TAG, "%s", outputBuffer);
 }
 
 
