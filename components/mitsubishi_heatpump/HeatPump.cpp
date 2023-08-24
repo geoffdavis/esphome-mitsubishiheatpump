@@ -599,7 +599,7 @@ int HeatPump::readPacket() {
 
       if (header[0] == HEADER[0]) {
         foundStart = true;
-        ESP_LOGD("HeatPump", "found start");
+        ESP_LOGI("HeatPump", "FOUND a START !!!!!                   <----");
         esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
       } else {
         ESP_LOGD("HeatPump", "read %d was expecting %d", header[0], HEADER[0]);
@@ -660,6 +660,7 @@ int HeatPump::readPacket() {
         }
 
         if (header[1] == 0x62) {
+          ESP_LOGD("HeatPump", "header[1] == 0x62, data[0]=%d", data[0]);
           switch (data[0]) {
           case 0x02: { // setting information
             heatpumpSettings receivedSettings;

@@ -24,7 +24,7 @@
 
 using namespace esphome;
 
-#ifndef ESPMHP_H 
+//#ifndef ESPMHP_H 
 #define ESPMHP_H
 
 
@@ -146,6 +146,7 @@ private:
     int baud_ = 0;
     // compteur pour n'appeler setup() qu'une fois de plus
     int cpt_ = 0;
+    unsigned long lastHpSync = 0;
 };
 
-#endif
+//#endif

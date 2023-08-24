@@ -60,6 +60,16 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     ESP_LOGD(TAG, "update() called");
+
+    if (hp->isConnected()) {
+        ESP_LOGD(TAG, "hp->isConnected=true");
+    } else {
+        ESP_LOGD(TAG, "hp->isConnected=false ;@( ");
+    }
+
+    hp->sync();
+    this->lastHpSync = esp::millis();
+
     //this->hp->sync();
 
 #ifndef USE_CALLBACKS
@@ -263,17 +273,8 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * to punt on the update. Likely not an issue when run in callback
          * mode, but that isn't working right yet.
          */
-        ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. %d", this->cpt_);
+        ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. (nbConAttempts:%d)", this->cpt_);
         esphome::delay(10);
-
-        /*if (this->cpt_ == 50) {
-            ESP_LOGW(TAG, "50 tries, calling setup() again.");
-            this->component_state_ = 0;
-            this->cpt_++;
-            this->setup();
-            // this->cpt_ = 0;
-        }
-        this->cpt_++;*/
 
         return;
     }
@@ -519,7 +520,7 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "delaying 1 sec...");
     esphome::delay(1000);
 
-    ESP_LOGI(TAG, "Calling hp->connect(%p) test %d", this->get_hw_serial_(), this->cpt_++);
+    ESP_LOGI(TAG, "TENTATIVE DE CONNEXION : Calling hp->connect(%p) test %d", this->get_hw_serial_(), this->cpt_++);
 
     //hp->connect(this->get_hw_serial_(), this->baud_);
 
@@ -626,14 +627,11 @@ void MitsubishiHeatPump::dump_state() {
     heatpumpStatus status = this->hp->getStatus();
 
     ESP_LOGI(TAG, "HP settings:");
-    if (settings.power != NULL) {
-        ESP_LOGD(TAG, "power: %s", settings.power);
-        ESP_LOGD(TAG, "fan: %s", settings.fan);
-        ESP_LOGD(TAG, "temperature: %f", settings.temperature);
-        ESP_LOGD(TAG, "mode: %s", settings.mode);
-    } else {
-        ESP_LOGE(TAG, "settings.power est NULL");
-    }
+    ESP_LOGD(TAG, "power: %s", settings.power);
+    ESP_LOGD(TAG, "fan: %s", settings.fan);
+    ESP_LOGD(TAG, "temperature: %f", settings.temperature);
+    ESP_LOGD(TAG, "mode: %s", settings.mode);
+
 
     ESP_LOGI(TAG, "HP status:");
 
