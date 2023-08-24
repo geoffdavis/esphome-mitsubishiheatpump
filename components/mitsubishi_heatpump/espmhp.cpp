@@ -68,8 +68,7 @@ void MitsubishiHeatPump::update() {
     }
 
     hp->sync();
-    this->lastHpSync = esp::millis();
-
+    this->lastHpSync = esphome::millis();
     //this->hp->sync();
 
 #ifndef USE_CALLBACKS
