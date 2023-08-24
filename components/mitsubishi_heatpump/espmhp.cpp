@@ -384,25 +384,23 @@ void MitsubishiHeatPump::hpDidConnect() {
     ESP_LOGD(TAG, "hpPacketDebug %s: %s", packetDirection, message);
 
 }*/
-
 void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
-    String message;
-    for (unsigned int idx = 0; idx < length; idx++) {
-        if (packet[idx] < 16) {
-            message += "0"; // pad single hex digits with a 0
-        }
-        message += String(packet[idx], HEX) + " ";
+    char buffer[3];
+    char outputBuffer[length * 5 + 1];
+
+    strcpy(outputBuffer, "Packet ");
+    strcat(outputBuffer, packetDirection);
+    strcat(outputBuffer, " (Length: ");
+    itoa(length, buffer, 10);
+    strcat(outputBuffer, buffer);
+    strcat(outputBuffer, "): ");
+
+    for (unsigned int i = 0; i < length; i++) {
+        sprintf(buffer, "0x%02X ", packet[i]);
+        strcat(outputBuffer, buffer);
     }
 
-    String packetHex;
-    for (unsigned int idx = 0; idx < length; idx++) {
-        if (packet[idx] < 16) {
-            packetHex += "0"; // pad single hex digits with a 0
-        }
-        packetHex += String(packet[idx], HEX) + " ";
-    }
-
-    ESP_LOGD(TAG, "hpPacketDebug %s: %s\nHEXA: %s", packetDirection, message, packetHex);
+    ESP_LOGD("MitsubishiHeatPump", "%s", outputBuffer);
 }
 
 
