@@ -92,15 +92,14 @@ climate:
   - platform: mitsubishi_heatpump  
     name: "${friendly_name}"
     id: hp_sejour
-    #baud_rate: 0
+    baud_rate: 2400
+    # Optional
+    hardware_uart: UART0   
+    # Optional
+    update_interval: 5000ms
     visual:
       min_temperature: 21
       max_temperature: 28
       temperature_step: 0.5
 
-    # Optional
-    hardware_uart: UART0
-    #baud_rate: 4200
-
-    # Optional
-    update_interval: 5000ms
+    

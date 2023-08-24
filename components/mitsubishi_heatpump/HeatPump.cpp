@@ -74,6 +74,7 @@ HeatPump::HeatPump() {
   lastWanted = esphome::millis();
   lastSend = 0;
   infoMode = 0;
+  baud_rate = 0;
   lastRecv = esphome::millis() - (PACKET_SENT_INTERVAL_MS * 10);
   autoUpdate = false;
   firstRun = true;
@@ -95,7 +96,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate) {
 }
 
 bool HeatPump::connect(HardwareSerial* serial, int rx, int tx) {
-  return connect(serial, 0, rx, tx);
+  return connect(serial, baud_rate, rx, tx);
 }
 
 bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
@@ -108,9 +109,12 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   }
   bool retry = false;
   if (bitrate == 0) {
+    baud_rate = 0;
     ESP_LOGD("HeatPump", "BitRate est à 0, true->retry et test 2400 et 9600");
     bitrate = 2400;
     retry = true;
+  } else {
+    baud_rate = bitrate;
   }
   connected = false;
   if (rx >= 0 && tx >= 0) {
