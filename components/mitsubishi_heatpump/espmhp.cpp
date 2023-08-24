@@ -68,7 +68,7 @@ void MitsubishiHeatPump::update() {
     }
 
     hp->sync();
-    this->lastHpSync = esphome::millis();
+    this->lastHpSync = CUSTOM_MILLIS;
     //this->hp->sync();
 
 #ifndef USE_CALLBACKS
@@ -273,7 +273,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
          * mode, but that isn't working right yet.
          */
         ESP_LOGW(TAG, "Waiting for HeatPump to read the settings the first time. (nbConAttempts:%d)", this->cpt_);
-        esphome::delay(10);
+        CUSTOM_DELAY(10);
 
         return;
     }
@@ -531,7 +531,7 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGD(TAG, "bauds: %d", this->baud_);
 
     ESP_LOGD(TAG, "delaying 1 sec...");
-    esphome::delay(1000);
+    CUSTOM_DELAY(1000);
 
     ESP_LOGI(TAG, "TENTATIVE DE CONNEXION : Calling hp->connect(%p) test %d", this->get_hw_serial_(), this->cpt_++);
 
@@ -541,11 +541,11 @@ void MitsubishiHeatPump::setup() {
     while ((!(success = hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) && (nb < 6))) {
         ESP_LOGI(TAG, "test %d delaying 5 sec...", ++nb);
         ESP_LOGD(TAG, "Calling again hp->connect(%p)", this->get_hw_serial_());
-        esphome::delay(5000);
+        CUSTOM_DELAY(5000);
     }
     if (success) {
         ESP_LOGD(TAG, "delaying 2 sec...");
-        esphome::delay(2000);
+        CUSTOM_DELAY(2000);
         hp->sync();
     } else {
         ESP_LOGE(
@@ -558,7 +558,7 @@ void MitsubishiHeatPump::setup() {
 
     if (hp->connect(this->get_hw_serial_(), this->baud_, -1, -1)) {
         ESP_LOGD(TAG, "delaying 1 sec...");
-        esphome::delay(1000);
+        CUSTOM_DELAY(1000);
         hp->sync();
     } else {
         ESP_LOGE(
