@@ -24,7 +24,7 @@
 
 using namespace esphome;
 
-//#ifndef ESPMHP_H 
+#ifndef ESPMHP_H 
 #define ESPMHP_H
 
 
@@ -149,4 +149,4 @@ private:
     unsigned long lastHpSync = 0;
 };
 
-//#endif
+#endif
