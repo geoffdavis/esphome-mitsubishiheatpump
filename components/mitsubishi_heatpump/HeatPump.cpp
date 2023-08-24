@@ -71,12 +71,11 @@ bool operator!=(const heatpumpTimers& lhs, const heatpumpTimers& rhs) {
 // Constructor /////////////////////////////////////////////////////////////////
 
 HeatPump::HeatPump() {
-  //lastWanted = esphome::millis();
-  lastWanted = millis();
+  lastWanted = CUSTOM_MILLIS;
   lastSend = 0;
   infoMode = 0;
   baud_rate = 0;
-  lastRecv = millis() - (PACKET_SENT_INTERVAL_MS * 10);
+  lastRecv = CUSTOM_MILLIS - (PACKET_SENT_INTERVAL_MS * 10);
   autoUpdate = false;
   firstRun = true;
   tempMode = false;
@@ -133,8 +132,8 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   ESP_LOGD("HeatPump", "settle 2s before we start sending packets...");
 
   // settle before we start sending packets
-  //esphome::delay(2000);
-  delay(2000);
+  //esphome::CUSTOM_CUSTOM_DELAY(2000);
+  CUSTOM_CUSTOM_DELAY(2000);
 
   if (onConnectCallback) {
     ESP_LOGD("HeatPump", "Appel de onConnectCallback()...");
@@ -153,8 +152,8 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
 
   ESP_LOGD("HeatPump", "Attente de la réponse...");
   while (!canRead()) {
-    //esphome::delay(10);
-    delay(10);
+    //esphome::CUSTOM_CUSTOM_DELAY(10);
+    CUSTOM_CUSTOM_DELAY(10);
   }
   ESP_LOGD("HeatPump", "-->");
 
@@ -174,8 +173,8 @@ bool HeatPump::update() {
   ESP_LOGD("HeatPump", "HeatPump::update() called");
 
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
 
   // Flush the serial buffer before updating settings to clear out
@@ -191,8 +190,8 @@ bool HeatPump::update() {
   writePacket(packet, PACKET_LEN);
 
   while (!canRead()) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
 
   ESP_LOGD("HeatPump", "readPacket();");
@@ -203,8 +202,8 @@ bool HeatPump::update() {
     // call sync() to get the latest settings from the heatpump for autoUpdate, which should now have the updated settings
     if (autoUpdate) { //this sync will happen regardless, but autoUpdate needs it sooner than later.
       while (!canSend(true)) {
-        //esphome::delay(10);
-        delay(10);
+        //esphome::CUSTOM_DELAY(10);
+        CUSTOM_DELAY(10);
       }
       sync(RQST_PKT_SETTINGS);
     } else {
@@ -223,7 +222,7 @@ bool HeatPump::update() {
 
 void HeatPump::sync(byte packetType) {
   ESP_LOGD("HeatPump", "sync function called");
-  if ((!connected) || (millis() - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
+  if ((!connected) || (CUSTOM_MILLIS - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
     //if ((!connected) || (esphome::millis() - lastRecv > (PACKET_SENT_INTERVAL_MS * 10))) {
     ESP_LOGD("HeatPump", "we are not connected to module");
     connect(NULL);
@@ -278,8 +277,8 @@ bool HeatPump::getPowerSettingBool() {
 
 void HeatPump::setPowerSetting(bool setting) {
   wantedSettings.power = lookupByteMapIndex(POWER_MAP, 2, POWER_MAP[setting ? 1 : 0]) > -1 ? POWER_MAP[setting ? 1 : 0] : POWER_MAP[0];
-  //lastWanted = esphome::millis();
-  lastWanted = millis();
+  //lastWanted = esphome::CUSTOM_MILLIS;
+  lastWanted = CUSTOM_MILLIS;
 }
 
 const char* HeatPump::getPowerSetting() {
@@ -293,8 +292,8 @@ void HeatPump::setPowerSetting(const char* setting) {
   } else {
     wantedSettings.power = POWER_MAP[0];
   }
-  lastWanted = //esphome::millis();
-    millis();
+  lastWanted = //esphome::CUSTOM_MILLIS;
+    CUSTOM_MILLIS;
 }
 
 const char* HeatPump::getModeSetting() {
@@ -309,8 +308,8 @@ void HeatPump::setModeSetting(const char* setting) {
     wantedSettings.mode = MODE_MAP[0];
   }
   lastWanted =
-    //esphome::millis();
-    millis();
+    //esphome::CUSTOM_MILLIS;
+    CUSTOM_MILLIS;
 }
 
 float HeatPump::getTemperature() {
@@ -326,7 +325,7 @@ void HeatPump::setTemperature(float setting) {
     setting = setting / 2;
     wantedSettings.temperature = setting < 10 ? 10 : (setting > 31 ? 31 : setting);
   }
-  lastWanted = millis();  //esphome::millis();
+  lastWanted = CUSTOM_MILLIS;  //esphome::millis();
 }
 
 void HeatPump::setRemoteTemperature(float setting) {
@@ -352,8 +351,8 @@ void HeatPump::setRemoteTemperature(float setting) {
   byte chkSum = checkSum(packet, 21);
   packet[21] = chkSum;
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
   writePacket(packet, PACKET_LEN);
 }
@@ -371,7 +370,7 @@ void HeatPump::setFanSpeed(const char* setting) {
     wantedSettings.fan = FAN_MAP[0];
   }
   lastWanted = //esphome::millis();
-    millis();
+    CUSTOM_MILLIS;
 }
 
 const char* HeatPump::getVaneSetting() {
@@ -386,7 +385,7 @@ void HeatPump::setVaneSetting(const char* setting) {
     wantedSettings.vane = VANE_MAP[0];
   }
   lastWanted = //esphome::millis();
-    millis();
+    CUSTOM_MILLIS;
 }
 
 const char* HeatPump::getWideVaneSetting() {
@@ -400,7 +399,7 @@ void HeatPump::setWideVaneSetting(const char* setting) {
   } else {
     wantedSettings.wideVane = WIDEVANE_MAP[0];
   }
-  lastWanted = millis(); //esphome::millis();
+  lastWanted = CUSTOM_MILLIS; //esphome::millis();
 }
 
 bool HeatPump::getIseeBool() { //no setter yet
@@ -452,8 +451,8 @@ void HeatPump::setRoomTempChangedCallback(ROOM_TEMP_CHANGED_CALLBACK_SIGNATURE) 
 //#### WARNING, THE FOLLOWING METHOD CAN F--K YOUR HP UP, USE WISELY ####
 void HeatPump::sendCustomPacket(byte data[], int packetLength) {
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
 
   packetLength += 2; // +2 for first header byte and checksum
@@ -514,12 +513,12 @@ int HeatPump::lookupByteMapValue(const int valuesMap[], const byte byteMap[], in
 
 bool HeatPump::canSend(bool isInfo) {
   //return (esphome::millis() - (isInfo ? PACKET_INFO_INTERVAL_MS : PACKET_SENT_INTERVAL_MS)) > lastSend;
-  return (millis() - (isInfo ? PACKET_INFO_INTERVAL_MS : PACKET_SENT_INTERVAL_MS)) > lastSend;
+  return (CUSTOM_MILLIS - (isInfo ? PACKET_INFO_INTERVAL_MS : PACKET_SENT_INTERVAL_MS)) > lastSend;
 }
 
 bool HeatPump::canRead() {
   //return (waitForRead && (esphome::millis() - PACKET_SENT_INTERVAL_MS) > lastSend);
-  return (waitForRead && (millis() - PACKET_SENT_INTERVAL_MS) > lastSend);
+  return (waitForRead && (CUSTOM_MILLIS - PACKET_SENT_INTERVAL_MS) > lastSend);
 }
 
 byte HeatPump::checkSum(byte bytes[], int len) {
@@ -606,7 +605,7 @@ void HeatPump::writePacket(byte* packet, int length) {
     packetCallback(packet, length, (char*)"packetSent");
   }
   waitForRead = true;
-  lastSend = millis(); //esphome::millis();
+  lastSend = CUSTOM_MILLIS; //esphome::millis();
 
 }
 
@@ -629,8 +628,8 @@ int HeatPump::readPacket() {
       if (header[0] == HEADER[0]) {
         foundStart = true;
         ESP_LOGI("HeatPump", "FOUND a START !!!!!                   <----");
-        //esphome::delay(100); // found that this delay increases accuracy when reading, might not be needed though
-        delay(10);
+        //esphome::CUSTOM_DELAY(100); // found that this delay increases accuracy when reading, might not be needed though
+        CUSTOM_DELAY(10);
       } else {
         ESP_LOGD("HeatPump", "read %d was expecting %d", header[0], HEADER[0]);
       }
@@ -677,7 +676,7 @@ int HeatPump::readPacket() {
       ESP_LOGD("HeatPump", "chkSUM...");
 
       if (data[dataLength] == checksum) {
-        lastRecv = millis(); // esphome::millis();
+        lastRecv = CUSTOM_MILLIS; // esphome::CUSTOM_MILLIS;
 
         if (packetCallback) {
           byte packet[37]; // we are going to put header[5] and data[32] into this, so the whole packet is sent to the callback
@@ -722,8 +721,8 @@ int HeatPump::readPacket() {
 
             // if this is the first time we have synced with the heatpump, set wantedSettings to receivedSettings
             // hack: add grace period of a few seconds before respecting external changes
-            //if (firstRun || (autoUpdate && externalUpdate && esphome::millis() - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
-            if (firstRun || (autoUpdate && externalUpdate && millis() - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
+            //if (firstRun || (autoUpdate && externalUpdate && esphome::CUSTOM_MILLIS - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
+            if (firstRun || (autoUpdate && externalUpdate && CUSTOM_MILLIS - lastWanted > AUTOUPDATE_GRACE_PERIOD_IGNORE_EXTERNAL_UPDATES_MS)) {
               wantedSettings = currentSettings;
               firstRun = false;
             }
@@ -876,14 +875,14 @@ heatpumpFunctions HeatPump::getFunctions() {
   packet2[21] = checkSum(packet2, 21);
 
   while (!canSend(false)) {
-    delay(10); // esphome::delay(10); 
+    CUSTOM_DELAY(10); // esphome::CUSTOM_DELAY(10); 
   }
   writePacket(packet1, PACKET_LEN);
   readPacket();
 
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
   writePacket(packet2, PACKET_LEN);
   readPacket();
@@ -891,8 +890,8 @@ heatpumpFunctions HeatPump::getFunctions() {
   // retry reading a few times in case responses were related
   // to other requests
   for (int i = 0; i < 5 && !functions.isValid(); ++i) {
-    //esphome::delay(100);
-    delay(100);
+    //esphome::CUSTOM_DELAY(100);
+    CUSTOM_DELAY(100);
     readPacket();
   }
 
@@ -930,15 +929,15 @@ bool HeatPump::setFunctions(heatpumpFunctions const& functions) {
   packet2[21] = checkSum(packet2, 21);
 
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
   writePacket(packet1, PACKET_LEN);
   readPacket();
 
   while (!canSend(false)) {
-    //esphome::delay(10); 
-    delay(10);
+    //esphome::CUSTOM_DELAY(10); 
+    CUSTOM_DELAY(10);
   }
   writePacket(packet2, PACKET_LEN);
   readPacket();

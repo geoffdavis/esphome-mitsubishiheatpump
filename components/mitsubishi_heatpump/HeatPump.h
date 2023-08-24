@@ -26,6 +26,24 @@
 #include "WProgram.h"
 #endif
 
+#define USE_ESPHOME_DELAY
+#define USE_ESPHOME_MILLIS
+
+#ifdef USE_ESPHOME_DELAY
+#define CUSTOM_DELAY(x) esphome::delay(x)
+#else
+#define CUSTOM_DELAY(x) delay(x)
+#endif
+
+
+#ifdef USE_ESPHOME_MILLIS
+#define CUSTOM_MILLIS esphome::millis()
+#else
+#define CUSTOM_MILLIS millis()
+#endif
+
+
+
 /*
  * Callback function definitions. Code differs for the ESP8266 platform, which requires the functional library.
  * Based on callback implementation in the Arduino Client for MQTT library (https://github.com/knolleary/pubsubclient)
