@@ -386,7 +386,7 @@ void MitsubishiHeatPump::hpDidConnect() {
 }*/
 void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
     char buffer[6];
-    char outputBuffer[length * 5 + 1];
+    char outputBuffer[length * 6 + 1];
 
     strcpy(outputBuffer, "Packet ");
     strcat(outputBuffer, packetDirection);
