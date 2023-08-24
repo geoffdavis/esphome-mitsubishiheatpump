@@ -26,8 +26,8 @@
 #include "WProgram.h"
 #endif
 
-#define USE_ESPHOME_DELAY
-#define USE_ESPHOME_MILLIS
+//#define USE_ESPHOME_DELAY
+//#define USE_ESPHOME_MILLIS
 
 #ifdef USE_ESPHOME_DELAY
 #define CUSTOM_DELAY(x) esphome::delay(x)
