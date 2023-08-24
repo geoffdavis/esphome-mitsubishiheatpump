@@ -388,19 +388,13 @@ void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const 
     char buffer[6];
     char outputBuffer[length * 6 + 1];
 
-    strcpy(outputBuffer, "Packet ");
-    strcat(outputBuffer, packetDirection);
-    strcat(outputBuffer, " (Length: ");
-    itoa(length, buffer, 10);
-    strcat(outputBuffer, buffer);
-    strcat(outputBuffer, "): ");
 
     for (unsigned int i = 0; i < length; i++) {
         sprintf(buffer, "0x%02X ", packet[i]);
         strcat(outputBuffer, buffer);
     }
 
-    ESP_LOGD(TAG, "%s", outputBuffer);
+    ESP_LOGD(TAG, "pck_debug, dir %s -> %s", packetDirection, outputBuffer);
 }
 
 
