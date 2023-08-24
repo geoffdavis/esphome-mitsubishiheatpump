@@ -32,14 +32,14 @@
 #ifdef USE_ESPHOME_DELAY
 #define CUSTOM_DELAY(x) esphome::delay(x)
 #else
-#define CUSTOM_DELAY(x) delay(x)
+#define CUSTOM_DELAY(x) ::delay(x)
 #endif
 
 
 #ifdef USE_ESPHOME_MILLIS
 #define CUSTOM_MILLIS esphome::millis()
 #else
-#define CUSTOM_MILLIS millis()
+#define CUSTOM_MILLIS ::millis()
 #endif
 
 
