@@ -60,7 +60,7 @@ void MitsubishiHeatPump::check_logger_conflict_() {
 void MitsubishiHeatPump::update() {
     // This will be called every "update_interval" milliseconds.
     ESP_LOGD(TAG, "update() called");
-    this->hp->sync();
+    //this->hp->sync();
 
 #ifndef USE_CALLBACKS
     this->hpSettingsChanged();
@@ -553,8 +553,11 @@ void MitsubishiHeatPump::setup() {
             //" Marking MitsubishiHeatPump component as failed."
         );
         //this->mark_failed();
-        hp->sync();
+        //hp->sync();
     }
+
+    hpSettingsChanged();
+    hpStatusChanged(hp->getStatus());
 
     // create various setpoint persistence:
     cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
