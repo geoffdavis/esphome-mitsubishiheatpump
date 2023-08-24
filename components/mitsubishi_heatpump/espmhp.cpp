@@ -622,13 +622,15 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGI(TAG, "HELLO from echavet");
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
 
+    /*
     heatpumpSettings settings = this->hp->getSettings();
     heatpumpStatus status = this->hp->getStatus();
 
     ESP_LOGI(TAG, "HP settings:");
-    ESP_LOGD(TAG, "power: %s", settings.power);
-    ESP_LOGD(TAG, "fan: %s", settings.fan);
+    if (settings.power!=NULL) ESP_LOGD(TAG, "power: %s", settings.power);
+    if (settings.fan != NULL) ESP_LOGD(TAG, "fan: %s", settings.fan);
     ESP_LOGD(TAG, "temperature: %f", settings.temperature);
+    if (settings.mode != NULL)
     ESP_LOGD(TAG, "mode: %s", settings.mode);
 
 
@@ -637,6 +639,6 @@ void MitsubishiHeatPump::dump_state() {
     ESP_LOGD(TAG, "operating: %d", status.operating);
     ESP_LOGD(TAG, "room temp : %f", status.roomTemperature);
 
-    ESP_LOGI(TAG, "  component state : %d", this->component_state_);
+    ESP_LOGI(TAG, "  component state : %d", this->component_state_);*/
 
 }
