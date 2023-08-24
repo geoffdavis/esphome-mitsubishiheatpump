@@ -31,16 +31,12 @@
 
 #ifdef ESP8266
 #define CUSTOM_DELAY(x) esphome::delay(x)
-#else
-#define CUSTOM_DELAY(x) ::delay(x)
-#endif
-
-
-#ifdef ESP8266
 #define CUSTOM_MILLIS esphome::millis()
 #else
+#define CUSTOM_DELAY(x) ::delay(x)
 #define CUSTOM_MILLIS ::millis()
 #endif
+
 
 
 
