@@ -100,7 +100,7 @@ climate:
 
     # Optional
     hardware_uart: UART0
-    baud_rate: 9600
+    #baud_rate: 4200
 
     # Optional
-    update_interval: 2000ms
+    update_interval: 5000ms

@@ -15,7 +15,7 @@
  * - ESPHome 1.19.1 or greater
  */
 
- //#define USE_CALLBACKS
+#define USE_CALLBACKS
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
