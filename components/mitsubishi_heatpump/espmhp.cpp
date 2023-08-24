@@ -447,17 +447,21 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 
 void MitsubishiHeatPump::setup() {
 
-
-    ESP_LOGD(TAG, "SETUP starting...");
+    ESP_LOGD(TAG, "-----------------");
+    ESP_LOGI(TAG, "SETUP starting...");
+    ESP_LOGD(TAG, "-----------------");
 
     // This will be called by App.setup()
     this->banner();
+
     ESP_LOGD(TAG, "Setting up UART...");
+
     if (!this->get_hw_serial_()) {
         ESP_LOGW(TAG, "No HardwareSerial was provided. Software serial ports are unsupported by this component.");
         this->mark_failed();
         return;
     }
+
     this->check_logger_conflict_();
 
     ESP_LOGD(TAG, "Intializing new HeatPump object.");

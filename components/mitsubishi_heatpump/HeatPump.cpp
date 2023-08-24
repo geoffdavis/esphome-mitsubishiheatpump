@@ -122,7 +122,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   } else {
     _HardSerial->begin(bitrate, SERIAL_8E1);
   }
-
+  // for debug purposes; will be removed
   readAllPackets();
 
   ESP_LOGD("HeatPump", "settle 2s before we start sending packets...");
@@ -158,7 +158,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
     ESP_LOGD("HeatPump", "packetType != RCVD_PKT_CONNECT_SUCCESS et retry");
     return connect(serial, 9600, rx, tx);
   }
-  connected = true;
+
   return packetType == RCVD_PKT_CONNECT_SUCCESS;
   //}
 }
