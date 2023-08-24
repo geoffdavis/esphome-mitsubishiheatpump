@@ -16,7 +16,6 @@
  */
 
 #define USE_CALLBACKS
-#define ESP32
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
