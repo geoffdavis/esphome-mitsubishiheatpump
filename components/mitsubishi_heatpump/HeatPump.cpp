@@ -132,8 +132,8 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   ESP_LOGD("HeatPump", "settle 2s before we start sending packets...");
 
   // settle before we start sending packets
-  //esphome::CUSTOM_CUSTOM_DELAY(2000);
-  CUSTOM_CUSTOM_DELAY(2000);
+  //esphome::CUSTOM_DELAY(2000);
+  CUSTOM_DELAY(2000);
 
   if (onConnectCallback) {
     ESP_LOGD("HeatPump", "Appel de onConnectCallback()...");
@@ -153,7 +153,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
   ESP_LOGD("HeatPump", "Attente de la réponse...");
   while (!canRead()) {
     //esphome::CUSTOM_CUSTOM_DELAY(10);
-    CUSTOM_CUSTOM_DELAY(10);
+    CUSTOM_DELAY(10);
   }
   ESP_LOGD("HeatPump", "-->");
 
