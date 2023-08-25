@@ -385,16 +385,14 @@ void MitsubishiHeatPump::hpDidConnect() {
 
 }*/
 void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
-    char buffer[6];
-    char outputBuffer[length * 6 + 1];
-
-
+    char buffer[4];
+    char outputBuffer[length * 4 + 1];
     for (unsigned int i = 0; i < length; i++) {
-        sprintf(buffer, "0x%02X ", packet[i]);
+        sprintf(buffer, "%02X ", packet[i]);
         strcat(outputBuffer, buffer);
     }
-
-    ESP_LOGD(TAG, "pck_debug, dir %s -> %s", packetDirection, outputBuffer);
+    ESP_LOGD(dir, "%s", outputBuffer);
+    //ESP_LOGD(TAG, "pck_debug, dir %s -> %s", packetDirection, outputBuffer);
 }
 
 

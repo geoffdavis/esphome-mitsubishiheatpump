@@ -13,16 +13,20 @@ esp8266:
 # Enable logging
 logger:  
   hardware_uart: UART1
-  level: VERBOSE    
-  
+  level: ERROR    
+  logs:
+    packetSent : DEBUG
+    packetRecv : DEBUG
+    Decoder    : VERBOSE
 # Enable Home Assistant API
 api:
   services:
     - service: reboot
       then:
         - logger.log: "Redémarrage en cours..."
-        - esp8266.reboot:
-            delay: 0ms
+        - lambda: |-
+            ESP.restart();
+
 #  services:
 #    - service: set_remote_temperature
 #      variables:
@@ -101,7 +105,7 @@ climate:
     # Optional
     hardware_uart: UART0   
     # Optional
-    update_interval: 5000ms
+    update_interval: 500ms
     visual:
       min_temperature: 21
       max_temperature: 28

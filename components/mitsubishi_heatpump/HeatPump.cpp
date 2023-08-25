@@ -627,7 +627,7 @@ int HeatPump::readPacket() {
 
       if (header[0] == HEADER[0]) {
         foundStart = true;
-        ESP_LOGI("HeatPump", "FOUND a START !!!!!                   <----");
+        ESP_LOGD("HeatPump", "FOUND a START                   <----");
         //esphome::CUSTOM_DELAY(100); // found that this delay increases accuracy when reading, might not be needed though
         CUSTOM_DELAY(10);
       } else {
@@ -644,15 +644,15 @@ int HeatPump::readPacket() {
     for (int i = 1;i < 5;i++) {
       header[i] = _HardSerial->read();
     }
-    ESP_LOGD("HeatPump", "read header %d %d %d %d", header[1], header[2], header[3], header[4]);
+    ESP_LOGV("Decoder", "%02X %02X %02X %02X <-- header", header[1], header[2], header[3], header[4]);
 
     //check header
     if (header[0] == HEADER[0] && header[2] == HEADER[2] && header[3] == HEADER[3]) {
-      ESP_LOGD("HeatPump", "header matches to HEADER");
+      ESP_LOGV("Decoder", "header matches HEADER");
 
       dataLength = header[4];
 
-      ESP_LOGD("HeatPump", "reading data..");
+      ESP_LOGV("Decoder", "reading data..");
 
       for (int i = 0;i < dataLength;i++) {
         data[i] = _HardSerial->read();
@@ -673,9 +673,11 @@ int HeatPump::readPacket() {
 
       // calculate checksum
       checksum = (0xfc - dataSum) & 0xff;
-      ESP_LOGD("HeatPump", "chkSUM...");
+
+      ESP_LOGV("Decoder", "->chkSUM: %d ", checkSum);
 
       if (data[dataLength] == checksum) {
+        ESP_LOGV("Decoder", "checkSUM OK");
         lastRecv = CUSTOM_MILLIS; // esphome::CUSTOM_MILLIS;
 
         if (packetCallback) {
@@ -690,9 +692,12 @@ int HeatPump::readPacket() {
         }
 
         if (header[1] == 0x62) {
-          ESP_LOGD("HeatPump", "header[1] == 0x62, data[0]=%d", data[0]);
+
+          ESP_LOGV("Decoder", "header[1] == 0x62, \n--> data[0]=%02X", data[0]);
+
           switch (data[0]) {
           case 0x02: { // setting information
+            ESP_LOGV("Decoder", "[0x02 is settings]");
             heatpumpSettings receivedSettings;
             receivedSettings.power = lookupByteMapValue(POWER_MAP, POWER, 2, data[3]);
             receivedSettings.iSee = data[4] > 0x08 ? true : false;
@@ -705,11 +710,18 @@ int HeatPump::readPacket() {
               tempMode = true;
             } else {
               receivedSettings.temperature = lookupByteMapValue(TEMP_MAP, TEMP, 16, data[5]);
+              ESP_LOGV("Decoder", "[Consigne °C: %f]", receivedSettings.temperature);
             }
 
             receivedSettings.fan = lookupByteMapValue(FAN_MAP, FAN, 6, data[6]);
+            ESP_LOGV("Decoder", "[Fan: %s]", receivedSettings.fan);
+
             receivedSettings.vane = lookupByteMapValue(VANE_MAP, VANE, 7, data[7]);
+            ESP_LOGV("Decoder", "[Vane: %s]", receivedSettings.vane);
+
             receivedSettings.wideVane = lookupByteMapValue(WIDEVANE_MAP, WIDEVANE, 7, data[10] & 0x0F);
+            wideVaneAdj = (data[10] & 0xF0) == 0x80 ? true : false;
+            ESP_LOGV("Decoder", "[wideVane: %s (adj:%d)]", receivedSettings.wideVane, wideVaneAdj);
             wideVaneAdj = (data[10] & 0xF0) == 0x80 ? true : false;
 
             if (settingsChangedCallback && receivedSettings != currentSettings) {
@@ -731,6 +743,7 @@ int HeatPump::readPacket() {
           }
 
           case 0x03: { //Room temperature reading
+            ESP_LOGV("Decoder", "[0x03 room temperature]");
             heatpumpStatus receivedStatus;
 
             if (data[6] != 0x00) {
@@ -740,6 +753,7 @@ int HeatPump::readPacket() {
             } else {
               receivedStatus.roomTemperature = lookupByteMapValue(ROOM_TEMP_MAP, ROOM_TEMP, 32, data[3]);
             }
+            ESP_LOGV("Decoder", "[Room °C: %f]", receivedStatus.roomTemperature);
 
             if ((statusChangedCallback || roomTempChangedCallback) && currentStatus.roomTemperature != receivedStatus.roomTemperature) {
               currentStatus.roomTemperature = receivedStatus.roomTemperature;
@@ -759,10 +773,12 @@ int HeatPump::readPacket() {
           }
 
           case 0x04: { // unknown
+            ESP_LOGV("Decoder", "[0x04 is unknown]");
             break;
           }
 
           case 0x05: { // timer packet
+            ESP_LOGV("Decoder", "[0x05 is timer packet]");
             heatpumpTimers receivedTimers;
 
             receivedTimers.mode = lookupByteMapValue(TIMER_MODE_MAP, TIMER_MODE, 4, data[3]);
@@ -783,6 +799,8 @@ int HeatPump::readPacket() {
           }
 
           case 0x06: { // status
+            ESP_LOGV("Decoder", "[0x06 is status]");
+
             heatpumpStatus receivedStatus;
             receivedStatus.operating = data[4];
             receivedStatus.compressorFrequency = data[3];
@@ -796,16 +814,20 @@ int HeatPump::readPacket() {
               currentStatus.operating = receivedStatus.operating;
               currentStatus.compressorFrequency = receivedStatus.compressorFrequency;
             }
+            ESP_LOGV("Decoder", "[Operating: %d]", currentStatus.operating);
+            ESP_LOGV("Decoder", "[Compressor Freq: %d]", currentStatus.compressorFrequency);
 
             return RCVD_PKT_STATUS;
           }
 
           case 0x09: { // standby mode maybe?
+            ESP_LOGV("Decoder", "[0x09 is standby mode maybe?]");
             break;
           }
 
           case 0x20:
           case 0x22: {
+            ESP_LOGV("Decoder", "[Packet Functions 0x20 et 0x22]");
             if (dataLength == 0x10) {
               if (data[0] == 0x20) {
                 functions.setData1(&data[1]);
@@ -821,18 +843,22 @@ int HeatPump::readPacket() {
         }
 
         if (header[1] == 0x61) { //Last update was successful 
+          ESP_LOGV("Decoder", "[0x61: Last update was successful]");
           return RCVD_PKT_UPDATE_SUCCESS;
-        } else if (header[1] == 0x7a) { //Last update was successful 
+        } else if (header[1] == 0x7a) { //Last connect was successful 
+          ESP_LOGV("Decoder", "[0x7a: Last connect was successful]");
           connected = true;
           return RCVD_PKT_CONNECT_SUCCESS;
         }
       } else {
-        ESP_LOGW("HeatPump", "chkSUM error");
+        ESP_LOGW("Decoder", "chkSUM error");
       }
     }
   } else {
     ESP_LOGW("HeatPump", "AUCUNE donnée disponible!");
   }
+
+  ESP_LOGV("Decoder", "[packet decode is a FAILLURE]");
 
   return RCVD_PKT_FAIL;
 }
