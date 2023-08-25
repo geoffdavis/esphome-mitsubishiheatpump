@@ -13,11 +13,14 @@ esp8266:
 # Enable logging
 logger:  
   hardware_uart: UART1
-  level: ERROR    
+  level: VERBOSE    
   logs:
-    packetSent : DEBUG
-    packetRecv : DEBUG
-    Decoder    : VERBOSE
+    MitsubishiHeatPump: WARN
+    HeatPump: WARN
+    #packetSent : DEBUG
+    #packetRecv : DEBUG
+    #Decoder    : VERBOSE
+
 # Enable Home Assistant API
 api:
   services:

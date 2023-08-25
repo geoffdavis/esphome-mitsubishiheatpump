@@ -391,7 +391,7 @@ void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const 
         sprintf(buffer, "%02X ", packet[i]);
         strcat(outputBuffer, buffer);
     }
-    ESP_LOGD(dir, "%s", outputBuffer);
+    ESP_LOGD(packetDirection, "%s", outputBuffer);
     //ESP_LOGD(TAG, "pck_debug, dir %s -> %s", packetDirection, outputBuffer);
 }
 
