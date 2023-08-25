@@ -13,7 +13,7 @@ esp8266:
 # Enable logging
 logger:  
   hardware_uart: UART1
-  level: VERBOSE    
+  level: DEBUG    
   logs:
     MitsubishiHeatPump: WARN
     HeatPump: WARN

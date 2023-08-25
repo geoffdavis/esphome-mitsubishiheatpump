@@ -412,9 +412,12 @@ void MitsubishiHeatPump::hpRoomTempChanged(float currentRoomTemperature) {
  * Report changes in the current temperature sensed by the HeatPump.
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
-    ESP_LOGD(TAG, "hpStatusChanged", currentStatus);
+    ESP_LOGD(TAG, "hpStatusChanged ->");
     this->current_temperature = currentStatus.roomTemperature;
-    ESP_LOGD(TAG, "hpStatusChanged t°", currentStatus.roomTemperature);
+    ESP_LOGD(TAG, "t°: %f", currentStatus.roomTemperature);
+    ESP_LOGD(TAG, "operating: %d", currentStatus.operating);
+    ESP_LOGD(TAG, "compressor freq: %d", currentStatus.compressorFrequency);
+
     switch (this->mode) {
     case climate::CLIMATE_MODE_HEAT:
         if (currentStatus.operating) {
