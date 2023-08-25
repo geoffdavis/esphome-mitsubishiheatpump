@@ -638,10 +638,8 @@ void MitsubishiHeatPump::dump_config() {
 }
 
 void MitsubishiHeatPump::dump_state() {
-
-    ESP_LOGI(TAG, "HELLO from echavet");
-    LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
-
+    //hp->currentStatus...
+    //LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     /*
     heatpumpSettings settings = this->hp->getSettings();
     heatpumpStatus status = this->hp->getStatus();
