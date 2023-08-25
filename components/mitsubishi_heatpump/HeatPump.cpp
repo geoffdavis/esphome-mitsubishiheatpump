@@ -127,7 +127,7 @@ bool HeatPump::connect(HardwareSerial* serial, int bitrate, int rx, int tx) {
     _HardSerial->begin(bitrate, SERIAL_8E1);
   }
   // for debug purposes; will be removed
-  readAllPackets();
+  // readAllPackets();
 
   ESP_LOGD("HeatPump", "settle 2s before we start sending packets...");
 

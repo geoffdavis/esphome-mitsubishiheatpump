@@ -17,7 +17,12 @@ logger:
   
 # Enable Home Assistant API
 api:
-
+  services:
+    - service: reboot
+      then:
+        - logger.log: "Redémarrage en cours..."
+        - esp8266.reboot:
+            delay: 0ms
 #  services:
 #    - service: set_remote_temperature
 #      variables:
@@ -92,7 +97,7 @@ climate:
   - platform: mitsubishi_heatpump  
     name: "${friendly_name}"
     id: hp_sejour
-    baud_rate: 2400
+    baud_rate: 0
     # Optional
     hardware_uart: UART0   
     # Optional
