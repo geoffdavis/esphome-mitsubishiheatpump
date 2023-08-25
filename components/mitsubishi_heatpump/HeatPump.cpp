@@ -703,6 +703,10 @@ int HeatPump::readPacket() {
             receivedSettings.iSee = data[4] > 0x08 ? true : false;
             receivedSettings.mode = lookupByteMapValue(MODE_MAP, MODE, 5, receivedSettings.iSee ? (data[4] - 0x08) : data[4]);
 
+            ESP_LOGD("Decoder", "[Power : %s]", receivedSettings.power);
+            ESP_LOGD("Decoder", "[iSee  : %d]", receivedSettings.iSee);
+            ESP_LOGD("Decoder", "[Mode  : %s]", receivedSettings.mode);
+
             if (data[11] != 0x00) {
               int temp = data[11];
               temp -= 128;
