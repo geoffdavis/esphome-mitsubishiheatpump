@@ -697,7 +697,7 @@ int HeatPump::readPacket() {
 
           switch (data[0]) {
           case 0x02: { // setting information
-            ESP_LOGV("Decoder", "[0x02 is settings]");
+            ESP_LOGD("Decoder", "[0x02 is settings]");
             heatpumpSettings receivedSettings;
             receivedSettings.power = lookupByteMapValue(POWER_MAP, POWER, 2, data[3]);
             receivedSettings.iSee = data[4] > 0x08 ? true : false;
@@ -710,18 +710,18 @@ int HeatPump::readPacket() {
               tempMode = true;
             } else {
               receivedSettings.temperature = lookupByteMapValue(TEMP_MAP, TEMP, 16, data[5]);
-              ESP_LOGV("Decoder", "[Consigne °C: %f]", receivedSettings.temperature);
+              ESP_LOGD("Decoder", "[Consigne °C: %f]", receivedSettings.temperature);
             }
 
             receivedSettings.fan = lookupByteMapValue(FAN_MAP, FAN, 6, data[6]);
-            ESP_LOGV("Decoder", "[Fan: %s]", receivedSettings.fan);
+            ESP_LOGD("Decoder", "[Fan: %s]", receivedSettings.fan);
 
             receivedSettings.vane = lookupByteMapValue(VANE_MAP, VANE, 7, data[7]);
-            ESP_LOGV("Decoder", "[Vane: %s]", receivedSettings.vane);
+            ESP_LOGD("Decoder", "[Vane: %s]", receivedSettings.vane);
 
             receivedSettings.wideVane = lookupByteMapValue(WIDEVANE_MAP, WIDEVANE, 7, data[10] & 0x0F);
             wideVaneAdj = (data[10] & 0xF0) == 0x80 ? true : false;
-            ESP_LOGV("Decoder", "[wideVane: %s (adj:%d)]", receivedSettings.wideVane, wideVaneAdj);
+            ESP_LOGD("Decoder", "[wideVane: %s (adj:%d)]", receivedSettings.wideVane, wideVaneAdj);
             wideVaneAdj = (data[10] & 0xF0) == 0x80 ? true : false;
 
             if (settingsChangedCallback && receivedSettings != currentSettings) {
@@ -743,7 +743,7 @@ int HeatPump::readPacket() {
           }
 
           case 0x03: { //Room temperature reading
-            ESP_LOGV("Decoder", "[0x03 room temperature]");
+            ESP_LOGD("Decoder", "[0x03 room temperature]");
             heatpumpStatus receivedStatus;
 
             if (data[6] != 0x00) {
@@ -753,7 +753,7 @@ int HeatPump::readPacket() {
             } else {
               receivedStatus.roomTemperature = lookupByteMapValue(ROOM_TEMP_MAP, ROOM_TEMP, 32, data[3]);
             }
-            ESP_LOGV("Decoder", "[Room °C: %f]", receivedStatus.roomTemperature);
+            ESP_LOGD("Decoder", "[Room °C: %f]", receivedStatus.roomTemperature);
 
             if ((statusChangedCallback || roomTempChangedCallback) && currentStatus.roomTemperature != receivedStatus.roomTemperature) {
               currentStatus.roomTemperature = receivedStatus.roomTemperature;
@@ -773,12 +773,12 @@ int HeatPump::readPacket() {
           }
 
           case 0x04: { // unknown
-            ESP_LOGV("Decoder", "[0x04 is unknown]");
+            ESP_LOGD("Decoder", "[0x04 is unknown]");
             break;
           }
 
           case 0x05: { // timer packet
-            ESP_LOGV("Decoder", "[0x05 is timer packet]");
+            ESP_LOGD("Decoder", "[0x05 is timer packet]");
             heatpumpTimers receivedTimers;
 
             receivedTimers.mode = lookupByteMapValue(TIMER_MODE_MAP, TIMER_MODE, 4, data[3]);
@@ -799,7 +799,7 @@ int HeatPump::readPacket() {
           }
 
           case 0x06: { // status
-            ESP_LOGV("Decoder", "[0x06 is status]");
+            ESP_LOGD("Decoder", "[0x06 is status]");
 
             heatpumpStatus receivedStatus;
             receivedStatus.operating = data[4];
@@ -814,20 +814,20 @@ int HeatPump::readPacket() {
               currentStatus.operating = receivedStatus.operating;
               currentStatus.compressorFrequency = receivedStatus.compressorFrequency;
             }
-            ESP_LOGV("Decoder", "[Operating: %d]", currentStatus.operating);
-            ESP_LOGV("Decoder", "[Compressor Freq: %d]", currentStatus.compressorFrequency);
+            ESP_LOGD("Decoder", "[Operating: %d]", currentStatus.operating);
+            ESP_LOGD("Decoder", "[Compressor Freq: %d]", currentStatus.compressorFrequency);
 
             return RCVD_PKT_STATUS;
           }
 
           case 0x09: { // standby mode maybe?
-            ESP_LOGV("Decoder", "[0x09 is standby mode maybe?]");
+            ESP_LOGD("Decoder", "[0x09 is standby mode maybe?]");
             break;
           }
 
           case 0x20:
           case 0x22: {
-            ESP_LOGV("Decoder", "[Packet Functions 0x20 et 0x22]");
+            ESP_LOGD("Decoder", "[Packet Functions 0x20 et 0x22]");
             if (dataLength == 0x10) {
               if (data[0] == 0x20) {
                 functions.setData1(&data[1]);
@@ -839,16 +839,18 @@ int HeatPump::readPacket() {
             }
             break;
           }
+          default:
+            ESP_LOGW("Decoder", "type de packet [%02X] <-- inconnu et inattendu", data[0]);
           }
-        }
-
-        if (header[1] == 0x61) { //Last update was successful 
+        } else if (header[1] == 0x61) { //Last update was successful 
           ESP_LOGV("Decoder", "[0x61: Last update was successful]");
           return RCVD_PKT_UPDATE_SUCCESS;
         } else if (header[1] == 0x7a) { //Last connect was successful 
           ESP_LOGV("Decoder", "[0x7a: Last connect was successful]");
           connected = true;
           return RCVD_PKT_CONNECT_SUCCESS;
+        } else {
+          ESP_LOGW("Decoder", "header[1] [%02X] <-- inconnu et inattendu", header[1]);
         }
       } else {
         ESP_LOGW("Decoder", "chkSUM error");
@@ -858,7 +860,7 @@ int HeatPump::readPacket() {
     ESP_LOGW("HeatPump", "AUCUNE donnée disponible!");
   }
 
-  ESP_LOGV("Decoder", "[packet decode is a FAILLURE]");
+  ESP_LOGD("Decoder", "[packet decode is a FAILLURE]");
 
   return RCVD_PKT_FAIL;
 }

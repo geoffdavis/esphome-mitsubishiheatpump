@@ -385,15 +385,20 @@ void MitsubishiHeatPump::hpDidConnect() {
 
 }*/
 void MitsubishiHeatPump::hpPacketDebug(byte* packet, unsigned int length, const char* packetDirection) {
-    char buffer[4];
-    char outputBuffer[length * 4 + 1];
+    char buffer[4]; // Petit tampon pour stocker chaque octet sous forme de texte
+    char outputBuffer[length * 4 + 1]; // Tampon pour stocker l'ensemble des octets sous forme de texte
+
+    // Initialisation du tampon de sortie avec une chaîne vide
+    outputBuffer[0] = '\0';
+
     for (unsigned int i = 0; i < length; i++) {
-        sprintf(buffer, "%02X ", packet[i]);
+        snprintf(buffer, sizeof(buffer), "%02X ", packet[i]); // Utilisation de snprintf pour éviter les dépassements de tampon
         strcat(outputBuffer, buffer);
     }
+
     ESP_LOGD(packetDirection, "%s", outputBuffer);
-    //ESP_LOGD(TAG, "pck_debug, dir %s -> %s", packetDirection, outputBuffer);
 }
+
 
 
 
