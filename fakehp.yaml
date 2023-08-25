@@ -17,6 +17,7 @@ logger:
   logs:
     MitsubishiHeatPump: WARN
     HeatPump: WARN
+    json: WARN
     #packetSent : DEBUG
     #packetRecv : DEBUG
     #Decoder    : VERBOSE
