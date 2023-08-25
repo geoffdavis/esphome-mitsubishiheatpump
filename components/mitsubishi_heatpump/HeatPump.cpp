@@ -674,7 +674,7 @@ int HeatPump::readPacket() {
       // calculate checksum
       checksum = (0xfc - dataSum) & 0xff;
 
-      ESP_LOGV("Decoder", "->chkSUM: %02X ", (int)checkSum);
+      ESP_LOGV("Decoder", "->chkSUM: %02X ", checksum);
 
       if (data[dataLength] == checksum) {
         ESP_LOGV("Decoder", "checkSUM OK");
