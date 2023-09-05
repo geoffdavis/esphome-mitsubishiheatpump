@@ -36,6 +36,8 @@ The whole integration with this libary and the underlying HeatPump has been
 tested by the author on the following units:
 * `MSZ-GL06NA`
 * `MFZ-KA09NA`
+* `MSZ-FH35V`
+* `MSZ-LN35VG2W`
 
 ## Usage
 ### Step 1: Build a control circuit.
