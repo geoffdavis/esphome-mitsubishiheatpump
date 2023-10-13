@@ -129,6 +129,8 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         static void save(float value, ESPPreferenceObject& storage);
         static optional<float> load(ESPPreferenceObject& storage);
 
+        static void log_packet(byte* packet, unsigned int length, char* packetDirection);
+
     private:
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
