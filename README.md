@@ -365,7 +365,9 @@ climate:
   `UART0`, `UART1`, and `UART2` are all valid choices. Default: `UART0`
 * `baud_rate` (_Optional_): Serial BAUD rate used to communicate with the
   HeatPump. Most systems use the default value of `4800` baud, but some use
-  `2400` or `9600`. Some ESP32 boards will require the baud_rate setting if
+  `2400` or `9600`. Check [here](https://github.com/SwiCago/HeatPump/issues/13)
+  to find discussion of whether your particular model requires a non-default baud rate.
+  Some ESP32 boards will require the baud_rate setting if
   hardware_uart is specified. Default: `4800`.
 * `rx_pin` (_Optional_): pin number to use as RX for the specified hardware
   UART (ESP32 only - ESP8266 hardware UART's pins aren't configurable).
@@ -409,9 +411,11 @@ climate:
 
 It is possible to use an external temperature sensor to tell the heat pump what
 the room temperature is, rather than relying on its internal temperature
-sensor. You can do this by calling `set_remote_temperature(float temp)` on the
-`mitsubishi_heatpump` object in a lambda. Note that you can call
-`set_remote_temperature(0)` to switch back to the internal temperature sensor.
+sensor. This is helpful if you want to make sure that a particular room, or part
+of the room, reaches the desired temperature—rather than just the area near the
+heat pump or the thermostat. You can do this by calling `set_remote_temperature(float temp)`
+on the `mitsubishi_heatpump` object in a lambda. (If needed, you can call
+`set_remote_temperature(0)` to switch back to the internal temperature sensor.)
 
 There are several ways you could make use of this functionality. One is to use
 a sensor automation:
@@ -423,7 +427,7 @@ climate:
     id: hp
 
 sensor:
-  # You could use a Bluetooth temperature sensor
+  # You could use a Bluetooth temperature sensor as the source...
   - platform: atc_mithermometer
     mac_address: "XX:XX:XX:XX:XX:XX"
     temperature:
@@ -432,7 +436,7 @@ sensor:
         then:
           - lambda: 'id(hp).set_remote_temperature(x);'
 
-  # Or you could use a HomeAssistant sensor
+  # ...or you could use a Home Assistant sensor as the source
   - platform: homeassistant
     name: "Temperature Sensor From Home Assistant"
     entity_id: sensor.temperature_sensor
@@ -440,10 +444,17 @@ sensor:
       then:
         - lambda: 'id(hp).set_remote_temperature(x);'
 ```
+One issue that you might have here is that, after some amount of time with no update from the
+external temperature sensor, the heat pump will revert back to its internal temperature.
+You can prevent this by [adding a `heartbeat` filter](https://github.com/geoffdavis/esphome-mitsubishiheatpump/issues/31#issuecomment-1207115352)
+to the sensor, which will keep reminding the heat pump of the external sensor value.
 
-Alternatively you could define a
+Also, if your external sensor is in Fahrenheit, you will have to [convert the value to Celsius](https://github.com/geoffdavis/esphome-mitsubishiheatpump/issues/31#issuecomment-1207115352).
+
+
+Alternatively, you could define a
 [service](https://www.esphome.io/components/api.html#user-defined-services)
-that HomeAssistant can call:
+that Home Assistant can call:
 
 ```yaml
 api:
