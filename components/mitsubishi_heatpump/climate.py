@@ -34,6 +34,11 @@ HORIZONTAL_SWING_OPTIONS = [
 ]
 VERTICAL_SWING_OPTIONS = ["swing", "auto", "up", "up_center", "center", "down_center", "down"]
 
+# Remote temperature timeout configuration
+CONF_REMOTE_OPERATING_TIMEOUT = "remote_temperature_operating_timeout_minutes"
+CONF_REMOTE_IDLE_TIMEOUT = "remote_temperature_idle_timeout_minutes"
+CONF_REMOTE_PING_TIMEOUT = "remote_temperature_ping_timeout_minutes"
+
 MitsubishiHeatPump = cg.global_ns.class_(
     "MitsubishiHeatPump", climate.Climate, cg.PollingComponent
 )
@@ -62,6 +67,9 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
         cv.Optional(CONF_BAUD_RATE): cv.positive_int,
+        cv.Optional(CONF_REMOTE_OPERATING_TIMEOUT): cv.positive_int,
+        cv.Optional(CONF_REMOTE_IDLE_TIMEOUT): cv.positive_int,
+        cv.Optional(CONF_REMOTE_PING_TIMEOUT): cv.positive_int,
         cv.Optional(CONF_RX_PIN): cv.positive_int,
         cv.Optional(CONF_TX_PIN): cv.positive_int,
         # If polling interval is greater than 9 seconds, the HeatPump library
@@ -100,6 +108,16 @@ def to_code(config):
 
     if CONF_TX_PIN in config:
         cg.add(var.set_tx_pin(config[CONF_TX_PIN]))
+
+    if CONF_REMOTE_OPERATING_TIMEOUT in config:
+        cg.add(var.set_remote_operating_timeout_minutes(config[CONF_REMOTE_OPERATING_TIMEOUT]))
+
+    if CONF_REMOTE_IDLE_TIMEOUT in config:
+        cg.add(var.set_remote_idle_timeout_minutes(config[CONF_REMOTE_IDLE_TIMEOUT]))
+
+    if CONF_REMOTE_PING_TIMEOUT in config:
+        cg.add(var.set_remote_ping_timeout_minutes(config[CONF_REMOTE_PING_TIMEOUT]))
+
 
     supports = config[CONF_SUPPORTS]
     traits = var.config_traits()
