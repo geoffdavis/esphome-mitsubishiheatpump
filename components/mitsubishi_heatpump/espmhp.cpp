@@ -477,9 +477,9 @@ void MitsubishiHeatPump::set_remote_ping_timeout_minutes(int minutes) {
 }
 
 void MitsubishiHeatPump::enforce_remote_temperature_sensor_timeout() {
-    // Handle ping timeouts.    
+    // Handle ping timeouts.
     if (remote_ping_timeout_.has_value() && last_ping_request_.has_value()) {
-        auto time_since_last_ping = 
+        auto time_since_last_ping =
             std::chrono::steady_clock::now() - last_ping_request_.value();
         if(time_since_last_ping > remote_ping_timeout_.value()) {
             ESP_LOGW(TAG, "Ping timeout.");
@@ -490,16 +490,16 @@ void MitsubishiHeatPump::enforce_remote_temperature_sensor_timeout() {
     }
 
     // Handle set_remote_temperature timeouts.
-    auto remote_set_temperature_timeout = 
+    auto remote_set_temperature_timeout =
         this->operating_ ? remote_operating_timeout_ : remote_idle_timeout_;
-    if (remote_set_temperature_timeout.has_value() && 
+    if (remote_set_temperature_timeout.has_value() &&
             last_remote_temperature_sensor_update_.has_value()) {
-        auto time_since_last_temperature_update = 
+        auto time_since_last_temperature_update =
             std::chrono::steady_clock::now() - last_remote_temperature_sensor_update_.value();
         if (time_since_last_temperature_update > remote_set_temperature_timeout.value()) {
             ESP_LOGW(TAG, "Set remote temperature timeout, operating=%d", this->operating_);
             this->set_remote_temperature(0);
-            return;            
+            return;
         }
     }
 }
