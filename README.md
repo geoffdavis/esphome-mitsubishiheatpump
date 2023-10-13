@@ -377,11 +377,11 @@ climate:
   component polls the heatpump hardware, in milliseconds. Maximum usable value
   is 9 seconds due to underlying issues with the HeatPump library. Default: 500ms
 * `supports` (_Optional_): Supported features for the device.
-  ** `mode` (_Optional_, list): Supported climate modes for the HeatPump. Default:
+  * `mode` (_Optional_, list): Supported climate modes for the HeatPump. Default:
     `['HEAT_COOL', 'COOL', 'HEAT', 'DRY', 'FAN_ONLY']`
-  ** `fan_mode` (_Optional_, list): Supported fan speeds for the HeatPump.
+  * `fan_mode` (_Optional_, list): Supported fan speeds for the HeatPump.
     Default: `['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']`
-  ** `swing_mode` (_Optional_, list): Supported fan swing modes. Most Mitsubishi
+  * `swing_mode` (_Optional_, list): Supported fan swing modes. Most Mitsubishi
     units only support the default. Default: `['OFF', 'VERTICAL']`
 * `remote_temperature_operating_timeout_minutes` (_Optional_): The number of
   minutes before a set_remote_temperature request becomes stale, while the
