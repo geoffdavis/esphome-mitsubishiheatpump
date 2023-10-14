@@ -538,6 +538,8 @@ void MitsubishiHeatPump::setup() {
                 this->hpStatusChanged(currentStatus);
             }
     );
+
+    hp->setPacketCallback(this->log_packet);    
 #endif
 
     ESP_LOGCONFIG(
@@ -605,4 +607,17 @@ void MitsubishiHeatPump::dump_config() {
 void MitsubishiHeatPump::dump_state() {
     LOG_CLIMATE("", "MitsubishiHeatPump Climate", this);
     ESP_LOGI(TAG, "HELLO");
+}
+
+void MitsubishiHeatPump::log_packet(byte* packet, unsigned int length, char* packetDirection) {
+    String packetHex;
+    char textBuf[15];
+
+    for (int i = 0; i < length; i++) {
+        memset(textBuf, 0, 15);
+        sprintf(textBuf, "%02X ", packet[i]);
+        packetHex += textBuf;
+    }
+    
+    ESP_LOGV(TAG, "PKT: [%s] %s", packetDirection, packetHex.c_str());
 }

@@ -148,6 +148,8 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         static void save(float value, esphome::ESPPreferenceObject& storage);
         static esphome::optional<float> load(esphome::ESPPreferenceObject& storage);
 
+        static void log_packet(byte* packet, unsigned int length, char* packetDirection);
+
     private:
         void enforce_remote_temperature_sensor_timeout();
 
