@@ -563,6 +563,7 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
                 this->action = climate::CLIMATE_ACTION_HEATING;
             }
             else {
+                hp->setPowerSetting("OFF");
                 this->action = climate::CLIMATE_ACTION_IDLE;
             }
             break;
@@ -596,7 +597,8 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
             this->action = climate::CLIMATE_ACTION_FAN;
             break;
         default:
-            this->action = climate::CLIMATE_ACTION_OFF;
+            // Ignore off signals
+            // this->action = climate::CLIMATE_ACTION_OFF;
     }
 
     this->operating_ = currentStatus.operating;
@@ -614,6 +616,11 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
     }
 
     this->hp->setRemoteTemperature(temp);
+
+    if (this->mode == climate::CLIMATE_MODE_HEAT && heat_setpoint.has_value() && temp < heat_setpoint.value()) {
+        hp->setModeSetting("HEAT");
+        hp->setPowerSetting("ON");
+    }
 }
 
 void MitsubishiHeatPump::ping() {
