@@ -560,7 +560,6 @@ void MitsubishiHeatPump::hpSettingsChanged() {
  * Report changes in the current temperature sensed by the HeatPump.
  */
 void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
-    this->current_temperature = currentStatus.roomTemperature;
     switch (this->mode) {
         case climate::CLIMATE_MODE_HEAT:
             if (currentStatus.operating) {
@@ -581,9 +580,9 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
         case climate::CLIMATE_MODE_HEAT_COOL:
             this->action = climate::CLIMATE_ACTION_IDLE;
             if (currentStatus.operating) {
-              if (this->current_temperature > this->target_temperature) {
+              if (currentStatus.roomTemperature > this->target_temperature) {
                   this->action = climate::CLIMATE_ACTION_COOLING;
-              } else if (this->current_temperature < this->target_temperature) {
+              } else if (currentStatus.roomTemperature < this->target_temperature) {
                   this->action = climate::CLIMATE_ACTION_HEATING;
               }
             }
@@ -620,6 +619,7 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
     }
 
     this->hp->setRemoteTemperature(temp);
+    this->current_temperature = temp;
 
     float round_temp = round(temp * 2) / 2;
     bool power_on = hp->getPowerSettingBool();
