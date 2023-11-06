@@ -105,6 +105,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     bool has_temp = call.get_target_temperature().has_value();
     bool has_fan = call.get_fan_mode().has_value();
     bool has_swing = call.get_swing_mode().has_value();
+        
     if (has_mode){
         ESP_LOGV(TAG, "Has Mode");
     } else {
@@ -115,6 +116,17 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     } else {
         ESP_LOGV(TAG, "Doesn't Have Temp");
     }
+    if (has_fan){
+        ESP_LOGV(TAG, "Has Fan");
+    } else {
+        ESP_LOGV(TAG, "Doesn't Have Fan");
+    }
+    if (has_swing){
+        ESP_LOGV(TAG, "Has Swing");
+    } else {
+        ESP_LOGV(TAG, "Doesn't Have Swing");
+    }
+
     return;
     if (has_mode){
         this->mode = *call.get_mode();
