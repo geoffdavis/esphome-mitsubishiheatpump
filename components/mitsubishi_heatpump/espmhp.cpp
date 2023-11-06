@@ -171,18 +171,17 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     }
 
     if (has_temp){
-        ESP_LOGV(
-            "control", "Sending target temp: %.1f",
+        ESP_LOGV(TAG, "control - Sending target temp: %.1f",
             *call.get_target_temperature()
         );
         hp->setTemperature(*call.get_target_temperature());
         this->target_temperature = *call.get_target_temperature();
         updated = true;
     }
-
+    ESP_LOGV(TAG,"About to enter fan control block");
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (call.get_fan_mode().has_value()) {
-        ESP_LOGV("control", "Requested fan mode is %s", *call.get_fan_mode());
+        ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
         /*
         this->fan_mode = *call.get_fan_mode();
         switch(*call.get_fan_mode()) {
