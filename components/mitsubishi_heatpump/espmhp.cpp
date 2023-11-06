@@ -105,75 +105,61 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     bool has_temp = call.get_target_temperature().has_value();
 
     if (has_mode){
-        ESP_LOGV(TAG, "Has Mode");
-        return;
         this->mode = *call.get_mode();
-    } else {
-        ESP_LOGV(TAG, "Doesn't Have Mode");
-        return;
-    }
-    switch (this->mode) {
-        case climate::CLIMATE_MODE_COOL:
-            hp->setModeSetting("COOL");
-            hp->setPowerSetting("ON");
+        switch (this->mode) {
+            case climate::CLIMATE_MODE_COOL:
+                hp->setModeSetting("COOL");
+                hp->setPowerSetting("ON");
 
-            if (has_mode){
                 if (cool_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(cool_setpoint.value());
                     this->target_temperature = cool_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
-            }
-            break;
-        case climate::CLIMATE_MODE_HEAT:
-            hp->setModeSetting("HEAT");
-            hp->setPowerSetting("ON");
-            if (has_mode){
+                break;
+            case climate::CLIMATE_MODE_HEAT:
+                hp->setModeSetting("HEAT");
+                hp->setPowerSetting("ON");
+
                 if (heat_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(heat_setpoint.value());
                     this->target_temperature = heat_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
-                updated = true;
-            }
-            break;
-        case climate::CLIMATE_MODE_DRY:
-            hp->setModeSetting("DRY");
-            hp->setPowerSetting("ON");
-            if (has_mode){
+                updated = true;        
+                break;
+            case climate::CLIMATE_MODE_DRY:
+                hp->setModeSetting("DRY");
+                hp->setPowerSetting("ON");
+         
                 this->action = climate::CLIMATE_ACTION_DRYING;
-                updated = true;
-            }
-            break;
-        case climate::CLIMATE_MODE_HEAT_COOL:
-            hp->setModeSetting("AUTO");
-            hp->setPowerSetting("ON");
-            if (has_mode){
+                updated = true;          
+                break;
+            case climate::CLIMATE_MODE_HEAT_COOL:
+                hp->setModeSetting("AUTO");
+                hp->setPowerSetting("ON");
+
                 if (auto_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(auto_setpoint.value());
                     this->target_temperature = auto_setpoint.value();
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
-            }
-            updated = true;
-            break;
-        case climate::CLIMATE_MODE_FAN_ONLY:
-            hp->setModeSetting("FAN");
-            hp->setPowerSetting("ON");
-            if (has_mode){
+                updated = true;
+                break;
+            case climate::CLIMATE_MODE_FAN_ONLY:
+                hp->setModeSetting("FAN");
+                hp->setPowerSetting("ON");
                 this->action = climate::CLIMATE_ACTION_FAN;
                 updated = true;
-            }
-            break;
-        case climate::CLIMATE_MODE_OFF:
-        default:
-            if (has_mode){
+                break;
+            case climate::CLIMATE_MODE_OFF:
+            default:
                 hp->setPowerSetting("OFF");
                 this->action = climate::CLIMATE_ACTION_OFF;
                 updated = true;
-            }
-            break;
+                break;
+        }
     }
 
     if (has_temp){
@@ -188,7 +174,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (call.get_fan_mode().has_value()) {
         ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
-        /*
+
         this->fan_mode = *call.get_fan_mode();
         switch(*call.get_fan_mode()) {
             case climate::CLIMATE_FAN_OFF:
@@ -222,7 +208,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
                 //updated = true;
                 break;
         }
-        */
     }
 
     //const char* VANE_MAP[7]        = {"AUTO", "1", "2", "3", "4", "5", "SWING"};
