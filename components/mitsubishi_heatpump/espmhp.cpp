@@ -199,7 +199,8 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     return;
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (has_fan) {
-        ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
+        //ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
+        ESP_LOGV(TAG,"Inside fan control block");          
         return;
         this->fan_mode = *call.get_fan_mode();
         switch(*call.get_fan_mode()) {
