@@ -99,13 +99,18 @@ climate::ClimateTraits& MitsubishiHeatPump::config_traits() {
  */
 void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     ESP_LOGV(TAG, "Control called.");
-    ESP_LOGV(TAG, "Returning.");
-    return;
+
     bool updated = false;
     bool has_mode = call.get_mode().has_value();
     bool has_temp = call.get_target_temperature().has_value();
+
     if (has_mode){
+        ESP_LOGV(TAG, "Has Mode");
+        return;
         this->mode = *call.get_mode();
+    } else {
+        ESP_LOGV(TAG, "Doesn't Have Mode");
+        return;
     }
     switch (this->mode) {
         case climate::CLIMATE_MODE_COOL:
