@@ -127,7 +127,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(TAG, "Doesn't Have Swing");
     }
 
-    return;
+/*
     if (has_mode){
         this->mode = *call.get_mode();
         switch (this->mode) {
@@ -194,11 +194,12 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         this->target_temperature = *call.get_target_temperature();
         updated = true;
     }
+*/
     ESP_LOGV(TAG,"About to enter fan control block");
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (has_fan) {
         ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
-
+        return;
         this->fan_mode = *call.get_fan_mode();
         switch(*call.get_fan_mode()) {
             case climate::CLIMATE_FAN_OFF:
