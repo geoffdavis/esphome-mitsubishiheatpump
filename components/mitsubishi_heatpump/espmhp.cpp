@@ -203,7 +203,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
   
         this->fan_mode = *call.get_fan_mode();
         ESP_LOGV(TAG,"Got fan mode");
-        return;
+//        return;
         switch (*call.get_fan_mode()) {
             case climate::CLIMATE_FAN_OFF:
                 //hp->setPowerSetting("OFF");
