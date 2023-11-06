@@ -200,9 +200,11 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     if (has_fan) {
         //ESP_LOGV(TAG, "control - Requested fan mode is %s", *call.get_fan_mode());
         ESP_LOGV(TAG,"Inside fan control block");          
-        return;
+  
         this->fan_mode = *call.get_fan_mode();
-        switch(*call.get_fan_mode()) {
+        ESP_LOGV(TAG,"Got fan mode");
+        return;
+        switch(this->fan_mode) {
             case climate::CLIMATE_FAN_OFF:
                 //hp->setPowerSetting("OFF");
                 //updated = true;
