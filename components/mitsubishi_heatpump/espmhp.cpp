@@ -105,6 +105,14 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     bool has_temp = call.get_target_temperature().has_value();
 
     if (has_mode){
+        ESP_LOGV(TAG, "Has Mode");
+        return;
+        this->mode = *call.get_mode();
+    } else {
+        ESP_LOGV(TAG, "Doesn't Have Mode");
+        return;
+    }
+    if (has_mode){
         this->mode = *call.get_mode();
         switch (this->mode) {
             case climate::CLIMATE_MODE_COOL:
