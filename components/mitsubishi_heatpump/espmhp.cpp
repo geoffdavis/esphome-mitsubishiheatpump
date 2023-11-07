@@ -127,7 +127,6 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(TAG, "Doesn't Have Swing");
     }
 
-/*
     if (has_mode){
         this->mode = *call.get_mode();
         switch (this->mode) {
@@ -194,7 +193,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         this->target_temperature = *call.get_target_temperature();
         updated = true;
     }
-*/
+
     ESP_LOGV(TAG,"About to enter fan control block");
     //const char* FAN_MAP[6]         = {"AUTO", "QUIET", "1", "2", "3", "4"};
     if (has_fan) {
@@ -207,40 +206,40 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         switch (*call.get_fan_mode()) {
             case climate::CLIMATE_FAN_OFF:
                 ESP_LOGV(TAG,"Setting Fan Off");      
-                //hp->setPowerSetting("OFF");
-                //updated = true;
+                hp->setPowerSetting("OFF");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_DIFFUSE:
                 ESP_LOGV(TAG,"Setting Fan Diffuse");  
-                //hp->setFanSpeed("QUIET");
-                //updated = true;
+                hp->setFanSpeed("QUIET");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_LOW:
                 ESP_LOGV(TAG,"Setting Fan Low");  
-                //hp->setFanSpeed("1");
-                //updated = true;
+                hp->setFanSpeed("1");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_MEDIUM:
                 ESP_LOGV(TAG,"Setting Fan Medium");  
-                //hp->setFanSpeed("2");
-                //updated = true;
+                hp->setFanSpeed("2");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_MIDDLE:
                 ESP_LOGV(TAG,"Setting Fan Middle");  
-                //hp->setFanSpeed("3");
-                //updated = true;
+                hp->setFanSpeed("3");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_HIGH:
                 ESP_LOGV(TAG,"Setting Fan High");  
-                //hp->setFanSpeed("4");
-                //updated = true;
+                hp->setFanSpeed("4");
+                updated = true;
                 break;
             case climate::CLIMATE_FAN_ON:
             case climate::CLIMATE_FAN_AUTO:
             default:
                 ESP_LOGV(TAG,"Setting Fan Auto");  
-                //hp->setFanSpeed("AUTO");
-                //updated = true;
+                hp->setFanSpeed("AUTO");
+                updated = true;
                 break;
         }
     }
