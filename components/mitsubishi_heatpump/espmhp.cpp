@@ -634,15 +634,18 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
         if ((power_on || strcmp(current_mode, "OFF") != 0)
             && round_temp >= heat_setpoint.value() + 0.4) {
             hp->setPowerSetting("OFF");
+            this->action = climate::CLIMATE_ACTION_IDLE;
             updated = true;
         } else if ((!power_on || strcmp(current_mode, "HEAT") != 0) 
                    && round_temp <= heat_setpoint.value() - 0.4) {
             hp->setModeSetting("HEAT");
             hp->setPowerSetting("ON");
+            this->action = climate::CLIMATE_ACTION_HEATING;
             updated = true;
         } else if (!power_on && strcmp(current_mode, "HEAT") == 0 &&
                    round_temp >= heat_setpoint.value() - 0.1) {
             hp->setPowerSetting("OFF");
+            this->action = climate::CLIMATE_ACTION_IDLE;
             updated = true;
         }
     }
@@ -651,6 +654,7 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
         ESP_LOGD(TAG, "Setting internal mode to %s - %s", hp->getModeSetting(),
                  hp->getPowerSetting());
         hp->update();
+        this->publish_state();
     }
 }
 
