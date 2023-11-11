@@ -117,7 +117,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(TAG, "Doesn't Have Temp");
     }
     if (has_fan){
-        ESP_LOGV(TAG, "Has Fan");
+        ESP_LOV(TAG, "Has Fan");
     } else {
         ESP_LOGV(TAG, "Doesn't Have Fan");
     }
@@ -439,11 +439,11 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 void MitsubishiHeatPump::setup() { 
     // This will be called by App.setup()
     // FIXME Added delay due to ESP01s not connecting to heatpump when connected at same time as MHK2 to splitter.
-    ESP_LOGCONFIG(TAG, "Delaying setup for 4 seconds...");        
+    ESP_LOGV(TAG, "Delaying setup for 4 seconds...");        
     esphome::delay(4000);
-    ESP_LOGCONFIG(TAG, "Ending delay...");        
+    ESP_LOGV(TAG, "Ending delay...");        
     this->banner();
-    ESP_LOGCONFIG(TAG, "Setting up UART...");
+    ESP_LOGV(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
         ESP_LOGCONFIG(
                 TAG,
@@ -455,7 +455,7 @@ void MitsubishiHeatPump::setup() {
     }
     this->check_logger_conflict_();
 
-    ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
+    ESP_LOGV(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
     this->current_temperature = NAN;
     this->target_temperature = NAN;
@@ -476,7 +476,7 @@ void MitsubishiHeatPump::setup() {
     );
 #endif
 
-    ESP_LOGCONFIG(
+    ESP_LOGV(
             TAG,
             "hw_serial(%p) is &Serial(%p)? %s",
             this->get_hw_serial_(),
