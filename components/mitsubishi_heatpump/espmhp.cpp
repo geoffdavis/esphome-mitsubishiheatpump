@@ -269,7 +269,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
     // send the update back to esphome:
     this->publish_state();
     // and the heat pump:
-    // hp->update();
+    hp->update();
 }
 
 void MitsubishiHeatPump::hpSettingsChanged() {
