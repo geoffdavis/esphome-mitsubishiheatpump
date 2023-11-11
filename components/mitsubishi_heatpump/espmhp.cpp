@@ -439,9 +439,9 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
 void MitsubishiHeatPump::setup() { 
     // This will be called by App.setup()
     // FIXME Added delay due to ESP01s not connecting to heatpump when connected at same time as MHK2 to splitter.
-    ESP_LOGV(TAG, "Delaying setup for 4 seconds...");        
+    ESP_LOGI(TAG, "Delaying setup for 4 seconds...");        
     esphome::delay(4000);
-    ESP_LOGV(TAG, "Ending delay...");        
+    ESP_LOGI(TAG, "Ending delay...");        
     this->banner();
     ESP_LOGV(TAG, "Setting up UART...");
     if (!this->get_hw_serial_()) {
