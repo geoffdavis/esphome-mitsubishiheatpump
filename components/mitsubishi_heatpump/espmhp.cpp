@@ -436,12 +436,11 @@ void MitsubishiHeatPump::set_remote_temperature(float temp) {
     this->hp->setRemoteTemperature(temp);
 }
 
-void MitsubishiHeatPump::setup() {
-    int delay_time = 4000;      
+void MitsubishiHeatPump::setup() { 
     // This will be called by App.setup()
     // FIXME Added delay due to ESP01s not connecting to heatpump when connected at same time as MHK2 to splitter.
     ESP_LOGCONFIG(TAG, "Delaying setup for 4 seconds...");        
-    delay(delay_time);
+    esphome::delay(4);
     ESP_LOGCONFIG(TAG, "Ending delay...");        
     this->banner();
     ESP_LOGCONFIG(TAG, "Setting up UART...");
