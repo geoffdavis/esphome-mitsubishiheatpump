@@ -117,7 +117,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         ESP_LOGV(TAG, "Doesn't Have Temp");
     }
     if (has_fan){
-        ESP_LOV(TAG, "Has Fan");
+        ESP_LOGV(TAG, "Has Fan");
     } else {
         ESP_LOGV(TAG, "Doesn't Have Fan");
     }
