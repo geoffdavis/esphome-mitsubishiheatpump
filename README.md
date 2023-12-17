@@ -393,8 +393,6 @@ climate:
   * `fan_mode` (_Optional_, list): Supported fan speeds for the HeatPump.
     Default: `['AUTO', 'DIFFUSE', 'LOW', 'MEDIUM', 'MIDDLE', 'HIGH']`
   * `swing_mode` (_Optional_, list): Supported fan swing modes. Most Mitsubishi
-    units only support the default. Default: `['OFF', 'VERTICAL', 'HORIZONTAL', 'BOTH']`
-  * `swing_mode` (_Optional_, list): Supported fan swing modes. Most Mitsubishi
     units only support the default. Default: `['OFF', 'VERTICAL']`
 * `remote_temperature_operating_timeout_minutes` (_Optional_): The number of
   minutes before a set_remote_temperature request becomes stale, while the
@@ -410,6 +408,7 @@ climate:
   request wasn't received from your ESPHome controller. This will result
   in the heatpump reverting to it's internal temperature sensor if the heatpump
   loses it's WiFi connection.
+equest.)
 
 ## Other configuration
 
