@@ -42,6 +42,8 @@ tested by the author on the following units:
 
 * `MSZ-GL06NA`
 * `MFZ-KA09NA`
+* `MSZ-FH35V`
+* `MSZ-LN35VG2W`
 
 ## Usage
 
@@ -240,6 +242,11 @@ climate:
   - platform: mitsubishi_heatpump
     name: "${friendly_name}"
 
+    horizontal_vane_select:
+      name: Horizontal Vane
+    vertical_vane_select:
+      name: Vertical Vane
+
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
     # logging. 
@@ -327,6 +334,11 @@ climate:
   - platform: mitsubishi_heatpump
     name: "${friendly_name}"
 
+    horizontal_vane_select:
+      name: Horizontal Vane
+    vertical_vane_select:
+      name: Vertical Vane
+
     # ESP32 only - change UART0 to UART1 or UART2 and remove the
     # logging:baud_rate above to allow the built-in UART0 to function for
     # logging.
@@ -350,8 +362,7 @@ climate:
     supports:
       mode: ["HEAT_COOL", "COOL", "HEAT", "FAN_ONLY"]
       fan_mode: ["AUTO", "LOW", "MEDIUM", "HIGH"]
-      swing_mode: ["OFF", "VERTICAL"]
-
+      swing_mode: ["OFF", "VERTICAL", "HORIZONTAL", "BOTH"]
     visual:
       min_temperature: 16
       max_temperature: 31
@@ -397,6 +408,7 @@ climate:
   request wasn't received from your ESPHome controller. This will result
   in the heatpump reverting to it's internal temperature sensor if the heatpump
   loses it's WiFi connection.
+equest.)
 
 ## Other configuration
 
