@@ -167,6 +167,8 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         void on_horizontal_swing_change(const std::string &swing);
         void on_vertical_swing_change(const std::string &swing);
 
+        static void log_packet(byte* packet, unsigned int length, char* packetDirection);
+
     private:
         void enforce_remote_temperature_sensor_timeout();
 
