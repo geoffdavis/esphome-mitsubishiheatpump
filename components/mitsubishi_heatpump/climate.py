@@ -90,5 +90,5 @@ def to_code(config):
     cg.add_library(
         name="HeatPump",
         repository="https://github.com/SwiCago/HeatPump",
-        version="d6a29134401d7caae1b8fca9c452c8eb92af60c5",
+        version="5d1e146771d2f458907a855bf9d5d4b9bf5ff033",
     )
