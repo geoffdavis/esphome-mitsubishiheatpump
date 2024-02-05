@@ -15,10 +15,12 @@
  * - ESPHome 1.19.1 or greater
  */
 
-#define USE_CALLBACKS
+//#define USE_CALLBACKS
 
 #include "esphome.h"
 #include "esphome/core/preferences.h"
+
+#include "pidcontroller.h"
 
 #include "HeatPump.h"
 using namespace esphome;
@@ -40,6 +42,9 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
                                                   //defined by hardware
 static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
+static const float p = 4.0;
+static const float i = 0.02;
+static const float d = 0.2;
 
 class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
@@ -133,6 +138,12 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         // Retrieve the HardwareSerial pointer from friend and subclasses.
         HardwareSerial *hw_serial_;
         int baud_ = 0;
+        PIDController *pidController;
+
+        bool same_float(const float left, const float right);
+        void update_setpoint(float value);
+        bool isComponentActive();
+        void run_workflows();
 };
 
 #endif
