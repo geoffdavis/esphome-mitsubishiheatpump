@@ -116,7 +116,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             if (has_mode){
                 if (cool_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(cool_setpoint.value());
-                    this->target_temperature = cool_setpoint.value();
+                    this->update_setpoint(cool_setpoint.value());
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
@@ -128,7 +128,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             if (has_mode){
                 if (heat_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(heat_setpoint.value());
-                    this->target_temperature = heat_setpoint.value();
+                    this->update_setpoint(heat_setpoint.value());
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
                 updated = true;
@@ -148,7 +148,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             if (has_mode){
                 if (auto_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(auto_setpoint.value());
-                    this->target_temperature = auto_setpoint.value();
+                    this->update_setpoint(auto_setpoint.value());
                 }
                 this->action = climate::CLIMATE_ACTION_IDLE;
             }
@@ -178,7 +178,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
             *call.get_target_temperature()
         );
         hp->setTemperature(*call.get_target_temperature());
-        this->target_temperature = *call.get_target_temperature();
+        this->update_setpoint(*call.get_target_temperature());
         updated = true;
     }
 
@@ -352,7 +352,7 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     /*
      * ******** HANDLE TARGET TEMPERATURE CHANGES ********
      */
-    this->target_temperature = currentSettings.temperature;
+    this->update_setpoint(currentSettings.temperature);
     ESP_LOGI(TAG, "Target temp is: %f", this->target_temperature);
 
     /*
@@ -436,16 +436,6 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
 
-    auto restore = this->restore_state_();
-    if (restore.has_value()) {
-        restore->apply(this);
-    } else {
-        this->current_temperature = NAN;
-        this->target_temperature = NAN;
-        this->fan_mode = climate::CLIMATE_FAN_OFF;
-        this->swing_mode = climate::CLIMATE_SWING_OFF;
-    }
-
 #ifdef USE_CALLBACKS
     hp->setSettingsChangedCallback(
             [this]() {
@@ -482,16 +472,6 @@ void MitsubishiHeatPump::setup() {
         this->mark_failed();
     }
 
-    // create various setpoint persistence:
-    cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
-    heat_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 2);
-    auto_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 3);
-
-    // load values from storage:
-    cool_setpoint = load(cool_storage);
-    heat_setpoint = load(heat_storage);
-    auto_setpoint = load(auto_storage);
-
     float min_temp = ESPMHP_MIN_TEMPERATURE;
     if (this->visual_min_temperature_override_.has_value()) {
         min_temp = this->visual_min_temperature_override_.value();
@@ -510,6 +490,26 @@ void MitsubishiHeatPump::setup() {
         min_temp,
         max_temp
     );
+
+    auto restore = this->restore_state_();
+    if (restore.has_value()) {
+        restore->to_call(this).perform();
+    } else {
+        this->current_temperature = NAN;
+        this->target_temperature = NAN;
+        this->fan_mode = climate::CLIMATE_FAN_OFF;
+        this->swing_mode = climate::CLIMATE_SWING_OFF;
+    }
+
+    // create various setpoint persistence:
+    cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
+    heat_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 2);
+    auto_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 3);
+
+    // load values from storage:
+    cool_setpoint = load(cool_storage);
+    heat_setpoint = load(heat_storage);
+    auto_setpoint = load(auto_storage);
 
     this->dump_config();
 }
@@ -755,19 +755,25 @@ void MitsubishiHeatPump::run_workflows() {
             }
 
             if (this->mode == climate::CLIMATE_MODE_HEAT) {
-                if (this->current_temperature - setPointCorrection > 0) {
+                const float delta = this->current_temperature - setPointCorrection;
+                ESP_LOGI(TAG, "Device off on heat: delta={%f} current={%f} setPointCorrection={%f}", delta, this->current_temperature, setPointCorrection);
+                if (delta > 0) {
                     return;
                 }
 
                 ESP_LOGI(TAG, "Turning on Workflow heat");
                 this->internalTurnOn();
             } else if (this->mode == climate::CLIMATE_MODE_COOL) {
-                if (setPointCorrection - this->current_temperature > 0) {
+                const float delta = setPointCorrection - this->current_temperature;
+                ESP_LOGI(TAG, "Device off on cool: delta={%f} current={%f} setPointCorrection={%f}", delta, this->current_temperature, setPointCorrection);
+                if (delta > 0) {
                     return;
                 }
 
                 ESP_LOGI(TAG, "Turning on Workflow cool");
                 this->internalTurnOn();
+            } else {
+                ESP_LOGI(TAG, "Device off on other: current={%f} setPointCorrection={%f}", this->current_temperature, setPointCorrection);
             }
             break;
         }
