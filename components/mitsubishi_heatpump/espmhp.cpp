@@ -624,11 +624,11 @@ bool MitsubishiHeatPump::isDeviceActive(heatpumpSettings *currentSettings) {
 
 void MitsubishiHeatPump::internalTurnOn() {
     const uint32_t end = esphome::millis();
-    const uint32_t durationInMilliseconds = end - this->lastInternalPowerUpdate;
-    const uint32_t durationInSeconds = durationInMilliseconds / 1000;
-    const uint32_t remaining = 60 - durationInSeconds; 
+    const int durationInMilliseconds = end - this->lastInternalPowerUpdate;
+    const int durationInSeconds = durationInMilliseconds / 1000;
+    const int remaining = 60 - durationInSeconds; 
     if (remaining > 0) {
-        ESP_LOGD(TAG, "Throttling internal turn on: %d seconds remaining", remaining);
+        ESP_LOGD(TAG, "Throttling internal turn on: %i seconds remaining", remaining);
         return;
     }
 
@@ -644,11 +644,11 @@ void MitsubishiHeatPump::internalTurnOn() {
 
 void MitsubishiHeatPump::internalTurnOff() {
     const uint32_t end = esphome::millis();
-    const uint32_t durationInMilliseconds = end - this->lastInternalPowerUpdate;
-    const uint32_t durationInSeconds = durationInMilliseconds / 1000;
-    const uint32_t remaining = 60 - durationInSeconds; 
+    const int durationInMilliseconds = end - this->lastInternalPowerUpdate;
+    const int durationInSeconds = durationInMilliseconds / 1000;
+    const int remaining = 60 - durationInSeconds; 
     if (remaining > 0) {
-        ESP_LOGD(TAG, "Throttling internal turn off: %d seconds remaining", remaining);
+        ESP_LOGD(TAG, "Throttling internal turn off: %i seconds remaining", remaining);
         return;
     }
 
