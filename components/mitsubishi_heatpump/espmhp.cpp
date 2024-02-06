@@ -435,10 +435,16 @@ void MitsubishiHeatPump::setup() {
 
     ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
     this->hp = new HeatPump();
-    this->current_temperature = NAN;
-    this->target_temperature = NAN;
-    this->fan_mode = climate::CLIMATE_FAN_OFF;
-    this->swing_mode = climate::CLIMATE_SWING_OFF;
+
+    auto restore = this->restore_state_();
+    if (restore.has_value()) {
+        restore->apply(this);
+    } else {
+        this->current_temperature = NAN;
+        this->target_temperature = NAN;
+        this->fan_mode = climate::CLIMATE_FAN_OFF;
+        this->swing_mode = climate::CLIMATE_SWING_OFF;
+    }
 
 #ifdef USE_CALLBACKS
     hp->setSettingsChangedCallback(
@@ -749,15 +755,14 @@ void MitsubishiHeatPump::run_workflows() {
             }
 
             if (this->mode == climate::CLIMATE_MODE_HEAT) {
-                if (this->current_temperature > setPointCorrection) {
+                if (this->current_temperature - setPointCorrection > 0) {
                     return;
                 }
 
                 ESP_LOGI(TAG, "Turning on Workflow heat");
                 this->internalTurnOn();
-
             } else if (this->mode == climate::CLIMATE_MODE_COOL) {
-                if (setPointCorrection > this->current_temperature) {
+                if (setPointCorrection - this->current_temperature > 0) {
                     return;
                 }
 
