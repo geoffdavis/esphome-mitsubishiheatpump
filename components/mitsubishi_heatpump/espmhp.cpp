@@ -63,7 +63,7 @@ void MitsubishiHeatPump::update() {
     this->hpStatusChanged(currentStatus);
 #endif
 
-    this->dump_heat_pump_details();
+    this->run_workflows();
 }
 
 void MitsubishiHeatPump::set_baud_rate(int baud) {
@@ -308,7 +308,9 @@ void MitsubishiHeatPump::hpSettingsChanged() {
             );
         }
     } else {
-        this->mode = climate::CLIMATE_MODE_OFF;
+        if (!this->internalPowerOff) {
+            this->mode = climate::CLIMATE_MODE_OFF;
+        }
         this->action = climate::CLIMATE_ACTION_OFF;
     }
 
@@ -484,6 +486,25 @@ void MitsubishiHeatPump::setup() {
     heat_setpoint = load(heat_storage);
     auto_setpoint = load(auto_storage);
 
+    float min_temp = ESPMHP_MIN_TEMPERATURE;
+    if (this->visual_min_temperature_override_.has_value()) {
+        min_temp = this->visual_min_temperature_override_.value();
+    }
+    float max_temp = ESPMHP_MAX_TEMPERATURE;
+    if (this->visual_max_temperature_override_.has_value()) {
+        max_temp = this->visual_max_temperature_override_.value();
+    }
+
+    this->pidController = new PIDController(
+        p,
+        i,
+        d,
+        this->get_update_interval(),
+        0.0,
+        min_temp,
+        max_temp
+    );
+
     this->dump_config();
 }
 
@@ -560,5 +581,190 @@ void MitsubishiHeatPump::dump_heat_pump_details() {
         ESP_LOGI(TAG, "  vane: %s", currentSettings.vane);
         ESP_LOGI(TAG, "  wideVane: %s", currentSettings.wideVane);
         ESP_LOGI(TAG, "  connected: %s", YESNO(currentSettings.connected));
+    }
+
+    /*
+    ESP_LOGI(TAG, "Current temperature (state):  %f", this->current_temperature);
+    ESP_LOGI(TAG, "Target temperature (state):  %f", this->target_temperature);
+    */
+}
+
+bool MitsubishiHeatPump::same_float(const float left, const float right) {
+    return fabs(left - right) <= 0.001;
+}
+
+void MitsubishiHeatPump::ensure_pid_target() {
+    if (!this->same_float(this->target_temperature, this->pidController->getTarget())) {
+        ESP_LOGI(TAG, "PID Target temp changing from %f to %f", this->pidController->getTarget(), this->target_temperature);
+        this->pidController->setTarget(this->target_temperature);
+    }
+}
+
+void MitsubishiHeatPump::update_setpoint(const float value) {
+    if (this->same_float(this->target_temperature, value)) {
+        this->ensure_pid_target();
+        ESP_LOGD(TAG, "Target temp unchanged: current={%f} updated={%f}", this->target_temperature, value);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Target temp changing from %f to %f", this->target_temperature, value);
+    this->target_temperature = value;
+
+    ESP_LOGI(TAG, "PID Target temp changing from %f to %f", this->pidController->getTarget(), value);
+    this->pidController->setTarget(this->target_temperature);
+}
+
+bool MitsubishiHeatPump::isComponentActive() {
+    return this->mode != climate::CLIMATE_MODE_OFF;
+}
+
+bool MitsubishiHeatPump::isDeviceActive(heatpumpSettings *currentSettings) {
+    return strcmp(currentSettings->power, "ON") == 0;
+}
+
+void MitsubishiHeatPump::internalTurnOn() {
+    const uint32_t end = esphome::millis();
+    const uint32_t durationInMilliseconds = end - this->lastInternalPowerUpdate;
+    const uint32_t durationInSeconds = durationInMilliseconds / 1000;
+    const uint32_t remaining = 60 - durationInSeconds; 
+    if (remaining > 0) {
+        ESP_LOGD(TAG, "Throttling internal turn on: %d seconds remaining", remaining);
+        return;
+    }
+
+    hp->setPowerSetting("ON");
+    if (hp->update()) {
+        this->lastInternalPowerUpdate = end;
+        this->internalPowerOff = false;
+        ESP_LOGW(TAG, "Performed internal turn on!");
+    } else {
+        ESP_LOGW(TAG, "Failed to perform internal turn on!");
+    }
+}
+
+void MitsubishiHeatPump::internalTurnOff() {
+    const uint32_t end = esphome::millis();
+    const uint32_t durationInMilliseconds = end - this->lastInternalPowerUpdate;
+    const uint32_t durationInSeconds = durationInMilliseconds / 1000;
+    const uint32_t remaining = 60 - durationInSeconds; 
+    if (remaining > 0) {
+        ESP_LOGD(TAG, "Throttling internal turn off: %d seconds remaining", remaining);
+        return;
+    }
+
+    hp->setPowerSetting("OFF");
+    if (hp->update()) {
+        this->lastInternalPowerUpdate = end;
+        this->internalPowerOff = true;
+        ESP_LOGW(TAG, "Performed internal turn off!");
+    } else {
+        ESP_LOGW(TAG, "Failed to perform internal turn off!");
+    }
+}
+
+void MitsubishiHeatPump::run_workflows() {
+    if (!this->statusUpdated || !this->settingsUpdated) {
+        ESP_LOGD(TAG, "System not ready, skipping run_workflows statusUpdated={%s}, settingsUpdated={%s}", YESNO(statusUpdated), YESNO(settingsUpdated));
+        return;
+    }
+
+    ESP_LOGD(TAG, "Run workflows...");
+
+    if (!this->isComponentActive()) {
+        ESP_LOGW(TAG, "Skipping run workflow due to inactive state.");
+        return;
+    }
+
+    ESP_LOGD(TAG, "Check PID Target: %f", this->pidController->getTarget());
+    this->ensure_pid_target();
+    if (this->pidController->getTarget() == 0) {
+        ESP_LOGW(TAG, "Skipping run workflow due pid target 0.");
+        return;
+    }
+
+    const float setPointCorrection = this->pidController->update(this->current_temperature);
+    ESP_LOGI(TAG, "PIDController set point correction: %.1f", setPointCorrection);
+
+    heatpumpSettings currentSettings = hp->getSettings();
+    const bool isDeviceOn = this->isDeviceActive(&currentSettings);
+    ESP_LOGI(TAG, "Device active (direct): %s", YESNO(isDeviceOn));
+    switch(this->action) {
+        case climate::CLIMATE_ACTION_HEATING: {
+            if (!isDeviceOn) {
+                return;
+            }
+
+            if (this->current_temperature - setPointCorrection > hysterisisUnderOff ||
+                    this->same_float(setPointCorrection, this->pidController->getOutputMin())) {
+                ESP_LOGI(TAG, "Turn off heating!");
+                this->internalTurnOff();
+                return;
+            }
+
+            //this.updateHeatingSetpoint(setPointCorrection);
+            break;
+        }
+        case climate::CLIMATE_ACTION_COOLING: {
+            if (!isDeviceOn) {
+                return;
+            }
+
+            if (setPointCorrection - this->current_temperature > hysterisisUnderOff ||
+                    this->same_float(this->pidController->getOutputMax(), setPointCorrection)) {
+                ESP_LOGI(TAG, "Turn off cooling!");
+                this->internalTurnOff();
+                return;
+            }
+
+            //this.updateCoolingSetpoint(setPointCorrection);
+            break;
+        }
+        case climate::CLIMATE_ACTION_IDLE: {
+            if (!isDeviceOn) {
+                return;
+            }
+
+            if (this->mode == climate::CLIMATE_MODE_HEAT) {
+                if (this->current_temperature - setPointCorrection > hysterisisUnderOff ||
+                        this->same_float(setPointCorrection, this->pidController->getOutputMin())) {
+                    ESP_LOGI(TAG, "Turn off while idling heat!");
+                    this->internalTurnOff();
+                    return;
+                }
+            } else if (this->mode == climate::CLIMATE_MODE_COOL) {
+                if (setPointCorrection - this->current_temperature > hysterisisUnderOff ||
+                        this->same_float(this->pidController->getOutputMax(), setPointCorrection)) {
+                    ESP_LOGI(TAG, "Turn off while idling cool!");
+                    this->internalTurnOff();
+                    return;
+                }
+            }
+
+            //this.updateCoolingSetpoint(setPointCorrection);
+            break;
+        }
+        default: {
+            if (isDeviceOn) {
+                return;
+            }
+
+            if (this->mode == climate::CLIMATE_MODE_HEAT) {
+                if (this->current_temperature > setPointCorrection) {
+                    return;
+                }
+
+                ESP_LOGI(TAG, "Turning on Workflow heat");
+                this->internalTurnOn();
+
+            } else if (this->mode == climate::CLIMATE_MODE_COOL) {
+                if (setPointCorrection > this->current_temperature) {
+                    return;
+                }
+
+                ESP_LOGI(TAG, "Turning on Workflow cool");
+                this->internalTurnOn();
+            }
+            break;
+        }
     }
 }

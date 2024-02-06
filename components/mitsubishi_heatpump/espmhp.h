@@ -20,6 +20,8 @@
 #include "esphome.h"
 #include "esphome/core/preferences.h"
 
+#include "pidcontroller.h"
+
 #include "HeatPump.h"
 using namespace esphome;
 
@@ -40,6 +42,11 @@ static const uint8_t ESPMHP_MAX_TEMPERATURE = 31; // degrees C,
                                                   //defined by hardware
 static const float   ESPMHP_TEMPERATURE_STEP = 0.5; // temperature setting step,
                                                     // in degrees C
+
+static const float p = 4.0;
+static const float i = 0.02;
+static const float d = 0.2;
+static const float hysterisisUnderOff = 1.0;
 
 class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
@@ -138,6 +145,21 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
 
         bool settingsUpdated = false;
         bool statusUpdated = false;
+
+        bool same_float(const float left, const float right);
+
+        PIDController *pidController;
+        void ensure_pid_target();
+        void update_setpoint(float value);
+
+        void run_workflows();
+
+        bool isComponentActive();
+        bool isDeviceActive(heatpumpSettings *currentSettings);
+        uint32_t lastInternalPowerUpdate = esphome::millis();
+        bool internalPowerOff = false;
+        void internalTurnOn();
+        void internalTurnOff();
 };
 
 #endif
