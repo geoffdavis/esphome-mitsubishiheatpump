@@ -42,15 +42,27 @@ MitsubishiHeatPump::MitsubishiHeatPump(
     this->traits_.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
 }
 
-void MitsubishiHeatPump::check_logger_conflict_() {
+bool MitsubishiHeatPump::verify_serial() {
+    if (!this->get_hw_serial_()) {
+        ESP_LOGCONFIG(
+                TAG,
+                "No HardwareSerial was provided. "
+                "Software serial ports are unsupported by this component."
+        );
+        return false;
+    }
+
 #ifdef USE_LOGGER
     if (this->get_hw_serial_() == logger::global_logger->get_hw_serial()) {
         ESP_LOGW(TAG, "  You're using the same serial port for logging"
                 " and the MitsubishiHeatPump component. Please disable"
                 " logging over the serial port by setting"
                 " logger:baud_rate to 0.");
+        return false;
     }
 #endif
+    // unless something went wrong, assume we have a valid serial configuration
+    return true;
 }
 
 void MitsubishiHeatPump::update() {
@@ -414,18 +426,13 @@ void MitsubishiHeatPump::setup() {
     // This will be called by App.setup()
     this->banner();
     ESP_LOGCONFIG(TAG, "Setting up UART...");
-    if (!this->get_hw_serial_()) {
-        ESP_LOGCONFIG(
-                TAG,
-                "No HardwareSerial was provided. "
-                "Software serial ports are unsupported by this component."
-        );
+
+    if (!this->verify_serial()) {
         this->mark_failed();
         return;
     }
-    this->check_logger_conflict_();
 
-    ESP_LOGCONFIG(TAG, "Intializing new HeatPump object.");
+    ESP_LOGCONFIG(TAG, "Initializing new HeatPump object.");
     this->hp = new HeatPump();
     this->current_temperature = NAN;
     this->target_temperature = NAN;
