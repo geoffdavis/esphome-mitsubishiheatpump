@@ -6,6 +6,8 @@ using namespace esphome;
 #ifndef PIDC_H
 #define PIDC_H
 
+float roundToDecimals(const float value, const int n);
+
 /*
     Based on: @mariusrumpf/pid-controller
 */

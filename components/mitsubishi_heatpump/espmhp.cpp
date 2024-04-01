@@ -20,6 +20,9 @@
 #include "espmhp.h"
 using namespace esphome;
 
+#include "devicestate.h"
+using namespace devicestate;
+
 /**
  * Create a new MitsubishiHeatPump object
  *
@@ -112,6 +115,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         case climate::CLIMATE_MODE_COOL:
             hp->setModeSetting("COOL");
             hp->setPowerSetting("ON");
+            this->internalPowerOn = true;
 
             if (has_mode){
                 if (cool_setpoint.has_value() && !has_temp) {
@@ -125,6 +129,8 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         case climate::CLIMATE_MODE_HEAT:
             hp->setModeSetting("HEAT");
             hp->setPowerSetting("ON");
+            this->internalPowerOn = true;
+
             if (has_mode){
                 if (heat_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(heat_setpoint.value());
@@ -137,6 +143,8 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         case climate::CLIMATE_MODE_DRY:
             hp->setModeSetting("DRY");
             hp->setPowerSetting("ON");
+            this->internalPowerOn = true;
+
             if (has_mode){
                 this->action = climate::CLIMATE_ACTION_DRYING;
                 updated = true;
@@ -145,6 +153,8 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         case climate::CLIMATE_MODE_HEAT_COOL:
             hp->setModeSetting("AUTO");
             hp->setPowerSetting("ON");
+            this->internalPowerOn = true;
+
             if (has_mode){
                 if (auto_setpoint.has_value() && !has_temp) {
                     hp->setTemperature(auto_setpoint.value());
@@ -157,6 +167,8 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         case climate::CLIMATE_MODE_FAN_ONLY:
             hp->setModeSetting("FAN");
             hp->setPowerSetting("ON");
+            this->internalPowerOn = true;
+
             if (has_mode){
                 this->action = climate::CLIMATE_ACTION_FAN;
                 updated = true;
@@ -166,6 +178,7 @@ void MitsubishiHeatPump::control(const climate::ClimateCall &call) {
         default:
             if (has_mode){
                 hp->setPowerSetting("OFF");
+                this->internalPowerOn = false;
                 this->action = climate::CLIMATE_ACTION_OFF;
                 updated = true;
             }
@@ -252,7 +265,6 @@ void MitsubishiHeatPump::hpSettingsChanged() {
     this->settingsUpdated = true;
 
     heatpumpSettings currentSettings = hp->getSettings();
-
     if (currentSettings.power == NULL) {
         /*
          * We should always get a valid pointer here once the HeatPump
@@ -272,45 +284,71 @@ void MitsubishiHeatPump::hpSettingsChanged() {
      * const char* POWER_MAP[2]       = {"OFF", "ON"};
      * const char* MODE_MAP[5]        = {"HEAT", "DRY", "COOL", "FAN", "AUTO"};
      */
-    if (strcmp(currentSettings.power, "ON") == 0) {
-        if (strcmp(currentSettings.mode, "HEAT") == 0) {
-            this->mode = climate::CLIMATE_MODE_HEAT;
-            if (heat_setpoint != currentSettings.temperature) {
-                heat_setpoint = currentSettings.temperature;
-                save(currentSettings.temperature, heat_storage);
-            }
-            this->action = climate::CLIMATE_ACTION_IDLE;
-        } else if (strcmp(currentSettings.mode, "DRY") == 0) {
-            this->mode = climate::CLIMATE_MODE_DRY;
-            this->action = climate::CLIMATE_ACTION_DRYING;
-        } else if (strcmp(currentSettings.mode, "COOL") == 0) {
-            this->mode = climate::CLIMATE_MODE_COOL;
-            if (cool_setpoint != currentSettings.temperature) {
-                cool_setpoint = currentSettings.temperature;
-                save(currentSettings.temperature, cool_storage);
-            }
-            this->action = climate::CLIMATE_ACTION_IDLE;
-        } else if (strcmp(currentSettings.mode, "FAN") == 0) {
-            this->mode = climate::CLIMATE_MODE_FAN_ONLY;
-            this->action = climate::CLIMATE_ACTION_FAN;
-        } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
-            this->mode = climate::CLIMATE_MODE_HEAT_COOL;
-            if (auto_setpoint != currentSettings.temperature) {
-                auto_setpoint = currentSettings.temperature;
-                save(currentSettings.temperature, auto_storage);
-            }
-            this->action = climate::CLIMATE_ACTION_IDLE;
-        } else {
-            ESP_LOGW(
-                    TAG,
-                    "Unknown climate mode value %s received from HeatPump",
-                    currentSettings.mode
-            );
+    const DeviceState deviceState = devicestate::toDeviceState(&currentSettings);
+    if (this->internalPowerOn != deviceState.active) {
+        ESP_LOGI(TAG, "Device active on change: deviceState.active={%s} internalPowerOn={%s}", YESNO(deviceState.active), YESNO(this->internalPowerOn));
+    }
+    // this->internalPowerOn = isDeviceOn; // Sync the internal state regardless of current value
+    
+    // We cannot use the internal state of the device initialize component state
+    if (this->isComponentActive()) {
+        switch (deviceState.mode) {
+            case DeviceMode::Heat:
+                this->mode = climate::CLIMATE_MODE_HEAT;
+                if (heat_setpoint != currentSettings.temperature) {
+                    heat_setpoint = currentSettings.temperature;
+                    save(currentSettings.temperature, heat_storage);
+                }
+
+                if (deviceState.active) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
+                break;
+            case DeviceMode::Dry:
+                this->mode = climate::CLIMATE_MODE_DRY;
+                this->action = climate::CLIMATE_ACTION_DRYING;
+                break;
+            case DeviceMode::Cool:
+                this->mode = climate::CLIMATE_MODE_COOL;
+                if (cool_setpoint != currentSettings.temperature) {
+                    cool_setpoint = currentSettings.temperature;
+                    save(currentSettings.temperature, cool_storage);
+                }
+
+                if (deviceState.active) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
+                break;
+            case DeviceMode::Fan:
+                this->mode = climate::CLIMATE_MODE_FAN_ONLY;
+                this->action = climate::CLIMATE_ACTION_FAN;
+                break;
+            case DeviceMode::Auto:
+                this->mode = climate::CLIMATE_MODE_HEAT_COOL;
+                if (auto_setpoint != currentSettings.temperature) {
+                    auto_setpoint = currentSettings.temperature;
+                    save(currentSettings.temperature, auto_storage);
+                }
+
+                if (deviceState.active) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
+                break;
+            default:
+                ESP_LOGW(
+                        TAG,
+                        "Unknown climate mode value %s received from HeatPump",
+                        currentSettings.mode
+                );
         }
     } else {
-        if (!this->internalPowerOff) {
-            this->mode = climate::CLIMATE_MODE_OFF;
-        }
+        this->mode = climate::CLIMATE_MODE_OFF;
         this->action = climate::CLIMATE_ACTION_OFF;
     }
 
@@ -374,7 +412,11 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
                 this->action = climate::CLIMATE_ACTION_HEATING;
             }
             else {
-                this->action = climate::CLIMATE_ACTION_IDLE;
+                if (this->internalPowerOn) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
             }
             break;
         case climate::CLIMATE_MODE_COOL:
@@ -382,11 +424,20 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
                 this->action = climate::CLIMATE_ACTION_COOLING;
             }
             else {
-                this->action = climate::CLIMATE_ACTION_IDLE;
+                if (this->internalPowerOn) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
             }
             break;
         case climate::CLIMATE_MODE_HEAT_COOL:
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            if (this->internalPowerOn) {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            } else {
+                this->action = climate::CLIMATE_ACTION_OFF;
+            }
+
             if (currentStatus.operating) {
               if (this->current_temperature > this->target_temperature) {
                   this->action = climate::CLIMATE_ACTION_COOLING;
@@ -400,14 +451,22 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
                 this->action = climate::CLIMATE_ACTION_DRYING;
             }
             else {
-                this->action = climate::CLIMATE_ACTION_IDLE;
+                if (this->internalPowerOn) {
+                    this->action = climate::CLIMATE_ACTION_IDLE;
+                } else {
+                    this->action = climate::CLIMATE_ACTION_OFF;
+                }
             }
             break;
         case climate::CLIMATE_MODE_FAN_ONLY:
             this->action = climate::CLIMATE_ACTION_FAN;
             break;
         default:
-            this->action = climate::CLIMATE_ACTION_OFF;
+            if (this->internalPowerOn) {
+                this->action = climate::CLIMATE_ACTION_IDLE;
+            } else {
+                this->action = climate::CLIMATE_ACTION_OFF;
+            }
     }
 
     this->publish_state();
@@ -491,16 +550,6 @@ void MitsubishiHeatPump::setup() {
         max_temp
     );
 
-    auto restore = this->restore_state_();
-    if (restore.has_value()) {
-        restore->to_call(this).perform();
-    } else {
-        this->current_temperature = NAN;
-        this->target_temperature = NAN;
-        this->fan_mode = climate::CLIMATE_FAN_OFF;
-        this->swing_mode = climate::CLIMATE_SWING_OFF;
-    }
-
     // create various setpoint persistence:
     cool_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 1);
     heat_storage = global_preferences->make_preference<uint8_t>(this->get_object_id_hash() + 2);
@@ -510,6 +559,16 @@ void MitsubishiHeatPump::setup() {
     cool_setpoint = load(cool_storage);
     heat_setpoint = load(heat_storage);
     auto_setpoint = load(auto_storage);
+
+    auto restore = this->restore_state_();
+    if (restore.has_value()) {
+        restore->to_call(this).perform();
+    } else {
+        this->current_temperature = NAN;
+        this->target_temperature = NAN;
+        this->fan_mode = climate::CLIMATE_FAN_OFF;
+        this->swing_mode = climate::CLIMATE_SWING_OFF;
+    }
 
     this->dump_config();
 }
@@ -624,10 +683,6 @@ bool MitsubishiHeatPump::isComponentActive() {
     return this->mode != climate::CLIMATE_MODE_OFF;
 }
 
-bool MitsubishiHeatPump::isDeviceActive(heatpumpSettings *currentSettings) {
-    return strcmp(currentSettings->power, "ON") == 0;
-}
-
 void MitsubishiHeatPump::internalTurnOn() {
     const uint32_t end = esphome::millis();
     const int durationInMilliseconds = end - this->lastInternalPowerUpdate;
@@ -641,7 +696,7 @@ void MitsubishiHeatPump::internalTurnOn() {
     hp->setPowerSetting("ON");
     if (hp->update()) {
         this->lastInternalPowerUpdate = end;
-        this->internalPowerOff = false;
+        this->internalPowerOn = true;
         ESP_LOGW(TAG, "Performed internal turn on!");
     } else {
         ESP_LOGW(TAG, "Failed to perform internal turn on!");
@@ -661,7 +716,7 @@ void MitsubishiHeatPump::internalTurnOff() {
     hp->setPowerSetting("OFF");
     if (hp->update()) {
         this->lastInternalPowerUpdate = end;
-        this->internalPowerOff = true;
+        this->internalPowerOn = false;
         ESP_LOGW(TAG, "Performed internal turn off!");
     } else {
         ESP_LOGW(TAG, "Failed to perform internal turn off!");
@@ -692,11 +747,14 @@ void MitsubishiHeatPump::run_workflows() {
     ESP_LOGI(TAG, "PIDController set point correction: %.1f", setPointCorrection);
 
     heatpumpSettings currentSettings = hp->getSettings();
-    const bool isDeviceOn = this->isDeviceActive(&currentSettings);
-    ESP_LOGI(TAG, "Device active (direct): %s", YESNO(isDeviceOn));
+    const DeviceState deviceState = devicestate::toDeviceState(&currentSettings);
+    ESP_LOGI(TAG, "Device active on workflow: deviceState.active={%s} internalPowerOn={%s}", YESNO(deviceState.active), YESNO(this->internalPowerOn));
+    if (deviceState.active != this->internalPowerOn) {
+        this->dump_heat_pump_details();
+    }
     switch(this->action) {
         case climate::CLIMATE_ACTION_HEATING: {
-            if (!isDeviceOn) {
+            if (!deviceState.active) {
                 return;
             }
 
@@ -711,7 +769,7 @@ void MitsubishiHeatPump::run_workflows() {
             break;
         }
         case climate::CLIMATE_ACTION_COOLING: {
-            if (!isDeviceOn) {
+            if (!deviceState.active) {
                 return;
             }
 
@@ -726,7 +784,7 @@ void MitsubishiHeatPump::run_workflows() {
             break;
         }
         case climate::CLIMATE_ACTION_IDLE: {
-            if (!isDeviceOn) {
+            if (!deviceState.active) {
                 return;
             }
 
@@ -750,7 +808,7 @@ void MitsubishiHeatPump::run_workflows() {
             break;
         }
         default: {
-            if (isDeviceOn) {
+            if (deviceState.active) {
                 return;
             }
 

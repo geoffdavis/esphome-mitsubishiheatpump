@@ -4,6 +4,7 @@
 
 #include "espmhp.h"
 using namespace esphome;
+using namespace std;
 
 PIDController::PIDController(
     float p,
@@ -89,6 +90,11 @@ void PIDController::setOutputLimits(float min, float max) {
     this->outputSum = this->applyOutputLimits(this->outputSum);
 }
 
+float roundToDecimals(const float value, const int n) {
+    const int decimals = std::pow(10, n);
+    return std::ceil(value * decimals) / decimals;
+}
+
 void PIDController::setTunings() {
 //    if (p < 0 || i < 0 || d < 0) {
 //        return;//throw new Error('PID values cannot be below 0');
@@ -96,7 +102,7 @@ void PIDController::setTunings() {
 
     // Calculate internal pid representations
     float sampleTimeSec = this->sampleTime / 1000.0;
-    float sampleTimeSecRounded = std::ceil((sampleTimeSec * 1000000)) / 1000000;
+    float sampleTimeSecRounded = roundToDecimals(sampleTimeSec, 1000000);
     this->kp = this->p;
     this->ki = this->i * sampleTimeSecRounded;
     this->kd = this->d / sampleTimeSecRounded;

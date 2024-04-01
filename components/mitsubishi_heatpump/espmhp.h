@@ -155,9 +155,9 @@ class MitsubishiHeatPump : public PollingComponent, public climate::Climate {
         void run_workflows();
 
         bool isComponentActive();
-        bool isDeviceActive(heatpumpSettings *currentSettings);
+       
         uint32_t lastInternalPowerUpdate = esphome::millis();
-        bool internalPowerOff = false;
+        bool internalPowerOn = false;
         void internalTurnOn();
         void internalTurnOff();
 };
