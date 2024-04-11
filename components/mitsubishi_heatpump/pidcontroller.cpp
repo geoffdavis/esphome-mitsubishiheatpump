@@ -122,6 +122,7 @@ float PIDController::getTarget() {
 
 void PIDController::setTarget(float target) {
     this->target = target;
+    this->resetState();
 }
 
 void PIDController::resetState() {

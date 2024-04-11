@@ -667,8 +667,8 @@ void MitsubishiHeatPump::ensure_pid_target() {
 
 void MitsubishiHeatPump::update_setpoint(const float value) {
     if (this->same_float(this->target_temperature, value)) {
-        this->ensure_pid_target();
         ESP_LOGD(TAG, "Target temp unchanged: current={%f} updated={%f}", this->target_temperature, value);
+        this->ensure_pid_target();
         return;
     }
 
