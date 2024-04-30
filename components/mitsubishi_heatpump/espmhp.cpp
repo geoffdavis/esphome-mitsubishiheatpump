@@ -42,7 +42,8 @@ MitsubishiHeatPump::MitsubishiHeatPump(
     this->traits_.set_supports_two_point_target_temperature(false);
     this->traits_.set_visual_min_temperature(ESPMHP_MIN_TEMPERATURE);
     this->traits_.set_visual_max_temperature(ESPMHP_MAX_TEMPERATURE);
-    this->traits_.set_visual_temperature_step(ESPMHP_TEMPERATURE_STEP);
+    this->traits_.set_visual_target_temperature_step(ESPMHP_TARGET_TEMPERATURE_STEP);
+    this->traits_.set_visual_current_temperature_step(ESPMHP_CURRENT_TEMPERATURE_STEP);
 }
 
 void MitsubishiHeatPump::check_logger_conflict_() {
