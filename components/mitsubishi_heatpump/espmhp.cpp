@@ -580,7 +580,7 @@ void MitsubishiHeatPump::setup() {
  * TEMPERATURE_STEPs from MIN_TEMPERATURE.
  **/
 void MitsubishiHeatPump::save(float value, ESPPreferenceObject& storage) {
-    uint8_t steps = (value - ESPMHP_MIN_TEMPERATURE) / ESPMHP_TEMPERATURE_STEP;
+    uint8_t steps = (value - ESPMHP_MIN_TEMPERATURE) / ESPMHP_CURRENT_TEMPERATURE_STEP;
     storage.save(&steps);
 }
 
@@ -589,7 +589,7 @@ optional<float> MitsubishiHeatPump::load(ESPPreferenceObject& storage) {
     if (!storage.load(&steps)) {
         return {};
     }
-    return ESPMHP_MIN_TEMPERATURE + (steps * ESPMHP_TEMPERATURE_STEP);
+    return ESPMHP_MIN_TEMPERATURE + (steps * ESPMHP_CURRENT_TEMPERATURE_STEP);
 }
 
 void MitsubishiHeatPump::dump_config() {
