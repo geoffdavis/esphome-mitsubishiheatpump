@@ -444,33 +444,40 @@ void MitsubishiHeatPump::hpSettingsChanged() {
      * const char* MODE_MAP[5]        = {"HEAT", "DRY", "COOL", "FAN", "AUTO"};
      */
     if (strcmp(currentSettings.power, "ON") == 0) {
+
         if (strcmp(currentSettings.mode, "HEAT") == 0) {
-            this->mode = climate::CLIMATE_MODE_HEAT;
             if (heat_setpoint != currentSettings.temperature) {
                 heat_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, heat_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            if(this->mode != climate::CLIMATE_MODE_HEAT){
+               this->action = climate::CLIMATE_ACTION_IDLE;
+               this->mode = climate::CLIMATE_MODE_HEAT;
+            }
         } else if (strcmp(currentSettings.mode, "DRY") == 0) {
             this->mode = climate::CLIMATE_MODE_DRY;
             this->action = climate::CLIMATE_ACTION_DRYING;
         } else if (strcmp(currentSettings.mode, "COOL") == 0) {
-            this->mode = climate::CLIMATE_MODE_COOL;
             if (cool_setpoint != currentSettings.temperature) {
                 cool_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, cool_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            if(this->mode != climate::CLIMATE_MODE_COOL){
+               this->action = climate::CLIMATE_ACTION_IDLE;
+               this->mode = climate::CLIMATE_MODE_COOL;
+            }
         } else if (strcmp(currentSettings.mode, "FAN") == 0) {
             this->mode = climate::CLIMATE_MODE_FAN_ONLY;
             this->action = climate::CLIMATE_ACTION_FAN;
         } else if (strcmp(currentSettings.mode, "AUTO") == 0) {
-            this->mode = climate::CLIMATE_MODE_HEAT_COOL;
             if (auto_setpoint != currentSettings.temperature) {
                 auto_setpoint = currentSettings.temperature;
                 save(currentSettings.temperature, auto_storage);
             }
-            this->action = climate::CLIMATE_ACTION_IDLE;
+            if(this->mode != climate::CLIMATE_MODE_HEAT_COOL){
+               this->action = climate::CLIMATE_ACTION_IDLE;
+               this->mode = climate::CLIMATE_MODE_HEAT_COOL;
+            }
         } else {
             ESP_LOGW(
                     TAG,
