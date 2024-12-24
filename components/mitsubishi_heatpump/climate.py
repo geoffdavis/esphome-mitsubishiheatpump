@@ -36,6 +36,7 @@ HORIZONTAL_SWING_OPTIONS = [
 VERTICAL_SWING_OPTIONS = ["swing", "auto", "up", "up_center", "center", "down_center", "down"]
 
 # Remote temperature timeout configuration
+CONF_REMOTE_PUBLISH_FREQUENCY = "remote_publish_frequency_seconds"
 CONF_REMOTE_OPERATING_TIMEOUT = "remote_temperature_operating_timeout_minutes"
 CONF_REMOTE_IDLE_TIMEOUT = "remote_temperature_idle_timeout_minutes"
 CONF_REMOTE_PING_TIMEOUT = "remote_temperature_ping_timeout_minutes"
@@ -68,6 +69,7 @@ CONFIG_SCHEMA = climate.CLIMATE_SCHEMA.extend(
         cv.GenerateID(): cv.declare_id(MitsubishiHeatPump),
         cv.Optional(CONF_HARDWARE_UART, default="UART0"): valid_uart,
         cv.Optional(CONF_BAUD_RATE): cv.positive_int,
+        cv.Optional(CONF_REMOTE_PUBLISH_FREQUENCY): cv.positive_int,
         cv.Optional(CONF_REMOTE_OPERATING_TIMEOUT): cv.positive_int,
         cv.Optional(CONF_REMOTE_IDLE_TIMEOUT): cv.positive_int,
         cv.Optional(CONF_REMOTE_PING_TIMEOUT): cv.positive_int,
@@ -109,6 +111,9 @@ def to_code(config):
 
     if CONF_TX_PIN in config:
         cg.add(var.set_tx_pin(config[CONF_TX_PIN]))
+
+    if CONF_REMOTE_PUBLISH_FREQUENCY in config:
+        cg.add(var.set_remote_publish_frequency_seconds(config[CONF_REMOTE_PUBLISH_FREQUENCY]))
 
     if CONF_REMOTE_OPERATING_TIMEOUT in config:
         cg.add(var.set_remote_operating_timeout_minutes(config[CONF_REMOTE_OPERATING_TIMEOUT]))

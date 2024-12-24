@@ -108,6 +108,12 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         // and this heatpump.
         void ping();
 
+        // Number of seconds to tell the HP about the remote temperature (if set).
+        // Newer HP seem to forget the remote temperature much faster and therefore
+        // require the remote temp to set even if there isn't a change.  Anecdottaly,
+        // they seem to forget the temperature every 60s or so.
+        void set_remote_publish_frequency_seconds(int seconds);
+
         // Number of minutes before the heatpump reverts back to the internal
         // temperature sensor if the machine is currently operating.
         void set_remote_operating_timeout_minutes(int);
@@ -126,6 +132,9 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
 
         // The ClimateTraits supported by this HeatPump.
         esphome::climate::ClimateTraits traits_;
+
+        // Remote Temperature
+        float remote_temperature{0};
 
         // Vane position
         void update_swing_horizontal(const std::string &swing);
@@ -182,6 +191,8 @@ class MitsubishiHeatPump : public esphome::PollingComponent, public esphome::cli
         std::optional<std::chrono::duration<long long, std::ratio<60>>> remote_operating_timeout_;
         std::optional<std::chrono::duration<long long, std::ratio<60>>> remote_idle_timeout_;
         std::optional<std::chrono::duration<long long, std::ratio<60>>> remote_ping_timeout_;
+        std::optional<std::chrono::duration<long long, std::ratio<1>>>  remote_publish_frequency_;
+        std::optional<std::chrono::time_point<std::chrono::steady_clock>> last_remote_temperature_publish_;
         std::optional<std::chrono::time_point<std::chrono::steady_clock>> last_remote_temperature_sensor_update_;
         std::optional<std::chrono::time_point<std::chrono::steady_clock>> last_ping_request_;
 };

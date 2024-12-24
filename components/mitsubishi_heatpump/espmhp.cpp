@@ -85,6 +85,7 @@ void MitsubishiHeatPump::update() {
     this->hpStatusChanged(currentStatus);
 #endif
     this->enforce_remote_temperature_sensor_timeout();
+    this->set_remote_temperature(this->remote_temperature);
 }
 
 void MitsubishiHeatPump::set_baud_rate(int baud) {
@@ -620,20 +621,48 @@ void MitsubishiHeatPump::hpStatusChanged(heatpumpStatus currentStatus) {
 }
 
 void MitsubishiHeatPump::set_remote_temperature(float temp) {
-    ESP_LOGD(TAG, "Setting remote temp: %.1f", temp);
-    if (temp > 0) {
-        last_remote_temperature_sensor_update_ = 
-            std::chrono::steady_clock::now();
-    } else {
-        last_remote_temperature_sensor_update_.reset();
+
+    bool isTempNew = (this->remote_temperature != temp);
+
+    if (isTempNew) {
+        if (temp > 0) {
+            this->remote_temperature = temp;
+
+            last_remote_temperature_sensor_update_ =
+                std::chrono::steady_clock::now();
+        } else {
+            this->remote_temperature = 0;
+            last_remote_temperature_sensor_update_.reset();
+        }
     }
 
-    this->hp->setRemoteTemperature(temp);
+    auto time_since_last_remote_temperature_publish =
+        last_remote_temperature_publish_.has_value() ?
+            (std::chrono::steady_clock::now() - last_remote_temperature_publish_.value()) :
+            std::chrono::seconds(99999999);
+
+    bool refreshRemoteTemp = remote_publish_frequency_.has_value() ?
+                                (time_since_last_remote_temperature_publish >= remote_publish_frequency_.value()) :
+                                false;
+
+    // Do not send zeros UNLESS the zero is new, which means it wasn't zero at one point
+    //  and now we need to update the HP to be zero once.  This zero check also prevents
+    //  us from telling the HP about a remote temperature if there is none
+    if (isTempNew || (refreshRemoteTemp && this->remote_temperature != 0)) {
+        ESP_LOGD(TAG, "Setting remote temp: %.1f", this->remote_temperature);
+        this->hp->setRemoteTemperature(this->remote_temperature);
+        last_remote_temperature_publish_ = std::chrono::steady_clock::now();
+    }
 }
 
 void MitsubishiHeatPump::ping() {
     ESP_LOGD(TAG, "Ping request received");
     last_ping_request_ = std::chrono::steady_clock::now();
+}
+
+void MitsubishiHeatPump::set_remote_publish_frequency_seconds(int seconds) {
+    ESP_LOGD(TAG, "Setting remote publish frequency: %d seconds", seconds);
+    remote_publish_frequency_ = std::chrono::seconds(seconds);
 }
 
 void MitsubishiHeatPump::set_remote_operating_timeout_minutes(int minutes) {
@@ -692,6 +721,7 @@ void MitsubishiHeatPump::setup() {
     ESP_LOGCONFIG(TAG, "Initializing new HeatPump object.");
     this->hp = new HeatPump();
     this->current_temperature = NAN;
+    this->remote_temperature = 0;
     this->target_temperature = NAN;
     this->fan_mode = climate::CLIMATE_FAN_OFF;
     this->swing_mode = climate::CLIMATE_SWING_OFF;
