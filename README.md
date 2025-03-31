@@ -3,6 +3,19 @@
 Wirelessly control your Mitsubishi Comfort HVAC equipment with an ESP8266 or
 ESP32 using the [ESPHome](https://esphome.io) framework.
 
+## DEPRECATION NOTICE
+
+> [!IMPORTANT]
+> As of 2025, it's clear that I'm not able to dedicate the necessary time to keep
+> this project running. Thanks to all of the contributors that have made it
+> popular and brought it kicking and screaming out of the ESP8266 era.
+
+### Recommended replacement
+
+[Eric Chavet](https://github.com/echavet/) has rewritten this code and expanded on it's features over at [echavet/MitsubishiCN105ESPHome](https://github.com/echavet/MitsubishiCN105ESPHome)
+
+Note that Eric's project "maintains all functionalities of (this) project", per the README there.
+
 ## Features
 
 * Instant feedback of command changes via RF Remote to HomeAssistant or MQTT.
